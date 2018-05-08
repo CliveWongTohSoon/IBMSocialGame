@@ -1,0 +1,13 @@
+#drawing-table {
+    width: 87%;
+    height: 100%;
+    border-collapse: collapse;
+}
+
+#drawing-table td {
+    border: 1.5px solid #b3b3b3;
+}
+
+body {
+    font: 12px Arial, serif;
+}
