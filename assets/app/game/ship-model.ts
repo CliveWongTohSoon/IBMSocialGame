@@ -9,6 +9,7 @@ export class ShipPosition {
     constructor(public xIndex: number, public yIndex: number) {}
 }
 
+
 export class ShipDirection {
     constructor(public left: boolean, public right: boolean, public front: boolean, public back: boolean) {}
 }

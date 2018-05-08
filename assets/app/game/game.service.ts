@@ -12,6 +12,7 @@ export class GameService {
             .apply(null, Array(25))
             .map((_, index) => new TableContent(index, 'white', null));
 
+
         const columnContent = Array
             .apply(null, Array(25))
             .map((_, index) => new TableContent(index, 'white', null));
