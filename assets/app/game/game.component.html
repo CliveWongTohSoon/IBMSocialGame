@@ -21,19 +21,18 @@
     <div   style="float:left;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
         <h4> PLAYER 1 </h4>
         <button  type="button" class="btn btn-danger  " id="move1"> Move </button>
-        <button  type="button" class="btn btn-default " id="right1"> Turn Right </button>
+        <button  type="button" class="btn btn-default " id="right1"> Turn {{text}} </button>
         <button  type="button" class="btn btn-default " id="left1"> Turn Left </button>
         <button  type="button" class="btn btn-default "> Shoot </button>
         <button  type="button" class="btn btn-default "> Shield Front </button>
         <button  type="button" class="btn btn-default "> Shield Back </button>
         <button  type="button" class="btn btn-default "> Shield Right</button>
         <button  type="button" class="btn btn-default "> Shield Left </button>
-
     </div>
 
     <div   style="float:right;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
         <h4> PLAYER 2 </h4>
-        <button  type="button" class="btn btn-primary " id="move2"> Move </button>
+        <button  type="button" class="btn btn-primary " (click)="move()"> Move </button>
         <button  type="button" class="btn btn-default " id="right2"> Turn Right </button>
         <button  type="button" class="btn btn-default " id="left2"> Turn Left </button>
         <button  type="button" class="btn btn-default "> Shoot </button>
@@ -44,10 +43,9 @@
     </div>
 
     <div align="center" class="col-sm-6">
-
         <table id="drawing-table">
             <tr *ngFor="let row of battleField?.rowGrid">
-                <td *ngFor="let col of battleField?.colGrid" [ngStyle]="{backgroundColor: col.backgroundColor}">&nbsp;</td>
+                <td *ngFor="let col of battleField?.colGrid" [ngStyle]="{backgroundColor: renderBackgroundColor(row, col)}">&nbsp;</td>
             </tr>
         </table>
         <br>
