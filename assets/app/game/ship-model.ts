@@ -1,35 +1,34 @@
 export class ShipModel {
 
-    constructor(public w1_X,
-                public w1_Y,
-                public w2_X,
-                public w2_Y,
-                public e1_X,
-                public e1_Y,
-                public e2_X,
-                public e2_Y,
-                public dir) {}
+    constructor(public shipPosition: ShipPosition,
+                public shipDirection: ShipDirection,
+                public shipStats: ShipStats) {}
+}
 
-    static displayShip(p1, p2) {
-        let x = '';
+export class ShipPosition {
+    constructor(public xIndex: number, public yIndex: number) {}
+}
 
-        for (let i = 0; i < 25; i++) {
-            x += "<tr>";
-            for (let j = 0; j < 25; j++) {
-                if ((i == p1.w1_X && j == p1.w1_Y) || (i == p1.w2_X && j == p1.w2_Y)) {
-                    x += "<td bgcolor='#990000'></td>"; //red
-                } else if ((i == p1.e1_X && j == p1.e1_Y) || (i == p1.e2_X && j == p1.e2_Y)) {
-                    x += "<td bgcolor = '#cc0000'></td>";
-                } else if ((i == p2.w1_X && j == p2.w1_Y) || (i == p2.w2_X && j == p2.w2_Y)) {
-                    x += "<td bgcolor= '#003399'></td>";  //blue
-                } else if ((i == p2.e1_X && j == p2.e1_Y) || (i == p2.e2_X && j == p2.e2_Y)) {
-                    x += "<td bgcolor= '#007399'></td>";
-                } else
-                    x += "<td>&nbsp; </td>";
-            }
-            x += "</tr>";
-        }
+export class ShipDirection {
+    constructor(public left: boolean, public right: boolean, public front: boolean, public back: boolean) {}
+}
 
-        // $("#drawing-table").html(x);
-    }
+export class ShipStats {
+    constructor(public totalHp: number,
+                public attack: number,
+                public defence: number,
+                public dep: ShipDepartment) {}
+}
+
+// Can make each department specific
+export class ShipDepartment {
+    constructor(public navDep: Department, public engineerDep: Department) {}
+}
+
+export class Department {
+    constructor(public health: number, public character: Character) {}
+}
+
+export class Character {
+    constructor(public name: string, question: string[]) {}
 }

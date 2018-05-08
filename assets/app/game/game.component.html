@@ -46,8 +46,8 @@
     <div align="center" class="col-sm-6">
 
         <table id="drawing-table">
-            <tr *ngFor="let row of rowGrid">
-                <td *ngFor="let col of colGrid">&nbsp;</td>
+            <tr *ngFor="let row of battleField?.rowGrid">
+                <td *ngFor="let col of battleField?.colGrid" [ngStyle]="{backgroundColor: col.backgroundColor}">&nbsp;</td>
             </tr>
         </table>
         <br>
