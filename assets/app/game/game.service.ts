@@ -1,35 +1,48 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipModel} from "./ship-model";
+import {ShipDirection, ShipModel, ShipPosition} from "./ship-model";
 
 @Injectable()
 export class GameService {
 
     battleField: BattleFieldModel;
 
-    init(): BattleFieldModel {
-        const rowContent = Array
-            .apply(null, Array(25))
-            .map((_, index) => new TableContent(index, 'white', null));
+    init(length: number): BattleFieldModel {
 
-        const columnContent = Array
-            .apply(null, Array(25))
-            .map((_, index) => new TableContent(index, 'white', null));
+        let rowContent: Array<TableContent[]> = [];
 
-        this.battleField = new BattleFieldModel(rowContent, columnContent);
+        for (let i = 0; i < length; i++) {
+            let colContent: TableContent[] = [];
+            for (let j = 0; j < length; j++) {
+                const column = new TableContent(i, null);
+                colContent.push(column);
+            }
+            rowContent.push(colContent);
+        }
+
+        // const columnContent = Array
+        //     .apply(null, Array(length))
+        //     .map((_, index) => new TableContent(index, null));
+        //
+        // let rowContent = Array
+        //     .apply(null, Array(length))
+        //     .map(_ => columnContent);
+
+        // rowContent[5][5].color = 'red';
+        this.battleField = new BattleFieldModel(rowContent);
         return this.battleField;
     }
 
-    createGame(): BattleFieldModel {
-        const currentShip = new ShipModel(null, null, null);
-        this.battleField.rowGrid[1].ship = currentShip;
-        this.battleField.colGrid[5].ship = currentShip;
-        return this.battleField;
+    createGame(prevBattleField: BattleFieldModel): BattleFieldModel {
+        const initShipPosition = new ShipPosition(5.5, 5.5);
+        const initShipDirection = new ShipDirection(true, false, false, false);
+        const currentShip = new ShipModel('Clive', initShipPosition, initShipDirection, null);
+        return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField);
     }
 
     move() {
-        const currentRowPosition = this.battleField.rowGrid.map(r => r.ship !== null);
-        const currentColPosition = this.battleField.colGrid.map(c => c.ship !== null);
-        console.log(currentColPosition, currentColPosition);
+        // const currentRowPosition = this.battleField.rowGrid.map(r => r.ship !== null);
+        // const currentColPosition = this.battleField.colGrid.map(c => c.ship !== null);
+        // console.log(currentColPosition, currentColPosition);
     }
 }
