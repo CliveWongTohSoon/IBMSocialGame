@@ -2,7 +2,6 @@ import {Component} from "@angular/core";
 import {ShipModel} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
-import {HalloModel} from "./hallo-model";
 
 @Component({
     selector: 'app-game',
@@ -19,28 +18,26 @@ export class GameComponent {
     battleField: BattleFieldModel;
     renderMe = true;
 
-    helloModel: HalloModel;
-
     constructor(private gameService: GameService) {
-        this.helloModel = new HalloModel('Hello');
-        this.battleField = gameService.init();
+        this.battleField = gameService.init(25);
     }
 
-    renderBackgroundColor(row: TableContent, col: TableContent) {
-        if (row.ship && col.ship) {
-            // console.log(row.ship, col.ship);
-            return 'red';
+    renderBackgroundColor(col: TableContent) {
+        // console.log(col);
+        if (col.color) {
+            return col.color;
         }
         return 'white';
     }
 
     main() {
-        this.battleField = this.gameService.createGame();
+        this.battleField = this.gameService.createGame(this.battleField);
+
         console.log('Start the game');
     }
 
     move() {
-        this.renderMe = false;
-        // this.gameService.move();
+        // this.renderMe = false;
+        this.gameService.move();
     }
 }
