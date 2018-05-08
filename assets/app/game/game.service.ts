@@ -20,7 +20,7 @@ export class GameService {
     }
 
     createGame(): BattleFieldModel {
-        this.battleField.colGrid[5].backgroundColor = 'red';
+        this.battleField.colGrid[10].backgroundColor = 'red';
         return this.battleField;
     }
 }
