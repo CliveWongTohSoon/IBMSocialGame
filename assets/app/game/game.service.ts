@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
+import {ShipModel} from "./ship-model";
 
 @Injectable()
 export class GameService {
@@ -20,7 +21,17 @@ export class GameService {
     }
 
     createGame(): BattleFieldModel {
-        this.battleField.colGrid[10].backgroundColor = 'red';
+
+        const currentShip = new ShipModel(null, null, null);
+        this.battleField.rowGrid[1].ship = currentShip;
+        this.battleField.colGrid[5].ship = currentShip;
+
         return this.battleField;
+    }
+
+    move() {
+        const currentRowPosition = this.battleField.rowGrid.map(r => r.ship !== null);
+        const currentColPosition = this.battleField.colGrid.map(c => c.ship !== null);
+        console.log(currentColPosition, currentColPosition);
     }
 }
