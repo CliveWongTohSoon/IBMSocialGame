@@ -4,6 +4,7 @@ export class BattleFieldModel {
     constructor(public rowGrid: Array<TableContent[]>) {} // row grid contain the column array
 
     static renderGrid(shipDepartment: ShipDepartment, battleField: BattleFieldModel, colourFront: string, colourBack: string) {
+
         const leftWeaponRowIndex = shipDepartment.leftWeapon.xIndex;
         const leftWeaponColIndex = shipDepartment.leftWeapon.yIndex;
 
@@ -22,8 +23,6 @@ export class BattleFieldModel {
 
         battleField.rowGrid[leftEngineRowIndex][leftEngineColIndex].color = colourBack;
         battleField.rowGrid[rightEngineRowIndex][rightEngineColIndex].color = colourBack;
-        // battleField.rowGrid[5][5].color = 'red';
-        // console.log(battleField);
 
         return battleField;
     }
