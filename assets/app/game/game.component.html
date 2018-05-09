@@ -14,11 +14,12 @@
 <!--</head>-->
 <h1>AI Social Game</h1>
 <body align="center">
-<div>
-
-    <button  type="button" class="btn btn-default " (click)="main()"> START </button><br>
+<div class="row">
+    <label for="player" class="col-md-8 col-offset-2">Number of players</label>
+    <input type="number" class="col-md-4 form-control" id="player" #player>
+    <button  type="button" class="btn btn-default " (click)="start(player.value)"> START </button><br>
     <br>
-    <div   style="float:left;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
+    <div style="float:left;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
         <h4> PLAYER 1 </h4>
         <button  type="button" class="btn btn-danger  " id="move1"> Move </button>
         <button  type="button" class="btn btn-default " id="right1"> Turn {{text}} </button>

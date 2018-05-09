@@ -3,27 +3,26 @@ import { ShipDepartment } from "./ship-model";
 export class BattleFieldModel {
     constructor(public rowGrid: Array<TableContent[]>) {} // row grid contain the column array
 
-    static renderGrid(shipDepartment: ShipDepartment, battleField: BattleFieldModel) {
-        const leftWeaponColIndex = shipDepartment.leftWeapon.xIndex;
-        const leftWeaponRowIndex = shipDepartment.leftWeapon.yIndex;
+    static renderGrid(shipDepartment: ShipDepartment, battleField: BattleFieldModel, colourFront: string, colourBack: string) {
 
-        const rightWeaponColIndex = shipDepartment.rightWeapon.xIndex;
-        const rightWeaponRowIndex = shipDepartment.rightWeapon.yIndex;
+        const leftWeaponRowIndex = shipDepartment.leftWeapon.xIndex;
+        const leftWeaponColIndex = shipDepartment.leftWeapon.yIndex;
 
-        const leftEngineColIndex = shipDepartment.leftEngine.xIndex;
-        const leftEngineRowIndex = shipDepartment.leftEngine.yIndex;
+        const rightWeaponRowIndex = shipDepartment.rightWeapon.xIndex;
+        const rightWeaponColIndex = shipDepartment.rightWeapon.yIndex;
 
-        const rightEngineColIndex = shipDepartment.rightEngine.xIndex;
-        const rightEngineRowIndex = shipDepartment.rightEngine.yIndex;
+        const leftEngineRowIndex = shipDepartment.leftEngine.xIndex;
+        const leftEngineColIndex = shipDepartment.leftEngine.yIndex;
+
+        const rightEngineRowIndex = shipDepartment.rightEngine.xIndex;
+        const rightEngineColIndex = shipDepartment.rightEngine.yIndex;
 
         // console.log(leftWeaponColIndex, leftWeaponRowIndex, rightWeaponColIndex, rightWeaponRowIndex, leftEngineColIndex, leftEngineRowIndex, rightEngineColIndex, rightEngineRowIndex);
-        battleField.rowGrid[leftWeaponRowIndex][leftWeaponColIndex].color = 'red';
-        battleField.rowGrid[rightWeaponRowIndex][rightWeaponColIndex].color = 'red';
+        battleField.rowGrid[leftWeaponRowIndex][leftWeaponColIndex].color = colourFront;
+        battleField.rowGrid[rightWeaponRowIndex][rightWeaponColIndex].color = colourFront;
 
-        battleField.rowGrid[leftEngineRowIndex][leftEngineColIndex].color = 'blue';
-        battleField.rowGrid[rightEngineRowIndex][rightEngineColIndex].color = 'blue';
-        // battleField.rowGrid[5][5].color = 'red';
-        // console.log(battleField);
+        battleField.rowGrid[leftEngineRowIndex][leftEngineColIndex].color = colourBack;
+        battleField.rowGrid[rightEngineRowIndex][rightEngineColIndex].color = colourBack;
 
         return battleField;
     }

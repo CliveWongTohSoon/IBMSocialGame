@@ -12,10 +12,14 @@ import {GameService} from "./game.service";
 
 export class GameComponent {
 
-    text: string = 'Ola';
+    text: string = 'Right';
     disabledBool = true;
 
     battleField: BattleFieldModel;
+    allBattleShip: ShipModel[];
+
+    battleFieldP1: BattleFieldModel;
+    battleFieldP2: BattleFieldModel;
     renderMe = true;
 
     constructor(private gameService: GameService) {
@@ -29,8 +33,15 @@ export class GameComponent {
         return 'white';
     }
 
-    main() {
-        this.battleField = this.gameService.createGame(this.battleField);
+    start(numberOfPlayers: string) {
+       // randomDir();
+        console.log(numberOfPlayers);
+
+        this.allBattleShip = this.gameService.createShip(Number(numberOfPlayers));
+        this.battleField = this.allBattleShip.reduce((prev, curr) => {
+            prev = this.gameService.updateGrid(curr, this.battleField, curr.colorFront, curr.colorBack)
+            return prev;
+        }, this.battleField);
 
         console.log('Start the game');
     }
