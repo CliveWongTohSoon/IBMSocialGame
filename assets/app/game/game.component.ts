@@ -3,6 +3,7 @@ import {ShipModel} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
 
+
 @Component({
     selector: 'app-game',
     templateUrl: './game.component.html',
@@ -16,6 +17,8 @@ export class GameComponent {
     disabledBool = true;
 
     battleField: BattleFieldModel;
+    allBattleShip: ShipModel[];
+
     battleFieldP1: BattleFieldModel;
     battleFieldP2: BattleFieldModel;
     renderMe = true;
@@ -25,31 +28,39 @@ export class GameComponent {
     }
 
     renderBackgroundColor(col: TableContent) {
-        // console.log(col);
         if (col.color) {
             return col.color;
         }
         return 'white';
     }
 
-    main() {
+    start(numberOfPlayers: string) {
        // randomDir();
-        let dir1 = this.gameService.randomDir();
-        let x1 = this.gameService.randomCoor();
-        let y1 = this.gameService.randomCoor();
+        console.log(numberOfPlayers);
 
-       this.battleFieldP1 = this.gameService.createGame(this.battleField, x1, y1,'#990000','#cc0000', dir1[0], dir1[1], dir1[2], dir1[3]);
-
+<<<<<<< HEAD
         let dir2 = this.gameService.randomDir();
         let x2 = this.gameService.randomCoor();
         let y2 = this.gameService.randomCoor();
        this.battleFieldP2 = this.gameService.createGame(this.battleField, x2, y2,'#003399','#007399',dir2[0], dir2[1], dir2[2], dir2[3]);
+=======
+        this.allBattleShip = this.gameService.createShip(Number(numberOfPlayers));
+        this.battleField = this.allBattleShip.reduce((prev, curr) => {
+            prev = this.gameService.updateGrid(curr, this.battleField, curr.colorFront, curr.colorBack)
+            return prev;
+        }, this.battleField);
+>>>>>>> f0745e1cee49e4405b95f97facfebe51ea0ff47a
 
         console.log('Start the game');
     }
 
-    move() {
+    rotate() {
+        console.log('Rotating...');
+    }
+
+    move(ship: ShipModel) {
         // this.renderMe = false;
-        this.gameService.move();
+        console.log(ship);
+        this.gameService.move(ship,this.battleField.rowGrid.length);
     }
 }

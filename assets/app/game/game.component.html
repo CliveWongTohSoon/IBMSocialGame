@@ -14,14 +14,16 @@
 <!--</head>-->
 <h1>AI Social Game</h1>
 <body align="center">
-<div>
-
-    <button  type="button" class="btn btn-default " (click)="main()"> START </button><br>
+<div class="row">
+    <label for="player" class="col-md-8 col-offset-2">Number of players</label>
+    <input type="number" class="col-md-4 form-control" id="player" #player>
+    <button  type="button" class="btn btn-default " (click)="start(player.value)"> START </button><br>
     <br>
-    <div style="float:left;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
-        <h4> PLAYER 1 </h4>
-        <button  type="button" class="btn btn-danger  " id="move1"> Move </button>
-        <button  type="button" class="btn btn-default " id="right1"> Turn {{text}} </button>
+
+    <div class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
+        <h4> PLAYER {{i+1}} </h4>
+        <button  type="button" class="btn btn-danger  " id="move1" (click)="move(ship)"> Move </button>
+        <button  type="button" class="btn btn-default " id="right1"> Turn Right </button>
         <button  type="button" class="btn btn-default " id="left1"> Turn Left </button>
         <button  type="button" class="btn btn-default "> Shoot </button>
         <button  type="button" class="btn btn-default "> Shield Front </button>
@@ -30,22 +32,22 @@
         <button  type="button" class="btn btn-default "> Shield Left </button>
     </div>
 
-    <div   style="float:right;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
-        <h4> PLAYER 2 </h4>
-        <button  type="button" class="btn btn-primary " (click)="move()"> Move </button>
-        <button  type="button" class="btn btn-default " id="right2"> Turn Right </button>
-        <button  type="button" class="btn btn-default " id="left2"> Turn Left </button>
-        <button  type="button" class="btn btn-default "> Shoot </button>
-        <button  type="button" class="btn btn-default "> Shield Front </button>
-        <button  type="button" class="btn btn-default "> Shield Back </button>
-        <button  type="button" class="btn btn-default "> Shield Right</button>
-        <button  type="button" class="btn btn-default "> Shield Left </button>
-    </div>
+    <!--<div class="btn-group-vertical col-sm-3" role="group" aria-label="...">-->
+        <!--<h4> PLAYER 2 </h4>-->
+        <!--<button  type="button" class="btn btn-primary " (click)="move()"> Move </button>-->
+        <!--<button  type="button" class="btn btn-default " id="right2"> Turn Right </button>-->
+        <!--<button  type="button" class="btn btn-default " id="left2"> Turn Left </button>-->
+        <!--<button  type="button" class="btn btn-default "> Shoot </button>-->
+        <!--<button  type="button" class="btn btn-default "> Shield Front </button>-->
+        <!--<button  type="button" class="btn btn-default "> Shield Back </button>-->
+        <!--<button  type="button" class="btn btn-default "> Shield Right</button>-->
+        <!--<button  type="button" class="btn btn-default "> Shield Left </button>-->
+    <!--</div>-->
 
     <div align="center" class="col-sm-6">
         <table id="drawing-table">
             <tr *ngFor="let row of battleField?.rowGrid">
-                <td *ngFor="let content of row" [ngStyle]="{backgroundColor: renderBackgroundColor(content)}">&nbsp;</td>
+                <td *ngFor="let content of row" [ngStyle]="{backgroundColor: content.color ? content.color : 'white'}">&nbsp;</td>
             </tr>
         </table>
         <br>
