@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {ShipDirection, ShipModel, ShipPosition} from "./ship-model";
+import {Direction} from "./ship-model";
 
 @Injectable()
 export class GameService {
@@ -33,11 +34,12 @@ export class GameService {
         return this.battleField;
     }
 
-    randomDir():string{
+    randomDir():number{
        //let dir = ['true,false,false,false','false,true,false,false','false,false,true,false','false,false,false,true'];
-        let dir = ['ynnn','nynn','nnyn','nnny'];
-        let x = dir[(Math.floor(Math.random() * 4))];
-        return x;
+       //  let dir = ['ynnn','nynn','nnyn','nnny'];
+       //  let x = dir[(Math.floor(Math.random() * 4))];
+       //  return x;
+        return Math.floor(Math.random() * 3)
     }
 
     randomCoor(){ //adjustment: number, prevX: number):number{
@@ -50,10 +52,10 @@ export class GameService {
         return (x);
     }
 
-    createGame(prevBattleField: BattleFieldModel, x: number, y: number, colourFront: string, colourBack: string, dirLeft: string, dirRight: string, dirFront: string, dirBack: string): BattleFieldModel {
+    createGame(prevBattleField: BattleFieldModel, x: number, y: number, colourFront: string, colourBack: string, dir:Direction): BattleFieldModel {
 
         const initShipPosition = new ShipPosition(x, y);
-        const initShipDirection = new ShipDirection(dirLeft, dirRight, dirFront, dirBack);
+        const initShipDirection = new ShipDirection(dir);
         const currentShip = new ShipModel('Clive', initShipPosition, initShipDirection, null);
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, colourFront, colourBack);
     }
