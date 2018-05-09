@@ -33,17 +33,33 @@ export class GameService {
         return this.battleField;
     }
 
+    randomDir():string{
+       //let dir = ['true,false,false,false','false,true,false,false','false,false,true,false','false,false,false,true'];
+        let dir = ['ynnn','nynn','nnyn','nnny'];
+        let x = dir[(Math.floor(Math.random() * 4))];
+        return x;
+    }
 
-    createGame(prevBattleField: BattleFieldModel): BattleFieldModel {
-        const initShipPosition = new ShipPosition(5.5, 5.5);
-        const initShipDirection = new ShipDirection(true, false, false, false);
+    randomCoor(){ //adjustment: number, prevX: number):number{
+        var x;
+        x = Math.floor((Math.random() * 24)) + 0.5;//(9 + adjustment)) + prevX + 8) + 0.5;
+
+        if(x > 23.5)
+            x = x - 23.5;
+        console.log(x);
+        return (x);
+    }
+
+    createGame(prevBattleField: BattleFieldModel, x: number, y: number, colourFront: string, colourBack: string, dirLeft: string, dirRight: string, dirFront: string, dirBack: string): BattleFieldModel {
+
+        const initShipPosition = new ShipPosition(x, y);
+        const initShipDirection = new ShipDirection(dirLeft, dirRight, dirFront, dirBack);
         const currentShip = new ShipModel('Clive', initShipPosition, initShipDirection, null);
-        return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField);
-
+        return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, colourFront, colourBack);
     }
 
     move() {
-        // const currentRowPosition = this.battleField.rowGrid.map(r => r.ship !== null);
+         //const currentRowPosition = this.battleField.rowGrid.map(r => r.ship !== null);
         // const currentColPosition = this.battleField.colGrid.map(c => c.ship !== null);
         // console.log(currentColPosition, currentColPosition);
     }
