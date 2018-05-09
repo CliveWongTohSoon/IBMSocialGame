@@ -4,6 +4,7 @@ import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
 import {HalloModel} from "./hallo-model";
 
+
 @Component({
     selector: 'app-game',
     templateUrl: './game.component.html',
