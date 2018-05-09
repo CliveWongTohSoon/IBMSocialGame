@@ -47,8 +47,13 @@ export class GameComponent {
         console.log('Start the game');
     }
 
-    move() {
+    rotate() {
+        console.log('Rotating...');
+    }
+
+    move(ship: ShipModel) {
         // this.renderMe = false;
-        this.gameService.move();
+        console.log(ship);
+        this.gameService.move(ship,this.battleField.rowGrid.length);
     }
 }

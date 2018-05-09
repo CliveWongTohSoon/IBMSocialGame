@@ -13,7 +13,6 @@ export class GameService {
 
         let rowContent: Array<TableContent[]> = [];
 
-
         for (let i = 0; i < length; i++) {
             let colContent: TableContent[] = [];
             for (let j = 0; j < length; j++) {
@@ -38,7 +37,7 @@ export class GameService {
         return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
     }
 
-    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel, colorFront: string, colorBack): BattleFieldModel {
+    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel, colorFront: string, colorBack: string): BattleFieldModel {
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, currentShip.colorFront, currentShip.colorBack);
     }
 
@@ -71,48 +70,59 @@ export class GameService {
         return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
-    updateShip() {
-
+    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
+        let newShip : ShipModel = ship;
+        newShip.shipPosition.xIndex = newPosition.xIndex;
+        newShip.shipPosition.yIndex = newPosition.yIndex;
+        newShip.shipDirection = newDirection;
     }
 
-    worldRound(position:number, fieldSize: number) {
-        let newValue;
-        if (position >= fieldSize) {
-            newValue = position - fieldSize;
+    worldRound(position:ShipPosition, fieldSize: number) {
+        let newPosition:ShipPosition = position;
+
+        if (position.xIndex >= fieldSize) {
+            newPosition.xIndex = position.xIndex - fieldSize;
         }
-        else if (position < 0) {
-            newValue = position + fieldSize;
+        else if (position.xIndex < 0) {
+            newPosition.xIndex = position.xIndex + fieldSize;
         }
-        else {
-            newValue = position
+        if (position.yIndex >= fieldSize) {
+            newPosition.yIndex = position.yIndex - fieldSize;
         }
-        return newValue;
+        else if (position.yIndex < 0) {
+            newPosition.yIndex = position.yIndex + fieldSize;
+        }
+        return newPosition;
     }
 
-    move(positionX:number,positionY:number, direction: Direction, fieldSizeX:number, fieldSizeY:number){
-        let newX;
-        let newY;
+    move(ship: ShipModel, fieldSize:number){
+        let newPosition:ShipPosition = ship.shipPosition;
 
-        if (direction == Direction.Up) {
-            newY = positionY - 1;
-            newX = positionX;
+        if (ship.shipDirection.dir == Direction.Up) {
+            newPosition.yIndex = ship.shipPosition.yIndex - 1;
+        }
+        else if (ship.shipDirection.dir == Direction.Down) {
+            newPosition.yIndex = ship.shipPosition.yIndex + 1;
+        }
+        else if (ship.shipDirection.dir == Direction.Right) {
+            newPosition.xIndex = ship.shipPosition.xIndex + 1;
+        }
+        else if (ship.shipDirection.dir == Direction.Left) {
+            newPosition.xIndex = ship.shipPosition.xIndex - 1;
+        }
+        newPosition = this.worldRound(newPosition, fieldSize);
+        return this.updateShip(ship, newPosition, ship.shipDirection);
+    }
 
+    rotate(ship:ShipModel, clockwise: boolean){
+        let newDirection:ShipDirection = ship.shipDirection;
+        if (clockwise){
+            newDirection.dir = ship.shipDirection.dir - 1;
         }
-        else if (direction == Direction.Down) {
-            newY = positionY + 1;
-            newX = positionX;
+        else{
+            newDirection.dir = ship.shipDirection.dir +1;
         }
-        else if (direction == Direction.Right) {
-            newX = positionX + 1;
-            newY = positionY;
-        }
-        else if (direction == Direction.Left) {
-            newX = positionX - 1;
-            newY = positionY;
-        }
-        newX = this.worldRound(newX, fieldSizeX);
-        newY = this.worldRound(newY, fieldSizeY);
-        return {x:newX, y:newY};
+        return this.updateShip(ship, ship.shipPosition, newDirection);
     }
 
 
