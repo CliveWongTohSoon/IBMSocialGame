@@ -13,7 +13,6 @@ export class GameService {
 
         let rowContent: Array<TableContent[]> = [];
 
-
         for (let i = 0; i < length; i++) {
             let colContent: TableContent[] = [];
             for (let j = 0; j < length; j++) {
@@ -37,7 +36,7 @@ export class GameService {
         return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
     }
 
-    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel, colorFront: string, colorBack): BattleFieldModel {
+    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel, colorFront: string, colorBack: string): BattleFieldModel {
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, currentShip.colorFront, currentShip.colorBack);
     }
 
@@ -70,12 +69,15 @@ export class GameService {
         return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
-    updateShip() {
+    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
+
+    }
+
+    rotate() {
 
     }
 
     move() {
-
         //const currentRowPosition = this.battleField.rowGrid.map(r => r.ship !== null);
         // const currentColPosition = this.battleField.colGrid.map(c => c.ship !== null);
         // console.log(currentColPosition, currentColPosition);

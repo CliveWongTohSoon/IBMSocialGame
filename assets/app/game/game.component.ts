@@ -36,7 +36,6 @@ export class GameComponent {
 
     start(numberOfPlayers: string) {
        // randomDir();
-<<<<<<< HEAD
         console.log(numberOfPlayers);
 
         this.allBattleShip = this.gameService.createShip(Number(numberOfPlayers));
@@ -44,24 +43,17 @@ export class GameComponent {
             prev = this.gameService.updateGrid(curr, this.battleField, curr.colorFront, curr.colorBack)
             return prev;
         }, this.battleField);
-=======
-        let dir1 = this.gameService.randomDir();
-        let x1 = this.gameService.randomCoor();
-        let y1 = this.gameService.randomCoor();
-
-       this.battleFieldP1 = this.gameService.createGame(this.battleField, x1, y1,'#990000','#cc0000', dir1);
-
-        let dir2 /*Array<string>*/ = this.gameService.randomDir();
-        let x2 = this.gameService.randomCoor();
-        let y2 = this.gameService.randomCoor();
-       this.battleFieldP2 = this.gameService.createGame(this.battleField, x2, y2,'#003399','#007399',dir2);
->>>>>>> f059dc3a3732902eef9b6476ea3e2268b3efaf5d
 
         console.log('Start the game');
     }
 
-    move() {
+    rotate() {
+        console.log('Rotating...');
+    }
+
+    move(ship: ShipModel) {
         // this.renderMe = false;
+        console.log(ship);
         this.gameService.move();
     }
 }
