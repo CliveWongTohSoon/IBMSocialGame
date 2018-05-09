@@ -18,7 +18,7 @@
 
     <button  type="button" class="btn btn-default " (click)="main()"> START </button><br>
     <br>
-    <div   style="float:left;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
+    <div style="float:left;" class="btn-group-vertical col-sm-3" role="group" aria-label="...">
         <h4> PLAYER 1 </h4>
         <button  type="button" class="btn btn-danger  " id="move1"> Move </button>
         <button  type="button" class="btn btn-default " id="right1"> Turn {{text}} </button>
@@ -45,7 +45,7 @@
     <div align="center" class="col-sm-6">
         <table id="drawing-table">
             <tr *ngFor="let row of battleField?.rowGrid">
-                <td *ngFor="let col of battleField?.colGrid" [ngStyle]="{backgroundColor: renderBackgroundColor(row, col)}">&nbsp;</td>
+                <td *ngFor="let content of row" [ngStyle]="{backgroundColor: renderBackgroundColor(content)}">&nbsp;</td>
             </tr>
         </table>
         <br>
