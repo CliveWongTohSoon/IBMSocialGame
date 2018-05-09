@@ -2,7 +2,15 @@ export class ShipModel {
 
     constructor(public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
-                public shipStats: ShipStats) {}
+                public shipStats: ShipStats,
+                public weaponLeft: WeaponLeft,
+                public weaponRight: WeaponRight,
+                public engineLeft: EngineLeft,
+                public engineRight: EngineRight) {}
+}
+
+export class WeaponLeft {
+    constructor(public xIndex: number, public yIndex: number, public health: number, public life: boolean){}
 }
 
 export class ShipPosition {
