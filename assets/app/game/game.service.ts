@@ -20,15 +20,6 @@ export class GameService {
             rowContent.push(colContent);
         }
 
-        // const columnContent = Array
-        //     .apply(null, Array(length))
-        //     .map((_, index) => new TableContent(index, null));
-        //
-        // let rowContent = Array
-        //     .apply(null, Array(length))
-        //     .map(_ => columnContent);
-
-        // rowContent[5][5].color = 'red';
         this.battleField = new BattleFieldModel(rowContent);
         return this.battleField;
     }

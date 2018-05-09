@@ -23,7 +23,6 @@ export class GameComponent {
     }
 
     renderBackgroundColor(col: TableContent) {
-        // console.log(col);
         if (col.color) {
             return col.color;
         }
