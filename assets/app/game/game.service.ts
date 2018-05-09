@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {ShipDirection, ShipModel, ShipPosition} from "./ship-model";
+import {Direction} from "./ship-model";
 
 @Injectable()
 export class GameService {
@@ -26,10 +27,8 @@ export class GameService {
         return this.battleField;
     }
 
-    randomDir(): string {
-       //let dir = ['true,false,false,false','false,true,false,false','false,false,true,false','false,false,false,true'];
-        let dir = ['ynnn','nynn','nnyn','nnny'];
-        return dir[(Math.floor(Math.random() * 4))];
+    randomDir(): number{
+        return Math.floor(Math.random() * 3);
     }
 
     randomCoor(max: number) { //adjustment: number, prevX: number):number {
@@ -52,14 +51,18 @@ export class GameService {
 
         return this.allBattleShips = Array.apply(null, {length: numberOfShips})
             .map((_, i) => {
-                const randomColorBack = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+                const randomColorBack = this.genRandomColor();
                 const randomColorFront = this.shadeColor(randomColorBack, 20);
                 const randomX = this.randomCoor(maxX), randomY = this.randomCoor(maxY);
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
-                const initShipDirection = new ShipDirection(randomDir[0], randomDir[1], randomDir[2], randomDir[3]);
+                const initShipDirection = new ShipDirection(randomDir);
                 return new ShipModel('Clive', initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
             });
+    }
+
+    genRandomColor(): string {
+        return '#'+(Math.random()*0xFFFFFF<<0).toString(16) === '#FFFFFF' ? '#990000' : '#'+(Math.random()*0xFFFFFF<<0).toString(16);
     }
 
     shadeColor(color, percent) {
