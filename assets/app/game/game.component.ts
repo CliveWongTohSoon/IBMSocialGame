@@ -2,7 +2,6 @@ import {Component} from "@angular/core";
 import {ShipModel} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
-import {HalloModel} from "./hallo-model";
 
 @Component({
     selector: 'app-game',
@@ -13,34 +12,44 @@ import {HalloModel} from "./hallo-model";
 
 export class GameComponent {
 
-    text: string = 'Ola';
+    text: string = 'Right';
     disabledBool = true;
 
     battleField: BattleFieldModel;
+    battleFieldP1: BattleFieldModel;
+    battleFieldP2: BattleFieldModel;
     renderMe = true;
 
-    helloModel: HalloModel;
-
     constructor(private gameService: GameService) {
-        this.helloModel = new HalloModel('Hello');
-        this.battleField = gameService.init();
+        this.battleField = gameService.init(25);
     }
 
-    renderBackgroundColor(row: TableContent, col: TableContent) {
-        if (row.ship && col.ship) {
-            // console.log(row.ship, col.ship);
-            return 'red';
+    renderBackgroundColor(col: TableContent) {
+        // console.log(col);
+        if (col.color) {
+            return col.color;
         }
         return 'white';
     }
 
     main() {
-        this.battleField = this.gameService.createGame();
+       // randomDir();
+        let dir1 = this.gameService.randomDir();
+        let x1 = this.gameService.randomCoor();
+        let y1 = this.gameService.randomCoor();
+
+       this.battleFieldP1 = this.gameService.createGame(this.battleField, x1, y1,'#990000','#cc0000', dir1[0], dir1[1], dir1[2], dir1[3]);
+
+        let dir2: Array<string> = this.gameService.randomDir();
+        let x2 = this.gameService.randomCoor();
+        let y2 = this.gameService.randomCoor();
+       this.battleFieldP2 = this.gameService.createGame(this.battleField, x2, y2,'#003399','#007399',dir2[0], dir2[1], dir2[2], dir2[3]);
+
         console.log('Start the game');
     }
 
     move() {
-        this.renderMe = false;
-        // this.gameService.move();
+        // this.renderMe = false;
+        this.gameService.move();
     }
 }
