@@ -62,7 +62,9 @@ export class GameService {
     }
 
     genRandomColor(): string {
-        return '#'+(Math.random()*0xFFFFFF<<0).toString(16) === '#FFFFFF' ? '#990000' : '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+        var randomColor = "#" + ('00000' +(Math.random()*(1<<24)|0).toString(16)).slice(-6);
+        randomColor === '#FFFFF' ? '#990000' : '#' +randomColor;
+        return randomColor;
     }
 
     shadeColor(color, percent) {
@@ -161,9 +163,6 @@ export class GameService {
          //   }
 
 
-
-        }
-    }
 
     randomDir(): number{
         return Math.floor(Math.random() * 4);
