@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDirection, ShipModel, ShipPosition} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition} from "./ship-model";
 import {Direction} from "./ship-model";
 
 @Injectable()
@@ -37,7 +37,14 @@ export class GameService {
         return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
     }
 
-    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel, colorFront: string, colorBack: string): BattleFieldModel {
+    updateGridWithShip(allBattleShip: ShipModel[], prevBattleField: BattleFieldModel): BattleFieldModel {
+        return allBattleShip.reduce((prev, curr) => {
+            prev = this.updateGrid(curr, prevBattleField);
+            return prev;
+        }, prevBattleField);
+    }
+
+    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel): BattleFieldModel {
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, currentShip.colorFront, currentShip.colorBack);
     }
 
@@ -71,47 +78,53 @@ export class GameService {
     }
 
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection):ShipModel {
+
         let newShip : ShipModel = ship;
-        newShip.shipPosition.xIndex = newPosition.xIndex;
-        newShip.shipPosition.yIndex = newPosition.yIndex;
+        newShip.shipPosition = newPosition;
         newShip.shipDirection = newDirection;
+
+        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
+        // console.log('After moving:', newShip.shipDepartment);
         return newShip;
     }
 
-    worldRound(position:ShipPosition, fieldSize: number):ShipPosition {
-        let newPosition:ShipPosition = position;
+    worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
+        let newPosition: ShipPosition = position;
 
         if (position.xIndex >= fieldSize) {
             newPosition.xIndex = position.xIndex - fieldSize;
-        }
-        else if (position.xIndex < 0) {
+        } else if (position.xIndex < 0) {
             newPosition.xIndex = position.xIndex + fieldSize;
         }
+
         if (position.yIndex >= fieldSize) {
             newPosition.yIndex = position.yIndex - fieldSize;
-        }
-        else if (position.yIndex < 0) {
+        } else if (position.yIndex < 0) {
             newPosition.yIndex = position.yIndex + fieldSize;
         }
+
         return newPosition;
     }
 
-    move(ship: ShipModel, fieldSize:number){
-        let newPosition:ShipPosition = ship.shipPosition;
-
+    move(ship: ShipModel, fieldSize:number): ShipModel {
+        let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
+        // console.log('Previous position:', newPosition);
         if (ship.shipDirection.dir == Direction.Up) {
-            newPosition.yIndex = ship.shipPosition.yIndex - 1;
+            console.log('Enter up');
+            newPosition.yIndex = newPosition.yIndex - 1;
+        } else if (ship.shipDirection.dir == Direction.Down) {
+            console.log('Enter down');
+            newPosition.yIndex = newPosition.yIndex + 1;
+        } else if (ship.shipDirection.dir == Direction.Right) {
+            console.log('Enter right');
+            newPosition.xIndex = newPosition.xIndex + 1;
+        } else if (ship.shipDirection.dir == Direction.Left) {
+            console.log('Enter left');
+            newPosition.xIndex = newPosition.xIndex - 1;
         }
-        else if (ship.shipDirection.dir == Direction.Down) {
-            newPosition.yIndex = ship.shipPosition.yIndex + 1;
-        }
-        else if (ship.shipDirection.dir == Direction.Right) {
-            newPosition.xIndex = ship.shipPosition.xIndex + 1;
-        }
-        else if (ship.shipDirection.dir == Direction.Left) {
-            newPosition.xIndex = ship.shipPosition.xIndex - 1;
-        }
+        // console.log('New position: ', newPosition);
         newPosition = this.worldRound(newPosition, fieldSize);
+        console.log('Updated ship department:', ship.shipDepartment);
         return this.updateShip(ship, newPosition, ship.shipDirection);
     }
 
