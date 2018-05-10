@@ -1,7 +1,9 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDirection, ShipModel, ShipPosition} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition} from "./ship-model";
 import {Direction} from "./ship-model";
+import {Observable} from "rxjs/Observable";
+import "rxjs/add/observable/of";
 
 @Injectable()
 export class GameService {
@@ -9,10 +11,8 @@ export class GameService {
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
 
-    init(length: number): BattleFieldModel {
-
+    init(length: number): Observable<BattleFieldModel> {
         let rowContent: Array<TableContent[]> = [];
-
         for (let i = 0; i < length; i++) {
             let colContent: TableContent[] = [];
             for (let j = 0; j < length; j++) {
@@ -23,26 +23,22 @@ export class GameService {
         }
 
         this.battleField = new BattleFieldModel(rowContent);
-        return this.battleField;
+
+        return Observable.of(this.battleField);
+        // return this.battleField;
     }
 
-    randomDir(): number{
-        return Math.floor(Math.random() * 3);
+
+    updateGridWithShip(allBattleShip: ShipModel[], prevBattleField: BattleFieldModel): BattleFieldModel {
+        return allBattleShip.reduce((prev, curr) => {
+            prev = this.updateGrid(curr, prevBattleField);
+            return prev;
+        }, prevBattleField);
     }
 
-
-    randomCoor(max: number) { //adjustment: number, prevX: number):number {
-        // var x;
-
-        return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
-    }
-
-    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel, colorFront: string, colorBack: string): BattleFieldModel {
+    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel): BattleFieldModel {
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, currentShip.colorFront, currentShip.colorBack);
     }
-
-    // Create an array ship
-    // updateGrid => reduce =>
 
     createShip(numberOfShips: number): ShipModel[] {
         //
@@ -66,54 +62,67 @@ export class GameService {
     }
 
     shadeColor(color, percent) {
-
-        const f = parseInt(color.slice(1),16),t = percent < 0 ? 0 : 255,p = percent < 0 ? percent *-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-        return "#"+(f-0x-330000).toString(16).slice(1);
-        //return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+        return '#000000';
+        // const f = parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+        // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
-    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
+    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection): ShipModel {
         let newShip : ShipModel = ship;
-        newShip.shipPosition.xIndex = newPosition.xIndex;
-        newShip.shipPosition.yIndex = newPosition.yIndex;
+        newShip.shipPosition = newPosition;
         newShip.shipDirection = newDirection;
+        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
+        return newShip;
     }
 
-    worldRound(position:ShipPosition, fieldSize: number) {
-        let newPosition:ShipPosition = position;
+    obsUpdateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection): BattleFieldModel {
+        let newShip : ShipModel = ship;
+        newShip.shipPosition = newPosition;
+        newShip.shipDirection = newDirection;
+        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
+        this.battleField = this.updateGrid(newShip, this.battleField);
+        return this.battleField;
+        // return newShip;
+    }
+
+    worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
+        let newPosition: ShipPosition = position;
 
         if (position.xIndex >= fieldSize) {
             newPosition.xIndex = position.xIndex - fieldSize;
-        }
-        else if (position.xIndex < 0) {
+        } else if (position.xIndex < 0) {
             newPosition.xIndex = position.xIndex + fieldSize;
         }
+
         if (position.yIndex >= fieldSize) {
             newPosition.yIndex = position.yIndex - fieldSize;
-        }
-        else if (position.yIndex < 0) {
+        } else if (position.yIndex < 0) {
             newPosition.yIndex = position.yIndex + fieldSize;
         }
+
         return newPosition;
     }
 
-    move(ship: ShipModel, fieldSize:number){
-        let newPosition:ShipPosition = ship.shipPosition;
-
+    move(ship: ShipModel, fieldSize:number): BattleFieldModel {
+        let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
+        // console.log('Previous position:', newPosition);
         if (ship.shipDirection.dir == Direction.Up) {
-            newPosition.yIndex = ship.shipPosition.yIndex - 1;
+            console.log('Enter up');
+            newPosition.yIndex = newPosition.yIndex - 1;
+        } else if (ship.shipDirection.dir == Direction.Down) {
+            console.log('Enter down');
+            newPosition.yIndex = newPosition.yIndex + 1;
+        } else if (ship.shipDirection.dir == Direction.Right) {
+            console.log('Enter right');
+            newPosition.xIndex = newPosition.xIndex + 1;
+        } else if (ship.shipDirection.dir == Direction.Left) {
+            console.log('Enter left');
+            newPosition.xIndex = newPosition.xIndex - 1;
         }
-        else if (ship.shipDirection.dir == Direction.Down) {
-            newPosition.yIndex = ship.shipPosition.yIndex + 1;
-        }
-        else if (ship.shipDirection.dir == Direction.Right) {
-            newPosition.xIndex = ship.shipPosition.xIndex + 1;
-        }
-        else if (ship.shipDirection.dir == Direction.Left) {
-            newPosition.xIndex = ship.shipPosition.xIndex - 1;
-        }
+        // console.log('New position: ', newPosition);
         newPosition = this.worldRound(newPosition, fieldSize);
-        return this.updateShip(ship, newPosition, ship.shipDirection);
+        console.log('Updated ship department:', ship.shipDepartment);
+        return this.obsUpdateShip(ship, newPosition, ship.shipDirection);
     }
 
     rotate(ship:ShipModel, clockwise: boolean){
@@ -127,5 +136,13 @@ export class GameService {
         return this.updateShip(ship, ship.shipPosition, newDirection);
     }
 
+    randomDir(): number{
+        return Math.floor(Math.random() * 3);
+    }
+
+
+    randomCoor(max: number) { //adjustment: number, prevX: number):number {
+        return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
+    }
 
 }

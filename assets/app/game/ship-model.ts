@@ -21,7 +21,7 @@ export enum Direction {
     Right,
 }
 export class ShipDirection {
-    constructor(public dir:Direction) {}
+    constructor(public dir: Direction) {}
 }
 
 export class ShipStats {
@@ -39,42 +39,47 @@ export class ShipDepartment {
                 public rightEngine: Department) {}
 
     static getDepartment(shipPosition: ShipPosition, shipDirection: ShipDirection): ShipDepartment {
+
+        // top left quadrant
         let cordAX = shipPosition.xIndex - 0.5;
         let cordAY = shipPosition.yIndex - 0.5;
+
+        // top right quadrant
         let cordBX = shipPosition.xIndex + 0.5;
         let cordBY = shipPosition.yIndex - 0.5;
+
+        // bottom left quadrant
         let cordCX = shipPosition.xIndex - 0.5;
         let cordCY = shipPosition.yIndex + 0.5;
+
+        // bottom right quadrant
         let cordDX = shipPosition.xIndex + 0.5;
         let cordDY = shipPosition.yIndex + 0.5;
-       // console.log(shipDirection);
 
-        if (shipDirection.dir==Direction.Left) {
-            const rightEngine = new Department(cordDX, cordDY, 1000, null);
-            const leftEngine = new Department(cordCX, cordCY, 1000, null);
-            const rightWeapon = new Department(cordBX, cordBY, 1000, null);
-            const leftWeapon = new Department(cordAX, cordAY, 1000, null);
-            return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
-        }
-        else if (shipDirection.dir==Direction.Right) {
-            const leftWeapon = new Department(cordDX, cordDY, 1000, null);
-            const rightWeapon = new Department(cordCX, cordCY, 1000, null);
-            const leftEngine = new Department(cordBX, cordBY, 1000, null);
-            const rightEngine = new Department(cordAX, cordAY, 1000, null);
-            return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
-        }
-        else if (shipDirection.dir==Direction.Up) {
-            const leftEngine = new Department(cordDX, cordDY, 1000, null);
-            const leftWeapon = new Department(cordCX, cordCY, 1000, null);
+        if (shipDirection.dir == Direction.Left) {
             const rightEngine = new Department(cordBX, cordBY, 1000, null);
+            const leftEngine = new Department(cordDX, cordDY, 1000, null);
             const rightWeapon = new Department(cordAX, cordAY, 1000, null);
+            const leftWeapon = new Department(cordCX, cordCY, 1000, null);
+            return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
+        } else if (shipDirection.dir == Direction.Right) {
+            const leftWeapon = new Department(cordBX, cordBY, 1000, null);
+            const rightWeapon = new Department(cordDX, cordDY, 1000, null);
+            const leftEngine = new Department(cordAX, cordAY, 1000, null);
+            const rightEngine = new Department(cordCX, cordCY, 1000, null);
+            return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
+        } else if (shipDirection.dir == Direction.Up) {
+            const leftEngine = new Department(cordCX, cordCY, 1000, null);
+            const leftWeapon = new Department(cordAX, cordAY, 1000, null);
+            const rightEngine = new Department(cordDX, cordDY, 1000, null);
+            const rightWeapon = new Department(cordBX, cordBY, 1000, null);
             return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
         }
-        else if (shipDirection.dir==Direction.Down) {
-            const rightWeapon = new Department(cordDX, cordDY, 1000, null);
-            const rightEngine = new Department(cordCX, cordCY, 1000, null);
-            const leftWeapon = new Department(cordBX, cordBY, 1000, null);
-            const leftEngine = new Department(cordAX, cordAY, 1000, null);
+        else if (shipDirection.dir == Direction.Down) {
+            const rightWeapon = new Department(cordCX, cordCY, 1000, null);
+            const rightEngine = new Department(cordAX, cordAY, 1000, null);
+            const leftWeapon = new Department(cordDX, cordDY, 1000, null);
+            const leftEngine = new Department(cordBX, cordBY, 1000, null);
             return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
         }
     }
