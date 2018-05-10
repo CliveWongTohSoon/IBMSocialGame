@@ -60,7 +60,7 @@ export class GameService {
     }
 
     genRandomColor(): string {
-        return '#'+(Math.random() * 0xFFFFFF<<0).toString(16) === '#FFFFFF' ? '#990000' : '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+       return '#'+(Math.random() * 0xFFFFFF<<0).toString(16) === '#FFFFFF' ? '#990000' : '#'+(Math.random()*0xFFFFFF<<0).toString(16);
     }
 
     shadeColor(color, percent) {
@@ -132,9 +132,7 @@ export class GameService {
 
     randomDir(): number{
 
-        var x= Math.floor(Math.random() * 4);
-        console.log(x);
-        return x;
+        return Math.floor(Math.random() * 4);
 
     }
 
