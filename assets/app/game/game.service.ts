@@ -11,6 +11,7 @@ export class GameService {
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
 
+    // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
         let rowContent: Array<TableContent[]> = [];
         for (let i = 0; i < length; i++) {
@@ -23,29 +24,14 @@ export class GameService {
         }
 
         this.battleField = new BattleFieldModel(rowContent);
-
         return Observable.of(this.battleField);
-        // return this.battleField;
     }
 
-
-    updateGridWithShip(allBattleShip: ShipModel[], prevBattleField: BattleFieldModel): BattleFieldModel {
-        return allBattleShip.reduce((prev, curr) => {
-            prev = this.updateGrid(curr, prevBattleField);
-            return prev;
-        }, prevBattleField);
-    }
-
-    updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel): BattleFieldModel {
-        return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, currentShip.colorFront, currentShip.colorBack);
-    }
-
-    createShip(numberOfShips: number): ShipModel[] {
-        //
+    createShip(numberOfShips: number): Observable<ShipModel[]> {
         const maxY = this.battleField.rowGrid.length;
         const maxX = this.battleField.rowGrid[0].length;
 
-        return this.allBattleShips = Array.apply(null, {length: numberOfShips})
+        this.allBattleShips = Array.apply(null, {length: numberOfShips})
             .map((_, i) => {
                 const randomColorBack = this.genRandomColor();
                 const randomColorFront = this.shadeColor(randomColorBack, 20);
@@ -53,8 +39,24 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
-                return new ShipModel('Clive', initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
+                return new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
             });
+
+        this.updateGridWithAllShip();
+        return Observable.of(this.allBattleShips);
+    }
+
+    updateGridWithAllShip() {
+        this.battleField.rowGrid.map(col => col.map(c => c.color = null));
+
+        this.battleField = this.allBattleShips.reduce((prev, curr) => {
+            prev = this.updateGrid(curr);
+            return prev;
+        }, this.battleField);
+    }
+
+    updateGrid(currentShip: ShipModel): BattleFieldModel {
+        return BattleFieldModel.renderGrid(currentShip.shipDepartment, this.battleField, currentShip.colorFront, currentShip.colorBack);
     }
 
     genRandomColor(): string {
@@ -67,22 +69,15 @@ export class GameService {
         // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
-    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection): ShipModel {
+    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
         let newShip : ShipModel = ship;
         newShip.shipPosition = newPosition;
         newShip.shipDirection = newDirection;
         newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
-        return newShip;
-    }
-
-    obsUpdateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection): BattleFieldModel {
-        let newShip : ShipModel = ship;
-        newShip.shipPosition = newPosition;
-        newShip.shipDirection = newDirection;
-        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
-        this.battleField = this.updateGrid(newShip, this.battleField);
-        return this.battleField;
-        // return newShip;
+        // this.updateGrid(newShip, this.battleField);
+        // this.battleField = this.updateGrid(newShip);
+        this.allBattleShips.filter(aShip => aShip.shipId === ship.shipId)[0] = ship;
+        this.updateGridWithAllShip();
     }
 
     worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
@@ -103,7 +98,7 @@ export class GameService {
         return newPosition;
     }
 
-    move(ship: ShipModel, fieldSize:number): BattleFieldModel {
+    move(ship: ShipModel, fieldSize:number) {
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
         // console.log('Previous position:', newPosition);
         if (ship.shipDirection.dir == Direction.Up) {
@@ -121,8 +116,7 @@ export class GameService {
         }
         // console.log('New position: ', newPosition);
         newPosition = this.worldRound(newPosition, fieldSize);
-        console.log('Updated ship department:', ship.shipDepartment);
-        return this.obsUpdateShip(ship, newPosition, ship.shipDirection);
+        this.updateShip(ship, newPosition, ship.shipDirection);
     }
 
     rotate(ship:ShipModel, clockwise: boolean){
@@ -133,7 +127,7 @@ export class GameService {
         else{
             newDirection.dir = ship.shipDirection.dir +1;
         }
-        return this.updateShip(ship, ship.shipPosition, newDirection);
+        this.updateShip(ship, ship.shipPosition, newDirection);
     }
 
     randomDir(): number{
@@ -149,4 +143,10 @@ export class GameService {
         return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
     }
 
+    uidGenerator(): string {
+        const S4 = function() {
+            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        };
+        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    }
 }
