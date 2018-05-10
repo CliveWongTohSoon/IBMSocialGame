@@ -19,8 +19,6 @@ export class GameComponent {
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
 
-    battleFieldP1: BattleFieldModel;
-    battleFieldP2: BattleFieldModel;
     renderMe = true;
 
     constructor(private gameService: GameService) {
@@ -39,10 +37,7 @@ export class GameComponent {
         console.log(numberOfPlayers);
 
         this.allBattleShip = this.gameService.createShip(Number(numberOfPlayers));
-        this.battleField = this.allBattleShip.reduce((prev, curr) => {
-            prev = this.gameService.updateGrid(curr, this.battleField, curr.colorFront, curr.colorBack)
-            return prev;
-        }, this.battleField);
+        this.battleField = this.gameService.updateGridWithShip(this.allBattleShip, this.battleField);
 
         console.log('Start the game');
     }
@@ -53,7 +48,11 @@ export class GameComponent {
 
     move(ship: ShipModel) {
         // this.renderMe = false;
-        console.log(ship);
-        this.gameService.move(ship,this.battleField.rowGrid.length);
+        // console.log('Before: ', this.battleField.rowGrid);
+        // console.log('Previous ship position', ship.shipPosition);
+        const updatedShip = this.gameService.move(ship, this.battleField.rowGrid.length);
+        this.battleField = this.gameService.updateGrid(updatedShip, this.battleField);
+        // console.log('After: ', this.battleField.rowGrid);
+        // console.log('Next ship position', updatedShip.shipPosition);
     }
 }
