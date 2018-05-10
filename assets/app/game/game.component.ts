@@ -36,9 +36,14 @@ export class GameComponent {
             .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
     }
 
-    rotate(ship: ShipModel) {
+    rotateRight(ship: ShipModel) {
         console.log('Rotating...');
         this.gameService.rotate(ship, true);
+    }
+
+    rotateLeft(ship: ShipModel) {
+        console.log('Rotating...');
+        this.gameService.rotate(ship, false);
     }
 
     move(ship: ShipModel) {
