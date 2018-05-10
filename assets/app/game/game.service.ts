@@ -41,12 +41,12 @@ export class GameService {
                 const initShipDirection = new ShipDirection(randomDir);
                 return new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
             });
-
         this.updateGridWithAllShip();
         return Observable.of(this.allBattleShips);
     }
 
     updateGridWithAllShip() {
+        // Clear the map
         this.battleField.rowGrid.map(col => col.map(c => c.color = null));
 
         this.battleField = this.allBattleShips.reduce((prev, curr) => {
@@ -99,6 +99,7 @@ export class GameService {
     }
 
     move(ship: ShipModel, fieldSize:number) {
+        // Change the ship to a new position
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
         // console.log('Previous position:', newPosition);
         if (ship.shipDirection.dir == Direction.Up) {
@@ -116,6 +117,7 @@ export class GameService {
         }
         // console.log('New position: ', newPosition);
         newPosition = this.worldRound(newPosition, fieldSize);
+
         this.updateShip(ship, newPosition, ship.shipDirection);
     }
 

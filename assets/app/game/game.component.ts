@@ -19,10 +19,9 @@ export class GameComponent {
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
 
-    renderMe = true;
-
     constructor(private gameService: GameService) {
-        gameService.init(25).subscribe(battleField => this.battleField = battleField);
+        gameService.init(25)
+            .subscribe(battleField => this.battleField = battleField);
     }
 
     renderBackgroundColor(col: TableContent) {
@@ -33,9 +32,6 @@ export class GameComponent {
     }
 
     start(numberOfPlayers: string) {
-       // randomDir();
-        console.log(numberOfPlayers);
-
         this.gameService.createShip(Number(numberOfPlayers))
             .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
     }
