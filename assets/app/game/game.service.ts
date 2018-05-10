@@ -2,6 +2,8 @@ import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {ShipDepartment, ShipDirection, ShipModel, ShipPosition} from "./ship-model";
 import {Direction} from "./ship-model";
+import {Observable} from "rxjs/Observable";
+import "rxjs/add/observable/of";
 
 @Injectable()
 export class GameService {
@@ -9,10 +11,8 @@ export class GameService {
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
 
-    init(length: number): BattleFieldModel {
-
+    init(length: number): Observable<BattleFieldModel> {
         let rowContent: Array<TableContent[]> = [];
-
         for (let i = 0; i < length; i++) {
             let colContent: TableContent[] = [];
             for (let j = 0; j < length; j++) {
@@ -23,19 +23,11 @@ export class GameService {
         }
 
         this.battleField = new BattleFieldModel(rowContent);
-        return this.battleField;
+
+        return Observable.of(this.battleField);
+        // return this.battleField;
     }
 
-    randomDir(): number{
-        return Math.floor(Math.random() * 3);
-    }
-
-
-    randomCoor(max: number) { //adjustment: number, prevX: number):number {
-        // var x;
-
-        return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
-    }
 
     updateGridWithShip(allBattleShip: ShipModel[], prevBattleField: BattleFieldModel): BattleFieldModel {
         return allBattleShip.reduce((prev, curr) => {
@@ -47,9 +39,6 @@ export class GameService {
     updateGrid(currentShip: ShipModel, prevBattleField: BattleFieldModel): BattleFieldModel {
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, prevBattleField, currentShip.colorFront, currentShip.colorBack);
     }
-
-    // Create an array ship
-    // updateGrid => reduce =>
 
     createShip(numberOfShips: number): ShipModel[] {
         //
@@ -73,8 +62,9 @@ export class GameService {
     }
 
     shadeColor(color, percent) {
-        const f = parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-        return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+        return '#000000';
+        // const f = parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+        // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection):ShipModel {
@@ -84,8 +74,17 @@ export class GameService {
         newShip.shipDirection = newDirection;
 
         newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
-        // console.log('After moving:', newShip.shipDepartment);
         return newShip;
+    }
+
+    obsUpdateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection): BattleFieldModel {
+        let newShip : ShipModel = ship;
+        newShip.shipPosition = newPosition;
+        newShip.shipDirection = newDirection;
+        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
+        this.battleField = this.updateGrid(newShip, this.battleField);
+        return this.battleField;
+        // return newShip;
     }
 
     worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
@@ -106,7 +105,7 @@ export class GameService {
         return newPosition;
     }
 
-    move(ship: ShipModel, fieldSize:number): ShipModel {
+    move(ship: ShipModel, fieldSize:number): BattleFieldModel {
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
         // console.log('Previous position:', newPosition);
         if (ship.shipDirection.dir == Direction.Up) {
@@ -125,7 +124,7 @@ export class GameService {
         // console.log('New position: ', newPosition);
         newPosition = this.worldRound(newPosition, fieldSize);
         console.log('Updated ship department:', ship.shipDepartment);
-        return this.updateShip(ship, newPosition, ship.shipDirection);
+        return this.obsUpdateShip(ship, newPosition, ship.shipDirection);
     }
 
     rotate(ship:ShipModel, clockwise: boolean){
@@ -149,5 +148,13 @@ export class GameService {
         return this.updateShip(ship, ship.shipPosition, newDirection);
     }
 
+    randomDir(): number{
+        return Math.floor(Math.random() * 4);
+    }
+
+
+    randomCoor(max: number) { //adjustment: number, prevX: number):number {
+        return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
+    }
 
 }
