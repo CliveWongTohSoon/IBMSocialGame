@@ -5,19 +5,21 @@ export class BattleFieldModel {
 
     static renderGrid(shipDepartment: ShipDepartment, battleField: BattleFieldModel, colourFront: string, colourBack: string) {
 
-        const leftWeaponRowIndex = shipDepartment.leftWeapon.xIndex;
-        const leftWeaponColIndex = shipDepartment.leftWeapon.yIndex;
+        const leftWeaponRowIndex = shipDepartment.leftWeapon.yIndex, leftWeaponColIndex = shipDepartment.leftWeapon.xIndex;
 
-        const rightWeaponRowIndex = shipDepartment.rightWeapon.xIndex;
-        const rightWeaponColIndex = shipDepartment.rightWeapon.yIndex;
+        const rightWeaponRowIndex = shipDepartment.rightWeapon.yIndex, rightWeaponColIndex = shipDepartment.rightWeapon.xIndex;
 
-        const leftEngineRowIndex = shipDepartment.leftEngine.xIndex;
-        const leftEngineColIndex = shipDepartment.leftEngine.yIndex;
+        const leftEngineRowIndex = shipDepartment.leftEngine.yIndex, leftEngineColIndex = shipDepartment.leftEngine.xIndex;
 
-        const rightEngineRowIndex = shipDepartment.rightEngine.xIndex;
-        const rightEngineColIndex = shipDepartment.rightEngine.yIndex;
+        const rightEngineRowIndex = shipDepartment.rightEngine.yIndex, rightEngineColIndex = shipDepartment.rightEngine.xIndex;
 
-        // console.log(leftWeaponColIndex, leftWeaponRowIndex, rightWeaponColIndex, rightWeaponRowIndex, leftEngineColIndex, leftEngineRowIndex, rightEngineColIndex, rightEngineRowIndex);
+        console.log('Left weapon: (', leftWeaponColIndex, ', ', leftWeaponRowIndex, ') ; ',
+            'Right Weapon: (' , rightWeaponColIndex, ', ', rightWeaponRowIndex, ') ; ',
+            'Left Engine: (', leftEngineColIndex, ', ', leftEngineRowIndex, ') ; ',
+            'Right Engine: (', rightEngineColIndex, ', ', rightEngineRowIndex, ')');
+
+        battleField.rowGrid.map(col => col.map(c => c.color = null));
+
         battleField.rowGrid[leftWeaponRowIndex][leftWeaponColIndex].color = colourFront;
         battleField.rowGrid[rightWeaponRowIndex][rightWeaponColIndex].color = colourFront;
 

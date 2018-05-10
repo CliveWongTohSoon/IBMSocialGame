@@ -22,7 +22,7 @@ export class GameComponent {
     renderMe = true;
 
     constructor(private gameService: GameService) {
-        this.battleField = gameService.init(25);
+        gameService.init(25).subscribe(battleField => this.battleField = battleField);
     }
 
     renderBackgroundColor(col: TableContent) {
@@ -37,22 +37,21 @@ export class GameComponent {
         console.log(numberOfPlayers);
 
         this.allBattleShip = this.gameService.createShip(Number(numberOfPlayers));
+        // console.log(this.allBattleShip[0].shipPosition, this.allBattleShip[0].shipDirection.dir);
         this.battleField = this.gameService.updateGridWithShip(this.allBattleShip, this.battleField);
 
         console.log('Start the game');
     }
 
-    rotate() {
+    rotate(ship: ShipModel) {
         console.log('Rotating...');
+        const updatedShip = this.gameService.rotate(ship, true);
+        this.battleField = this.gameService.updateGrid(updatedShip, this.battleField);
     }
 
     move(ship: ShipModel) {
-        // this.renderMe = false;
-        // console.log('Before: ', this.battleField.rowGrid);
-        // console.log('Previous ship position', ship.shipPosition);
-        const updatedShip = this.gameService.move(ship, this.battleField.rowGrid.length);
-        this.battleField = this.gameService.updateGrid(updatedShip, this.battleField);
-        // console.log('After: ', this.battleField.rowGrid);
-        // console.log('Next ship position', updatedShip.shipPosition);
+        // TODO:- Issue: just update 1 ship
+        this.gameService.move(ship, this.battleField.rowGrid.length);
+        // this.battleField = this.gameService.updateGrid(updatedShip, this.battleField);
     }
 }
