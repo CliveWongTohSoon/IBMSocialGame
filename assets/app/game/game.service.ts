@@ -129,10 +129,10 @@ export class GameService {
     }
 
     rotate(ship:ShipModel, clockwise: boolean){
-        let newDirection:ShipDirection = ship.shipDirection;
+        let newDirection:ShipDirection = new ShipDirection(ship.shipDirection.dir);
         if (clockwise){
             if (newDirection.dir == 0){
-                newDirection.dir = ship.shipDirection.dir - 1 + 4;
+                newDirection.dir = 3;
             }
             else {
                 newDirection.dir = ship.shipDirection.dir - 1;
@@ -140,7 +140,7 @@ export class GameService {
         }
         else{
             if(newDirection.dir == 3){
-                newDirection.dir = ship.shipDirection.dir + 1 - 4;
+                newDirection.dir = 0;
             }
             else {
                 newDirection.dir = ship.shipDirection.dir + 1;
