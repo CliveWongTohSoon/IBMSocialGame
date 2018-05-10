@@ -6,7 +6,7 @@ export class ShipModel {
                 public shipStats: ShipStats,
                 public colorFront: string,
                 public colorBack: string) {
-        this.shipDepartment = ShipDepartment.getDepartment(shipPosition, shipDirection);
+        // this.shipDepartment = ShipDepartment.getDepartment(shipPosition, shipDirection, );
     }
 }
 
@@ -40,23 +40,26 @@ export class ShipDepartment {
                 public leftEngine: Department,
                 public rightEngine: Department) {}
 
-    static getDepartment(shipPosition: ShipPosition, shipDirection: ShipDirection): ShipDepartment {
-
+    static getDepartment(shipPosition: ShipPosition, shipDirection: ShipDirection, fieldSize: number ): ShipDepartment {
         // top left quadrant
         let cordAX = shipPosition.xIndex - 0.5;
         let cordAY = shipPosition.yIndex - 0.5;
 
         // top right quadrant
         let cordBX = shipPosition.xIndex + 0.5;
+        if (cordBX == fieldSize){cordBX = cordBX - fieldSize};
         let cordBY = shipPosition.yIndex - 0.5;
 
         // bottom left quadrant
         let cordCX = shipPosition.xIndex - 0.5;
         let cordCY = shipPosition.yIndex + 0.5;
+        if (cordCY == fieldSize){cordCY = cordCY - fieldSize};
 
         // bottom right quadrant
         let cordDX = shipPosition.xIndex + 0.5;
+        if (cordDX == fieldSize){cordDX = cordDX - fieldSize};
         let cordDY = shipPosition.yIndex + 0.5;
+        if (cordDY == fieldSize){cordDY = cordDY - fieldSize};
 
         if (shipDirection.dir == Direction.Left) {
             const rightEngine = new Department(cordBX, cordBY, 1000, null);

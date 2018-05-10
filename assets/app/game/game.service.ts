@@ -39,7 +39,9 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
-                return new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
+                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
+                newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
+                return newShip;
             });
 
         this.updateGridWithAllShip();
@@ -69,11 +71,12 @@ export class GameService {
         // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
+
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
         let newShip : ShipModel = ship;
         newShip.shipPosition = newPosition;
         newShip.shipDirection = newDirection;
-        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection);
+        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
         // this.updateGrid(newShip, this.battleField);
         // this.battleField = this.updateGrid(newShip);
         this.allBattleShips.filter(aShip => aShip.shipId === ship.shipId)[0] = ship;
@@ -120,12 +123,22 @@ export class GameService {
     }
 
     rotate(ship:ShipModel, clockwise: boolean){
-        let newDirection:ShipDirection = ship.shipDirection;
+        let newDirection:ShipDirection = new ShipDirection(ship.shipDirection.dir);
         if (clockwise){
-            newDirection.dir = ship.shipDirection.dir - 1;
+            if (newDirection.dir == 0){
+                newDirection.dir = 3;
+            }
+            else {
+                newDirection.dir = ship.shipDirection.dir - 1;
+            }
         }
         else{
-            newDirection.dir = ship.shipDirection.dir +1;
+            if(newDirection.dir == 3){
+                newDirection.dir = 0;
+            }
+            else {
+                newDirection.dir = ship.shipDirection.dir + 1;
+            }
         }
         this.updateShip(ship, ship.shipPosition, newDirection);
     }
@@ -153,7 +166,7 @@ export class GameService {
     }
 
     randomDir(): number{
-        return Math.floor(Math.random() * 3);
+        return Math.floor(Math.random() * 4);
     }
 
 
