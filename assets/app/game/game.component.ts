@@ -36,22 +36,21 @@ export class GameComponent {
        // randomDir();
         console.log(numberOfPlayers);
 
-        this.allBattleShip = this.gameService.createShip(Number(numberOfPlayers));
-        // console.log(this.allBattleShip[0].shipPosition, this.allBattleShip[0].shipDirection.dir);
-        this.battleField = this.gameService.updateGridWithShip(this.allBattleShip, this.battleField);
-
-        console.log('Start the game');
+        this.gameService.createShip(Number(numberOfPlayers))
+            .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
     }
 
     rotateRight(ship: ShipModel) {
         console.log('Rotating...');
-        const updatedShip = this.gameService.rotate(ship, true);
-        this.battleField = this.gameService.updateGrid(updatedShip, this.battleField);
+        this.gameService.rotate(ship, true);
+    }
+
+    rotateLeft(ship: ShipModel) {
+        console.log('Rotating...');
+        this.gameService.rotate(ship, false);
     }
 
     move(ship: ShipModel) {
-        // TODO:- Issue: just update 1 ship
         this.gameService.move(ship, this.battleField.rowGrid.length);
-        // this.battleField = this.gameService.updateGrid(updatedShip, this.battleField);
     }
 }

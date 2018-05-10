@@ -1,5 +1,3 @@
-import {BattleFieldModel, TableContent} from "./battle-field-model";
-
 export class ShipModel {
     public shipDepartment: ShipDepartment;
     constructor(public shipId: string,
@@ -8,7 +6,7 @@ export class ShipModel {
                 public shipStats: ShipStats,
                 public colorFront: string,
                 public colorBack: string) {
-        this.shipDepartment = ShipDepartment.getDepartment(shipPosition, shipDirection);
+        // this.shipDepartment = ShipDepartment.getDepartment(shipPosition, shipDirection, );
     }
 }
 
@@ -40,8 +38,7 @@ export class ShipDepartment {
                 public leftEngine: Department,
                 public rightEngine: Department) {}
 
-    static getDepartment(shipPosition: ShipPosition, shipDirection: ShipDirection, battleField: BattleFieldModel ): ShipDepartment {
-        let fieldSize = battleField.rowGrid.length;
+    static getDepartment(shipPosition: ShipPosition, shipDirection: ShipDirection, fieldSize: number ): ShipDepartment {
         // top left quadrant
         let cordAX = shipPosition.xIndex - 0.5;
         let cordAY = shipPosition.yIndex - 0.5;
