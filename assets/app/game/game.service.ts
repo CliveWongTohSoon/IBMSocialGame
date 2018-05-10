@@ -137,7 +137,11 @@ export class GameService {
     }
 
     randomDir(): number{
-        return Math.floor(Math.random() * 3);
+
+        var x= Math.floor(Math.random() * 4);
+        console.log(x);
+        return x;
+
     }
 
 
