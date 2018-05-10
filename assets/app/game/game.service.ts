@@ -130,6 +130,28 @@ export class GameService {
         this.updateShip(ship, ship.shipPosition, newDirection);
     }
 
+    shield(ship:ShipModel, shieldDirection:Direction) {
+
+        let newShip = ship;
+        newShip.shipStats.shieldActive = true;
+        newShip.shipStats.shieldDirection = shieldDirection;
+
+        return newShip;
+    }
+
+       // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
+
+         //   NewShieldDirection = ship.ShipStats.shieldDirection + ship.shipDirection.dir;
+
+         //   if (NewShieldDirection >=4){
+         //       NewShieldDirection = NewShieldDirection%4;
+         //   }
+
+
+
+        }
+    }
+
     randomDir(): number{
         return Math.floor(Math.random() * 3);
     }
