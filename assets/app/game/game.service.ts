@@ -70,14 +70,15 @@ export class GameService {
         return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
-    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
+    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection):ShipModel {
         let newShip : ShipModel = ship;
         newShip.shipPosition.xIndex = newPosition.xIndex;
         newShip.shipPosition.yIndex = newPosition.yIndex;
         newShip.shipDirection = newDirection;
+        return newShip;
     }
 
-    worldRound(position:ShipPosition, fieldSize: number) {
+    worldRound(position:ShipPosition, fieldSize: number):ShipPosition {
         let newPosition:ShipPosition = position;
 
         if (position.xIndex >= fieldSize) {
@@ -117,10 +118,20 @@ export class GameService {
     rotate(ship:ShipModel, clockwise: boolean){
         let newDirection:ShipDirection = ship.shipDirection;
         if (clockwise){
-            newDirection.dir = ship.shipDirection.dir - 1;
+            if (newDirection.dir == 0){
+                newDirection.dir = ship.shipDirection.dir - 1 + 4;
+            }
+            else {
+                newDirection.dir = ship.shipDirection.dir - 1;
+            }
         }
         else{
-            newDirection.dir = ship.shipDirection.dir +1;
+            if(newDirection.dir == 3){
+                newDirection.dir = ship.shipDirection.dir + 1 - 4;
+            }
+            else {
+                newDirection.dir = ship.shipDirection.dir + 1;
+            }
         }
         return this.updateShip(ship, ship.shipPosition, newDirection);
     }
