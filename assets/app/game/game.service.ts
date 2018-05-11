@@ -39,7 +39,7 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
-                const  initShipStat = new shipStats(5,5,5,5,false,1);
+                const  initShipStat = new shipStats(5,5,5,5,false,0);
                 const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStat,randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 i++;
@@ -152,9 +152,12 @@ export class GameService {
 
         this.updateGridWithAllShip();
 
+        console.log("shieldActive: " + ship.shipStats.shieldActive);
+        console.log("shieldDirection " + ship.shipStats.shieldDirection);
+
     }
 
-       // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
+       // if(ship.ShipStats.shieldActive == true && ship.ShipStats.defence !=0) {
 
          //   NewShieldDirection = ship.ShipStats.shieldDirection + ship.shipDirection.dir;
 
