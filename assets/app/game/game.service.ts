@@ -171,7 +171,7 @@ export class GameService {
 
 
     randomCoor(max: number){ //}, prevPos : number, range : number){
-        return Math.floor((Math.random() * max) + 0.5; // + (prevPos + range)) (9 + adjustment)) + prevX + 8) + 0.5;
+        return Math.floor((Math.random() * max) + 0.5); // + (prevPos + range)) (9 + adjustment)) + prevX + 8) + 0.5;
     }
 
     uidGenerator(): string {
