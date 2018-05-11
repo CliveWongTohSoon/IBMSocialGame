@@ -22,7 +22,8 @@ export class GameComponent {
     renderMe = true;
 
     constructor(private gameService: GameService) {
-        gameService.init(25).subscribe(battleField => this.battleField = battleField);
+        gameService.init(25)
+            .subscribe(battleField => this.battleField = battleField);
     }
 
     renderBackgroundColor(col: TableContent) {
@@ -53,4 +54,10 @@ export class GameComponent {
     move(ship: ShipModel) {
         this.gameService.move(ship, this.battleField.rowGrid.length);
     }
+
+    shoot(ship:ShipModel){
+        this.gameService.shoot(ship);
+    }
+
 }
+
