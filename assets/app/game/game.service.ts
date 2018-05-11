@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, shipStats} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -28,19 +28,22 @@ export class GameService {
     }
 
     createShip(numberOfShips: number): Observable<ShipModel[]> {
+        const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
         const maxY = this.battleField.rowGrid.length;
-        const maxX = this.battleField.rowGrid[0].length;
 
         this.allBattleShips = Array.apply(null, {length: numberOfShips})
             .map((_, i) => {
                 const randomColorBack = this.genRandomColor();
                 const randomColorFront = this.shadeColor(randomColorBack, 20);
-                const randomX = this.randomCoor(maxX), randomY = this.randomCoor(maxY);
+                const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
-                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
+                const  initShipStat = new shipStats(5,5,5,5,false,1);
+                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStat,randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
+                i++;
+
                 return newShip;
             });
 
@@ -64,6 +67,7 @@ export class GameService {
     genRandomColor(): string {
         var randomColor = "#" + ('00000' + (Math.random() * (1 << 24) | 0).toString(16)).slice(-6);
         randomColor === '#FFFFF' ? '#990000' : '#' + randomColor;
+
         return randomColor;
     }
 
@@ -143,11 +147,11 @@ export class GameService {
 
     shield(ship: ShipModel, shieldDirection: Direction) {
 
-        let newShip = ship;
-        newShip.shipStats.shieldActive = true;
-        newShip.shipStats.shieldDirection = shieldDirection;
+        ship.shipStats.shieldActive = true;
+        ship.shipStats.shieldDirection = shieldDirection;
 
-        return newShip;
+        this.updateGridWithAllShip();
+
     }
 
     // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
@@ -164,8 +168,8 @@ export class GameService {
     }
 
 
-    randomCoor(max: number) { //adjustment: number, prevX: number):number {
-        return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
+    randomCoor(max: number, start: number){ //}, prevPos : number, range : number){
+        return Math.floor((Math.random() * max) + start) + 0.5; // + (prevPos + range)) (9 + adjustment)) + prevX + 8) + 0.5;
     }
 
     uidGenerator(): string {
