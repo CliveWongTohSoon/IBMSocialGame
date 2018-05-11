@@ -33,8 +33,9 @@ export class GameComponent {
     }
 
     start(numberOfPlayers: string) {
-       // randomDir();
+        // randomDir();
         console.log(numberOfPlayers);
+        console.log("Working");
 
         this.gameService.createShip(Number(numberOfPlayers))
             .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
@@ -54,18 +55,19 @@ export class GameComponent {
         this.gameService.move(ship, this.battleField.rowGrid.length);
     }
 
-    shieldUp(ship: ShipModel){
-        this.gameService.shield(ship,0)
+    shieldUp(ship: ShipModel) {
+        this.gameService.shield(ship, 0)
     }
 
-    shieldLeft(ship: ShipModel){
-        this.gameService.shield(ship,1)
+    shieldLeft(ship: ShipModel) {
+        this.gameService.shield(ship, 1)
     }
 
-    shieldDown(ship: ShipModel){
+    shieldDown(ship: ShipModel) {
         this.gameService.shield(ship, 2)
     }
 
-    shieldRight(ship: ShipModel){
+    shieldRight(ship: ShipModel) {
         this.gameService.shield(ship, 3)
     }
+}
