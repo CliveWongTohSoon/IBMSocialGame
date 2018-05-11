@@ -146,7 +146,7 @@ export class GameService {
 
     shield(ship:ShipModel, shieldDirection:Direction) {
 
-        ship.shipStats.shieldActive = true;
+        ship.shipStats.shieldActive = 1;
         ship.shipStats.shieldDirection = shieldDirection;
 
         this.updateGridWithAllShip();

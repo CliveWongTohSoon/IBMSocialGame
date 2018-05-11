@@ -28,7 +28,7 @@ export class ShipStats {
                 public attack: number,
                 public defence: number,
                 public range: number,
-                public shieldActive: boolean = false,
+                public shieldActive: number,
                 public shieldDirection: number) {}
 }
 
