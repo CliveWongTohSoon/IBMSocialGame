@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, shipStats} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -39,7 +39,8 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
-                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
+                const  initShipStat = new shipStats(5,5,5,5,false,1);
+                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStat,randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 i++;
 

@@ -36,7 +36,7 @@ export class GameComponent {
         // randomDir();
         console.log(numberOfPlayers);
 
-        console.log("Working3");
+        console.log("Working4");
 
 
         this.gameService.createShip(Number(numberOfPlayers))

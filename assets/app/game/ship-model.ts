@@ -29,7 +29,7 @@ export class shipStats {
                 public defence: number,
                 public range: number,
                 public shieldActive: boolean,
-                public shieldDirection: number) {}
+                public shieldDirection: Direction) {}
 }
 
 // Can make each department specific
