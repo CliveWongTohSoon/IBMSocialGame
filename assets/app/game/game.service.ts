@@ -157,41 +157,25 @@ export class GameService {
             loopAttackRange:
             for(let i = 1; i < ship.shipStats.attackRange+1;i++){ //check all attack range
                 for(let j = 0; j < this.allBattleShips.length;j++){ //check all ships
-                    for(let k = 0; k < 4; k++) {                  //ckeck all four department
+                    if( ship.shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex == 1) {//only left weapon hits
 
-
-
-                        if (((ship.shipDepartment[k].yIndex + i) == this.allBattleShips[j].shipDepartment[k].yIndex) && (ship.shipDepartment[k].xIndex == this.allBattleShips[j].shipDepartment[k].xIndex)) {
-                            if (this.allBattleShips[j].shipDepartment[k].health != 0) {
-                                //write your update health function here, I already checked it should be attacked
-                                //...this.allBattleShips[j].shipDepartment.leftWeapon is damaged
-                                //...
-                                break loopAttackRange;
-                            } else {
-                                if (this.allBattleShips[j].shipDirection.dir == Direction.Left) {
-                                    //...this.allBattleShips[j].shipDepartment.rightWeapon is damaged
+                        for (let k = 0; k < 4; k++) {//ckeck all four department, also 4 directions. directions are anti-clockwise, and four department are clockwise
+                            if (((ship.shipDepartment[2].yIndex + i) == this.allBattleShips[j].shipDepartment[k].yIndex) && (ship.shipDepartment[2].xIndex == this.allBattleShips[j].shipDepartment[k].xIndex)) {
+                                if (this.allBattleShips[j].shipDepartment[k].health != 0) {
+                                    //write your update health function here, I already checked this particular department should be attacked
+                                    //this.allBattleShips[j].shipDepartment[k] is damaged
                                     //...
                                     break loopAttackRange;
-                                } else if (this.allBattleShips[j].shipDirection.dir == Direction.Down) {
-                                    //...this.allBattleShips[j].shipDepartment.leftEngine is damaged
+                                }else{
+                                    //this.allBattleShips[j].shipDepartment[k-1] is damaged
                                     //...
                                     break loopAttackRange;
                                 }
                             }
-
-
-
-
-
                         }
-                       // if (((ship.shipDepartment.rightWeapon.yIndex + i) == this.allBattleShips[j].shipDepartment.leftWeapon.yIndex) && (ship.shipDepartment.rightWeapon.xIndex == this.allBattleShips[j].shipDepartment.leftWeapon.xIndex))
-                            }
-
-
-
+                    }
                 }
             }
-
         }
     }
 
