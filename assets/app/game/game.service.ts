@@ -81,7 +81,7 @@ export class GameService {
         this.updateGridWithAllShip();
     }
 
-    updateShield(ship: ShipModel, newshieldDirection :  ship.ShipStats.shieldDirection) {
+    updateShield(ship: ShipModel, ShieldActive, newshieldDirection :  ship.ShipStats.shieldDirection) {
         ship.ShipStats.shieldDirection = newshieldDirection;
     this.updateGridWithAllShip();
     }
@@ -152,7 +152,7 @@ export class GameService {
         ship.shipStats.shieldActive = true;
         ship.shipStats.shieldDirection = shieldDirection;
 
-        this.updateShield(ship, shieldDirection);
+        this.updateShield(ship, ShieldActive, shieldDirection);
 
         ;
     }
