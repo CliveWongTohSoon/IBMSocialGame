@@ -73,13 +73,9 @@ export class GameService {
 
 
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
-        let newShip : ShipModel = ship;
-        newShip.shipPosition = newPosition;
-        newShip.shipDirection = newDirection;
-        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
-        // this.updateGrid(newShip, this.battleField);
-        // this.battleField = this.updateGrid(newShip);
-        this.allBattleShips.filter(aShip => aShip.shipId === ship.shipId)[0] = ship;
+        ship.shipPosition = newPosition;
+        ship.shipDirection = newDirection;
+        ship.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
         this.updateGridWithAllShip();
     }
 
