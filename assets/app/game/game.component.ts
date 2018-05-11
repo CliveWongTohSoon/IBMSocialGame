@@ -36,7 +36,7 @@ export class GameComponent {
         // randomDir();
         console.log(numberOfPlayers);
 
-        console.log("Working");
+        console.log("Working3");
 
 
         this.gameService.createShip(Number(numberOfPlayers))
@@ -58,18 +58,18 @@ export class GameComponent {
     }
 
     shieldUp(ship: ShipModel) {
-        this.gameService.shield(ship, 0)
+        this.gameService.shield(ship,0)
     }
 
     shieldLeft(ship: ShipModel) {
-        this.gameService.shield(ship, 1)
+        this.gameService.shield(ship,1)
     }
 
     shieldDown(ship: ShipModel) {
-        this.gameService.shield(ship, 2)
+        this.gameService.shield(ship,2)
     }
 
     shieldRight(ship: ShipModel) {
-        this.gameService.shield(ship, 3)
+        this.gameService.shield(ship,3)
     }
 }

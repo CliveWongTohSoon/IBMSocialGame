@@ -3,7 +3,7 @@ export class ShipModel {
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
-                public shipStats: ShipStats,
+                public shipStats: shipStats,
                 public colorFront: string,
                 public colorBack: string) {
     }
@@ -23,12 +23,12 @@ export class ShipDirection {
     constructor(public dir: Direction) {}
 }
 
-export class ShipStats {
+export class shipStats {
     constructor(public totalHp: number,
                 public attack: number,
                 public defence: number,
                 public range: number,
-                public shieldActive: number,
+                public shieldActive: boolean,
                 public shieldDirection: number) {}
 }
 
