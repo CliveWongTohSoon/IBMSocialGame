@@ -85,6 +85,14 @@ export class GameService {
         this.updateGridWithAllShip();
     }
 
+    updateShield(ship: ShipModel, ShipStats.shieldActive, ShipStats.shieldDirection) {
+        let newShip : ShipModel = ship;
+        newShip.ShipStats.shieldDirection = newshieldDirection;
+        newShip.shipDepartment = ShipDepartment.getDepartment(newshieldDirection, this.battleField.rowGrid.length);
+        this.allBattleShips.filter(aShip => aShip.shipId === ship.shipId)[0] = ship;
+        this.updateGridWithAllShip();
+    }
+
     worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
         let newPosition: ShipPosition = position;
 
@@ -147,11 +155,11 @@ export class GameService {
 
     shield(ship:ShipModel, shieldDirection:Direction) {
 
-        let newShip = ship;
+        let newShieldActive = ship.shipStats.shieldActive;
         newShip.shipStats.shieldActive = true;
         newShip.shipStats.shieldDirection = shieldDirection;
 
-        return newShip;
+        ;
     }
 
        // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
