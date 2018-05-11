@@ -62,8 +62,9 @@ export class GameService {
     }
 
     genRandomColor(): string {
-        var randomColor = '#' + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
-        randomColor === '#FFFFFF' ? '#990000' : '#' + randomColor;
+
+        var randomColor = "#" + ('00000' +(Math.random()*(1<<24)|0).toString(16)).slice(-6);
+        randomColor === '#FFFFF' ? '#990000' : '#' +randomColor;
         return randomColor;
     }
 
@@ -144,6 +145,25 @@ export class GameService {
         }
         this.updateShip(ship, ship.shipPosition, newDirection);
     }
+
+    shield(ship:ShipModel, shieldDirection:Direction) {
+
+        let newShip = ship;
+        newShip.shipStats.shieldActive = true;
+        newShip.shipStats.shieldDirection = shieldDirection;
+
+        return newShip;
+    }
+
+       // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
+
+         //   NewShieldDirection = ship.ShipStats.shieldDirection + ship.shipDirection.dir;
+
+         //   if (NewShieldDirection >=4){
+         //       NewShieldDirection = NewShieldDirection%4;
+         //   }
+
+
 
     randomDir(): number{
         return Math.floor(Math.random() * 4);
