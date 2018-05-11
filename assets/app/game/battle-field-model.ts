@@ -17,6 +17,7 @@ export class BattleFieldModel {
              'Right Weapon: (' , rightWeaponColIndex, ', ', rightWeaponRowIndex, ') ; ',
                         'Left Engine: (', leftEngineColIndex, ', ', leftEngineRowIndex, ') ; ',
                        'Right Engine: (', rightEngineColIndex, ', ', rightEngineRowIndex, ')');
+
         battleField.rowGrid[leftWeaponRowIndex][leftWeaponColIndex].color = colourFront;
         battleField.rowGrid[rightWeaponRowIndex][rightWeaponColIndex].color = colourFront;
 

@@ -35,6 +35,7 @@ export class GameComponent {
     start(numberOfPlayers: string) {
         // randomDir();
         console.log(numberOfPlayers);
+        console.log("HEY");
 
         this.gameService.createShip(Number(numberOfPlayers))
             .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
