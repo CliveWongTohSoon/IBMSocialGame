@@ -75,22 +75,15 @@ export class GameService {
 
 
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
-        let newShip : ShipModel = ship;
-        newShip.shipPosition = newPosition;
-        newShip.shipDirection = newDirection;
-        newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
-        // this.updateGrid(newShip, this.battleField);
-        // this.battleField = this.updateGrid(newShip);
-        this.allBattleShips.filter(aShip => aShip.shipId === ship.shipId)[0] = ship;
+        ship.shipPosition = newPosition;
+        ship.shipDirection = newDirection;
+        ship.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
         this.updateGridWithAllShip();
     }
 
-    updateShield(ship: ShipModel, ShipStats.shieldActive, ShipStats.shieldDirection) {
-        let newShip : ShipModel = ship;
-        newShip.ShipStats.shieldDirection = newshieldDirection;
-        newShip.shipDepartment = ShipDepartment.getDepartment(newshieldDirection, this.battleField.rowGrid.length);
-        this.allBattleShips.filter(aShip => aShip.shipId === ship.shipId)[0] = ship;
-        this.updateGridWithAllShip();
+    updateShield(ship: ShipModel, newshieldDirection :  ship.ShipStats.shieldDirection) {
+        ship.ShipStats.shieldDirection = newshieldDirection;
+    this.updateGridWithAllShip();
     }
 
     worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
@@ -155,9 +148,11 @@ export class GameService {
 
     shield(ship:ShipModel, shieldDirection:Direction) {
 
-        let newShieldActive = ship.shipStats.shieldActive;
-        newShip.shipStats.shieldActive = true;
-        newShip.shipStats.shieldDirection = shieldDirection;
+        let ShieldActive = ship.shipStats.shieldActive;
+        ship.shipStats.shieldActive = true;
+        ship.shipStats.shieldDirection = shieldDirection;
+
+        this.updateShield(ship, shieldDirection);
 
         ;
     }
