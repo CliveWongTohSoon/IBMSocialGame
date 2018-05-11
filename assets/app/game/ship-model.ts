@@ -18,7 +18,7 @@ export enum Direction {
     Left,
     Down,
     Right
-};
+}
 export class ShipDirection {
     constructor(public dir: Direction) {}
 }
@@ -28,7 +28,7 @@ export class ShipStats {
                 public attack: number,
                 public defence: number,
                 public range: number,
-                public shieldActive: boolean,
+                public shieldActive: boolean = false,
                 public shieldDirection: number) {}
 }
 
