@@ -28,19 +28,21 @@ export class GameService {
     }
 
     createShip(numberOfShips: number): Observable<ShipModel[]> {
+        const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
         const maxY = this.battleField.rowGrid.length;
-        const maxX = this.battleField.rowGrid[0].length;
 
         this.allBattleShips = Array.apply(null, {length: numberOfShips})
             .map((_, i) => {
                 const randomColorBack = this.genRandomColor();
                 const randomColorFront = this.shadeColor(randomColorBack, 20);
-                const randomX = this.randomCoor(maxX), randomY = this.randomCoor(maxY);
+                const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
                 const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
+                i++;
+
                 return newShip;
             });
 
@@ -62,6 +64,7 @@ export class GameService {
     }
 
     genRandomColor(): string {
+
         var randomColor = "#" + ('00000' +(Math.random()*(1<<24)|0).toString(16)).slice(-6);
         randomColor === '#FFFFF' ? '#990000' : '#' +randomColor;
         return randomColor;
@@ -165,8 +168,8 @@ export class GameService {
     }
 
 
-    randomCoor(max: number) { //adjustment: number, prevX: number):number {
-        return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
+    randomCoor(max: number, start: number){ //}, prevPos : number, range : number){
+        return Math.floor((Math.random() * max) + start) + 0.5; // + (prevPos + range)) (9 + adjustment)) + prevX + 8) + 0.5;
     }
 
     uidGenerator(): string {

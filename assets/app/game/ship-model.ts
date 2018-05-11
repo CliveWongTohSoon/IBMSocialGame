@@ -6,7 +6,6 @@ export class ShipModel {
                 public shipStats: ShipStats,
                 public colorFront: string,
                 public colorBack: string) {
-        // this.shipDepartment = ShipDepartment.getDepartment(shipPosition, shipDirection, );
     }
 }
 
@@ -18,8 +17,8 @@ export enum Direction {
     Up,
     Left,
     Down,
-    Right,
-}
+    Right
+};
 export class ShipDirection {
     constructor(public dir: Direction) {}
 }
