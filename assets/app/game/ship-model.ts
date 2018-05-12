@@ -86,6 +86,7 @@ export class ShipDepartment {
             const leftEngine = new Department(cordBX, cordBY, 1000, null);
             return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
         }
+        console.log(shipPosition);
     }
 }
 

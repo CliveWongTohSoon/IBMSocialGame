@@ -132,10 +132,9 @@ export class GameService {
     checkCollision(ship: ShipModel, fieldSize : number,) {
         let Position: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
         var i =0, j=0;
-        const collidedShip = this.allBattleShips.filter(aShip => (((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex))<=1) && ((Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex))<=1 )|| ((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)== 24) && (Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)== 24)) && aShip.shipId !== ship.shipId)[0];
+        const collidedShip = this.allBattleShips.filter(aShip => (((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)<=1) || (Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)==24)) && ((Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)<=1) || (Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)==24))) && aShip.shipId !== ship.shipId)[0];
         console.log(collidedShip);
         if(collidedShip) {
-
 
         }
         /*this.allBattleShips = Array.apply(null, {length: this.allBattleShips.length})
