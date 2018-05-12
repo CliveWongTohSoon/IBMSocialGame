@@ -47,6 +47,8 @@ export class GameService {
             });
 
         this.updateGridWithAllShip();
+        console.log("LOL");
+        console.log(this.allBattleShips.length);
         return Observable.of(this.allBattleShips);
     }
 
@@ -102,9 +104,10 @@ export class GameService {
         return newPosition;
     }
 
-    move(ship: ShipModel, fieldSize:number) {
+    move(ship: ShipModel, fieldSize: number) {
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
         // console.log('Previous position:', newPosition);
+
         if (ship.shipDirection.dir == Direction.Up) {
             console.log('Enter up');
             newPosition.yIndex = newPosition.yIndex - 1;
@@ -118,9 +121,37 @@ export class GameService {
             console.log('Enter left');
             newPosition.xIndex = newPosition.xIndex - 1;
         }
-        // console.log('New position: ', newPosition);
+
         newPosition = this.worldRound(newPosition, fieldSize);
         this.updateShip(ship, newPosition, ship.shipDirection);
+
+        this.checkCollision(ship,fieldSize);
+
+    }
+
+    checkCollision(ship: ShipModel, fieldSize : number,) {
+        let Position: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
+        var i =0, j=0;
+        const collidedShip = this.allBattleShips.filter(aShip => (((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex))<=1) && ((Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex))<=1 )|| ((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)== 24) && (Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)== 24)) && aShip.shipId !== ship.shipId)[0];
+        console.log(collidedShip);
+        if(collidedShip) {
+
+
+        }
+        /*this.allBattleShips = Array.apply(null, {length: this.allBattleShips.length})
+            .map((_, i) => {
+                if ((Math.abs(Position.xIndex - this.allBattleShips.ShipPosition.xIndex))<=1 && ((Math.abs(Position.yIndex == this.allBattleShips.ShipPosition.yIndex))<=1 )){
+                    ship.shipDirection.dir = this.randomDir();
+                    const kickback = Math.floor(Math.random() * 3 + 3);
+
+                    while (i < kickback) {
+                        move(ship, fieldSize);
+                        i++;
+                    }
+
+                }
+                j++;
+            });*/
     }
 
     rotate(ship:ShipModel, clockwise: boolean){

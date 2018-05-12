@@ -36,7 +36,7 @@ export class GameComponent {
         // randomDir();
         console.log(numberOfPlayers);
 
-        console.log("Working");
+        console.log("Dharshan");
 
 
         this.gameService.createShip(Number(numberOfPlayers))
@@ -55,6 +55,7 @@ export class GameComponent {
 
     move(ship: ShipModel) {
         this.gameService.move(ship, this.battleField.rowGrid.length);
+        //this.gameService.checkCollision(ship, this.battleField.rowGrid.length);
     }
 
     shieldUp(ship: ShipModel) {
