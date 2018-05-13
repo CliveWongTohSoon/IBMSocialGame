@@ -8,6 +8,7 @@ import "rxjs/add/observable/of";
 @Injectable()
 export class GameService {
 
+    // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
 
@@ -22,7 +23,6 @@ export class GameService {
             }
             rowContent.push(colContent);
         }
-
         this.battleField = new BattleFieldModel(rowContent);
         return Observable.of(this.battleField);
     }
@@ -47,6 +47,7 @@ export class GameService {
         return Observable.of(this.allBattleShips);
     }
 
+    // --------------------------------------- Update Data ---------------------------------------------------------- //
     updateGridWithAllShip() {
         // Clear the map
         this.battleField.rowGrid.map(col => col.map(c => c.color = null));
@@ -61,46 +62,16 @@ export class GameService {
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, this.battleField, currentShip.colorFront, currentShip.colorBack);
     }
 
-    genRandomColor(): string {
-        return '#'+(Math.random()*0xFFFFFF<<0).toString(16) === '#FFFFFF' ? '#990000' : '#'+(Math.random()*0xFFFFFF<<0).toString(16);
-    }
-
-    shadeColor(color, percent) {
-        return '#000000';
-        // const f = parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-        // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
-    }
-
-
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
         let newShip : ShipModel = ship;
         newShip.shipPosition = newPosition;
         newShip.shipDirection = newDirection;
         newShip.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
-        // this.updateGrid(newShip, this.battleField);
-        // this.battleField = this.updateGrid(newShip);
         this.allBattleShips.filter(aShip => aShip.shipId === ship.shipId)[0] = ship;
         this.updateGridWithAllShip();
     }
 
-    worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
-        let newPosition: ShipPosition = position;
-
-        if (position.xIndex >= fieldSize) {
-            newPosition.xIndex = position.xIndex - fieldSize;
-        } else if (position.xIndex < 0) {
-            newPosition.xIndex = position.xIndex + fieldSize;
-        }
-
-        if (position.yIndex >= fieldSize) {
-            newPosition.yIndex = position.yIndex - fieldSize;
-        } else if (position.yIndex < 0) {
-            newPosition.yIndex = position.yIndex + fieldSize;
-        }
-
-        return newPosition;
-    }
-
+    // ------------------------------------- Functions used by front end -------------------------------------------- //
     move(ship: ShipModel, fieldSize:number) {
         // Change the ship to a new position
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
@@ -145,13 +116,42 @@ export class GameService {
         this.updateShip(ship, ship.shipPosition, newDirection);
     }
 
+
+    // ------------------------------------------ Useful functions -------------------------------------------------- //
+    worldRound(position:ShipPosition, fieldSize: number): ShipPosition {
+        let newPosition: ShipPosition = position;
+
+        if (position.xIndex >= fieldSize) {
+            newPosition.xIndex = position.xIndex - fieldSize;
+        } else if (position.xIndex < 0) {
+            newPosition.xIndex = position.xIndex + fieldSize;
+        }
+
+        if (position.yIndex >= fieldSize) {
+            newPosition.yIndex = position.yIndex - fieldSize;
+        } else if (position.yIndex < 0) {
+            newPosition.yIndex = position.yIndex + fieldSize;
+        }
+
+        return newPosition;
+    }
+
     randomDir(): number{
         return Math.floor(Math.random() * 4);
     }
 
-
     randomCoor(max: number) { //adjustment: number, prevX: number):number {
         return Math.floor((Math.random() * max)) + 0.5; // (9 + adjustment)) + prevX + 8) + 0.5;
+    }
+
+    genRandomColor(): string {
+        return '#'+(Math.random()*0xFFFFFF<<0).toString(16) === '#FFFFFF' ? '#990000' : '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    }
+
+    shadeColor(color, percent): string {
+        return '#000000';
+        // const f = parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+        // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
     uidGenerator(): string {

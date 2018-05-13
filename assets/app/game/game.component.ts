@@ -24,16 +24,16 @@ export class GameComponent {
             .subscribe(battleField => this.battleField = battleField);
     }
 
+    start(numberOfPlayers: string) {
+        this.gameService.createShip(Number(numberOfPlayers))
+            .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+    }
+
     renderBackgroundColor(col: TableContent) {
         if (col.color) {
             return col.color;
         }
         return 'white';
-    }
-
-    start(numberOfPlayers: string) {
-        this.gameService.createShip(Number(numberOfPlayers))
-            .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
     }
 
     rotateRight(ship: ShipModel) {

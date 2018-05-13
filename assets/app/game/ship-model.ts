@@ -5,9 +5,7 @@ export class ShipModel {
                 public shipDirection: ShipDirection,
                 public shipStats: ShipStats,
                 public colorFront: string,
-                public colorBack: string) {
-        // this.shipDepartment = ShipDepartment.getDepartment(shipPosition, shipDirection, );
-    }
+                public colorBack: string) {}
 }
 
 export class ShipPosition {
@@ -77,8 +75,7 @@ export class ShipDepartment {
             const rightEngine = new Department(cordDX, cordDY, 1000, null);
             const rightWeapon = new Department(cordBX, cordBY, 1000, null);
             return new ShipDepartment(leftWeapon, rightWeapon, leftEngine, rightEngine);
-        }
-        else if (shipDirection.dir == Direction.Down) {
+        } else if (shipDirection.dir == Direction.Down) {
             const rightWeapon = new Department(cordCX, cordCY, 1000, null);
             const rightEngine = new Department(cordAX, cordAY, 1000, null);
             const leftWeapon = new Department(cordDX, cordDY, 1000, null);
