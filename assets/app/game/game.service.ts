@@ -37,7 +37,7 @@ export class GameService {
                 const randomColorFront = this.shadeColor(randomColorBack, 20);
                 const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
                 const initShipPosition = new ShipPosition(randomX, randomY);
-                const randomDir = this.randomDir();
+                const randomDir = this.randomDir(4);
                 const initShipDirection = new ShipDirection(randomDir);
                 const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
@@ -130,27 +130,45 @@ export class GameService {
     }
 
     checkCollision(ship: ShipModel, fieldSize : number,) {
-        let Position: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
-        var i =0, j=0;
+
         const collidedShip = this.allBattleShips.filter(aShip => (((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)<=1) || (Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)==24)) && ((Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)<=1) || (Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)==24))) && aShip.shipId !== ship.shipId)[0];
         console.log(collidedShip);
+
         if(collidedShip) {
 
+            collidedShip.shipDirection.dir = ship.shipDirection.dir;
+
+            if(ship.shipDirection.dir == Direction.Up){
+                const possibleDir = [1,2,3];
+                ship.shipDirection.dir = possibleDir[this.randomDir(3)];
+            }
+            else if(ship.shipDirection.dir == Direction.Left){
+                const possibleDir = [0,2,3];
+                ship.shipDirection.dir = possibleDir[this.randomDir(3)];
+            }
+            else if(ship.shipDirection.dir == Direction.Down){
+                const possibleDir = [0,1,3];
+                ship.shipDirection.dir = possibleDir[this.randomDir(3)];
+            }
+            else if(ship.shipDirection.dir == Direction.Right){
+                const possibleDir = [0,1,2];
+                ship.shipDirection.dir = possibleDir[this.randomDir(3)];
+            }
+
+            const kickback = Math.floor(Math.random() * 3 + 3);
+            var i =0;
+            while (i < kickback) {
+                this.move(ship, fieldSize);
+                this.move(collidedShip, fieldSize);
+                i++;
+            }
+            ship.shipDirection.dir = this.randomDir(4);
+            collidedShip.shipDirection.dir = this.randomDir(4);
         }
-        /*this.allBattleShips = Array.apply(null, {length: this.allBattleShips.length})
-            .map((_, i) => {
-                if ((Math.abs(Position.xIndex - this.allBattleShips.ShipPosition.xIndex))<=1 && ((Math.abs(Position.yIndex == this.allBattleShips.ShipPosition.yIndex))<=1 )){
-                    ship.shipDirection.dir = this.randomDir();
-                    const kickback = Math.floor(Math.random() * 3 + 3);
+    }
 
-                    while (i < kickback) {
-                        move(ship, fieldSize);
-                        i++;
-                    }
-
-                }
-                j++;
-            });*/
+    randomCollisionDir(): number{
+         return Math.floor(Math.random() * 3);
     }
 
     rotate(ship:ShipModel, clockwise: boolean){
@@ -193,8 +211,8 @@ export class GameService {
 
 
 
-    randomDir(): number{
-        return Math.floor(Math.random() * 4);
+    randomDir(range : number): number{
+        return Math.floor(Math.random() * range);
     }
 
 

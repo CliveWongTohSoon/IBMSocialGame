@@ -13,10 +13,10 @@ export class BattleFieldModel {
 
         const rightEngineRowIndex = shipDepartment.rightEngine.yIndex, rightEngineColIndex = shipDepartment.rightEngine.xIndex;
 
-        console.log('Left weapon: (', leftWeaponColIndex, ', ', leftWeaponRowIndex, ') ; ',
+        /*console.log('Left weapon: (', leftWeaponColIndex, ', ', leftWeaponRowIndex, ') ; ',
              'Right Weapon: (' , rightWeaponColIndex, ', ', rightWeaponRowIndex, ') ; ',
                         'Left Engine: (', leftEngineColIndex, ', ', leftEngineRowIndex, ') ; ',
-                       'Right Engine: (', rightEngineColIndex, ', ', rightEngineRowIndex, ')');
+                       'Right Engine: (', rightEngineColIndex, ', ', rightEngineRowIndex, ')');*/
 
         battleField.rowGrid[leftWeaponRowIndex][leftWeaponColIndex].color = colourFront;
         battleField.rowGrid[rightWeaponRowIndex][rightWeaponColIndex].color = colourFront;
