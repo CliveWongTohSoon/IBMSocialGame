@@ -1,9 +1,10 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, shipStats} from "./ship-model";
+import {Action, ShipActions, ShipDepartment, ShipDirection, ShipModel, ShipPosition, shipStats} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
+import {s} from "@angular/core/src/render3";
 
 @Injectable()
 export class GameService {
@@ -39,8 +40,9 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir(4);
                 const initShipDirection = new ShipDirection(randomDir);
-                const  initShipStat = new shipStats(5,5,5,5,false,0);
-                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStat,randomColorFront, randomColorBack);
+                const initShipStat = new shipStats(5,5,5,5,false,0);
+                const initActions = new ShipActions(null);
+                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStat,randomColorFront, randomColorBack, initActions);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 i++;
 
@@ -129,7 +131,6 @@ export class GameService {
         this.checkCollision(ship,fieldSize);
 
     }
-
     checkCollision(ship: ShipModel, fieldSize : number,) {
 
         const collidedShip = this.allBattleShips.filter(aShip => (((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)<=1) || (Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)==24)) && ((Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)<=1) || (Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)==24))) && aShip.shipId !== ship.shipId)[0];
@@ -233,18 +234,22 @@ export class GameService {
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
 
-    updateHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number, damage: number) {
-        if (victimShip.shipStats.shieldActive == true) {
-            damage = this.shieldCheck(shooterShip, victimShip, damage)
+    updateHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number, shoot: boolean, turn: number) {
+        let damage = shooterShip.shipStats.attack;
+        if (victimShip.shipStats.shieldActive == true && shoot == true) {
+            damage = this.shootShieldCheck(shooterShip, victimShip, damage)
         }
-        // if victimShip.shipDepartment[affectedDep].health < shooterShip.shipStats.attack){
+        else if(victimShip.shipStats.shieldActive == true && shoot == false) {
+            damage = this.collisionShieldCheck(shooterShip,victimShip, damage, turn)
+        }
+        // if victimShip.shipDepartment[affectedDep].health < damage){
         //     victimShip.shipDepartment[affectedDep].health = 0;
         // }
         // else{
         //     victimShip.shipDepartment[affectedDep].health = victimShip.shipDepartment[affectedDep].health - damage;
         // }
         if (affectedDep == 0) {
-            if (victimShip.shipDepartment.leftWeapon.health < shooterShip.shipStats.attack) {
+            if (victimShip.shipDepartment.leftWeapon.health < damage) {
                 victimShip.shipDepartment.leftWeapon.health = 0;
             }
             else{
@@ -252,7 +257,7 @@ export class GameService {
             }
         }
         if (affectedDep == 1) {
-            if (victimShip.shipDepartment.rightWeapon.health < shooterShip.shipStats.attack) {
+            if (victimShip.shipDepartment.rightWeapon.health < damage) {
                 victimShip.shipDepartment.rightWeapon.health = 0;
             }
             else{
@@ -260,7 +265,7 @@ export class GameService {
             }
         }
         if (affectedDep == 2) {
-            if (victimShip.shipDepartment.leftEngine.health < shooterShip.shipStats.attack) {
+            if (victimShip.shipDepartment.leftEngine.health < damage) {
                 victimShip.shipDepartment.leftEngine.health = 0;
             }
             else{
@@ -268,7 +273,7 @@ export class GameService {
             }
         }
         if (affectedDep == 3) {
-            if (victimShip.shipDepartment.rightEngine.health < shooterShip.shipStats.attack) {
+            if (victimShip.shipDepartment.rightEngine.health < damage) {
                 victimShip.shipDepartment.rightEngine.health = 0;
             }
             else{
@@ -277,36 +282,113 @@ export class GameService {
         }
     }
 
-    shieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
+    shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
         let shieldGridDirection: Direction;
-        let enemyDirection: Direction = 4;
+        // let enemyDirection: Direction = 4;
         let reducedDamage = damage;
         shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
         if (shieldGridDirection > 3) {
             shieldGridDirection = shieldGridDirection - 4;
         }
-        let xDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.xIndex;
-        let yDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.yIndex;
-        if (Math.abs(xDiff) < 1) {
-            if (yDiff > 0) {
-                enemyDirection = Direction.Up;
-            }
-            else {
-                enemyDirection = Direction.Down;
+        if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2){
+            reducedDamage = damage * (1 - victimShip.shipStats.defence)
+        }
+        // let xDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.xIndex;
+        // let yDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.yIndex;
+        // if (Math.abs(xDiff) < 1) {
+        //     if (yDiff > 0) {
+        //         enemyDirection = Direction.Up;
+        //     }
+        //     else {
+        //         enemyDirection = Direction.Down;
+        //     }
+        // }
+        // else if (Math.abs(yDiff) < 1) {
+        //     if (xDiff > 0) {
+        //         enemyDirection = Direction.Left;
+        //     }
+        //     else {
+        //         enemyDirection = Direction.Right;
+        //     }
+        // }
+        //
+        // if (shieldGridDirection == enemyDirection) {
+        //     reducedDamage = damage * (1 - victimShip.shipStats.defence);
+        // }
+        return reducedDamage;
+    }
+    collisionShieldCheck(updatingShip: ShipModel, referShip: ShipModel, damage: number, turn: number){
+        let shieldGridDirection: Direction;
+        let reducedDamage = damage;
+        let xdiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
+        let ydiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+        shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
+        if (shieldGridDirection > 3) {
+            shieldGridDirection = shieldGridDirection - 4;
+        }
+        if (referShip.shipActions.act[turn-1] == Action.MoveFront){
+            if (Math.abs(shieldGridDirection - referShip.shipDirection.dir) == 2){
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
             }
         }
-        else if (Math.abs(yDiff) < 1) {
-            if (xDiff > 0) {
-                enemyDirection = Direction.Left;
+        else if (referShip.shipActions.act[turn-1] == Action.RightTurn || referShip.shipActions.act[turn-1] == Action.LeftTurn){
+            if (xdiff > 0){
+                if (shieldGridDirection == Direction.Left){
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)                }
             }
-            else {
-                enemyDirection = Direction.Right;
+            else if (xdiff < 0){
+                if (shieldGridDirection == Direction.Right){
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                }
+            }
+            if (ydiff > 0){
+                if (shieldGridDirection == Direction.Up) {
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                }
+            }
+            else if (ydiff < 0){
+                if (shieldGridDirection == Direction.Down){
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                }
             }
         }
-
-        if (shieldGridDirection == enemyDirection) {
-            reducedDamage = damage * (1 - victimShip.shipStats.defence);
+        else if (updatingShip.shipActions.act[turn-1] == Action.MoveFront){
+            if(updatingShip.shipDirection.dir == shieldGridDirection){
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+        }
+        else if (updatingShip.shipActions.act[turn-1] == Action.LeftTurn || updatingShip.shipActions.act[turn-1] == Action.RightTurn){
+            if (xdiff > 0){
+                if (shieldGridDirection == Direction.Left){
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)                }
+            }
+            else if (xdiff < 0){
+                if (shieldGridDirection == Direction.Right){
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                }
+            }
+            if (ydiff > 0){
+                if (shieldGridDirection == Direction.Up) {
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                }
+            }
+            else if (ydiff < 0){
+                if (shieldGridDirection == Direction.Down){
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                }
+            }
         }
         return reducedDamage;
+    }
+
+    inputAction(ship: ShipModel, act: Action, turn: number):boolean{
+        let maxActions = 3;
+        if (ship.shipActions.act.length >= maxActions){
+            return false;
+        }
+        else {
+            ship.shipActions.act[(turn - 1)] =act;
+            return true;
+        }
     }
 }

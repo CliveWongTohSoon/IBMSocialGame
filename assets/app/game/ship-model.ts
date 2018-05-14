@@ -5,7 +5,8 @@ export class ShipModel {
                 public shipDirection: ShipDirection,
                 public shipStats: shipStats,
                 public colorFront: string,
-                public colorBack: string) {
+                public colorBack: string,
+                public shipActions: ShipActions) {
     }
 }
 
@@ -95,4 +96,20 @@ export class Department {
 
 export class Character {
     constructor(public name: string, question: string[]) {}
+}
+
+export enum Action {
+    FrontShield,
+    LeftShield,
+    BackShield,
+    RightShield,
+    ShootFront,
+    MoveFront,
+    RightTurn,
+    LeftTurn,
+    DoNothing
+}
+
+export class ShipActions {
+    constructor(public act: Action[]) {}
 }
