@@ -160,10 +160,19 @@ export class GameService {
             for(let i = 1; i < ship.shipStats.attackRange+1;i++){ //check all attack range
                 for(let j = 0; j < this.allBattleShips.length;j++){ //check all ships
                     for (let k = 0; k < 4; k++) {//check all four department being hit, also 4 directions. directions are anti-clockwise, and four department are clockwise
-                        console.log('attack range' + i + 'ship'+ j + 'department'+ k);
-                        /*switch(ship.shipDirection.dir){//check four attacking ship direction
+                        switch(ship.shipDirection.dir){//check four attacking ship direction
                             case Direction.Up:
+
                                 let relativePosition = ship.shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
+                                switch (relativePosition) {
+                                    case 1:
+                                    console.log( (ship.shipDepartment.departmentArray[2].yIndex + i)+' : ship.shipDepartment.departmentArray[2].yIndex'+ship.shipDepartment.departmentArray[2].yIndex+'; i: '+ i+';'     );
+                                    console.log( (this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex) +' : this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex' )
+                                    console.log((ship.shipDepartment.departmentArray[2].xIndex)+': ship.shipDepartment.departmentArray[2].xIndex');
+                                    console.log( (this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex)+'this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex')
+                                    console.log('\n');
+                                }
+                                /*let relativePosition = ship.shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
                                 switch(relativePosition){
                                     case 1://only leftWeapon hits
                                         if (((ship.shipDepartment.departmentArray[2].yIndex + i) == this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex) && (ship.shipDepartment.departmentArray[2].xIndex == this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex)) {
@@ -183,9 +192,9 @@ export class GameService {
                                         }
                                     default:
                                         break loopAttackRange;
-                                }
+                                }*/
 
-                        }*/
+                        }
                     }
                 }
             }
