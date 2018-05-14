@@ -22,6 +22,10 @@
 
     <div class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
         <h4> PLAYER {{i+1}} </h4>
+        <p>Left Weapon Health: {{ship.shipDepartment.departmentArray[2].health}}</p>
+        <p>Right Weapon Health: {{ship.shipDepartment.departmentArray[3].health}}</p>
+        <p>Left Engine Health: {{ship.shipDepartment.departmentArray[1].health}}</p>
+        <p>Right Engine Health: {{ship.shipDepartment.departmentArray[0].health}}</p>
         <button  type="button" class="btn btn-danger  " id="move1" (click)="move(ship)"> Move </button>
         <button  type="button" class="btn btn-default " id="right1" (click)="rotateRight(ship)"> Turn Right </button>
         <button  type="button" class="btn btn-default " id="left1" (click)="rotateLeft(ship)"> Turn Left </button>

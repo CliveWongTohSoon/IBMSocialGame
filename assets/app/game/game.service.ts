@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -39,7 +39,9 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
-                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, randomColorFront, randomColorBack);
+                const initShipStats = new ShipStats (null,500,3,0);
+
+                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStats, randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 return newShip;
             });
@@ -152,26 +154,30 @@ export class GameService {
 
 
     shoot(ship:ShipModel){
-        let newDirection:ShipDirection = new ShipDirection(ship.shipDirection.dir);
-        if (newDirection.dir == Direction.Up){
-            loopAttackRange:
+        // let newDirection:ShipDirection = new ShipDirection(ship.shipDirection.dir);
+        // if (newDirection.dir == Direction.Up){
+            //loopAttackRange:
             for(let i = 1; i < ship.shipStats.attackRange+1;i++){ //check all attack range
                 for(let j = 0; j < this.allBattleShips.length;j++){ //check all ships
                     for (let k = 0; k < 4; k++) {//check all four department being hit, also 4 directions. directions are anti-clockwise, and four department are clockwise
-                        switch(ship.shipDirection.dir){//check four attacking ship direction
+                        console.log('attack range' + i + 'ship'+ j + 'department'+ k);
+                        /*switch(ship.shipDirection.dir){//check four attacking ship direction
                             case Direction.Up:
                                 let relativePosition = ship.shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
                                 switch(relativePosition){
                                     case 1://only leftWeapon hits
-                                        if (((ship.shipDepartment[2].yIndex + i) == this.allBattleShips[j].shipDepartment[k].yIndex) && (ship.shipDepartment[2].xIndex == this.allBattleShips[j].shipDepartment[k].xIndex)) {
-                                            if (this.allBattleShips[j].shipDepartment[k].health != 0) {
+                                        if (((ship.shipDepartment.departmentArray[2].yIndex + i) == this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex) && (ship.shipDepartment.departmentArray[2].xIndex == this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex)) {
+                                            if (this.allBattleShips[j].shipDepartment.departmentArray[k].health != 0) {
                                                 //write your update health function here, I already checked this particular department should be attacked
                                                 //this.allBattleShips[j].shipDepartment[k] is damaged
                                                 //...
+                                               // ship.shipDepartment.
+                                                console.log('Department '+ k + 'of shop '+ j +' is being hit');
                                                 break loopAttackRange;
                                             }else{
                                                 //this.allBattleShips[j].shipDepartment[k-1] is damaged
                                                 //...
+                                                console.log('Department '+ (k-1) + 'of shop '+ j +' is being hit');
                                                 break loopAttackRange;
                                             }
                                         }
@@ -179,12 +185,12 @@ export class GameService {
                                         break loopAttackRange;
                                 }
 
-                        }
+                        }*/
                     }
                 }
             }
         }
-    }
+    //}
 
     randomDir(): number{
         return Math.floor(Math.random() * 4);
