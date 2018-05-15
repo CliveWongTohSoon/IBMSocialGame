@@ -155,19 +155,6 @@ export class GameService {
 
     shoot(ship:ShipModel){
 
-        function findNeibourDepart( k:number,offset: number){ // kth department plus offset
-            let result = k + offset;
-            if( result > 3 || result < 0 ){
-                return mod(result, 4);
-            }else {
-                return result;
-            }
-
-            function mod(n, m) {
-                return ((n % m) + m) % m;
-            }
-        }
-
         loopAttackRange:
         for(let i = 1; i < ship.shipStats.attackRange+1; i++){ //check all attack range
             for(let j = 0; j < this.allBattleShips.length; j++){ // check all ships (for being attacked)
@@ -187,7 +174,7 @@ export class GameService {
                                     if (((leftAttackDepart.yIndex - i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
                                         //write your update health function here, I already checked this particular department should be attacked
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up1');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
                                         break loopAttackRange;
                                     }
                                     break;
@@ -195,12 +182,12 @@ export class GameService {
                                 case 0: // both weapon hits
                                     if (((leftAttackDepart.yIndex - i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
 
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up0l');
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         console.log('Department '+ findNeibourDepart(k,-1) + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
                                     }
                                     if (((rightAttackDepart.yIndex - i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up0r');
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         console.log('Department '+ findNeibourDepart(k,1) + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
                                     }
@@ -209,7 +196,7 @@ export class GameService {
                                 case -1: // only right weapon hits
                                     if (((rightAttackDepart.yIndex - i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up-1');
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
                                     }
                                     break;
@@ -223,19 +210,19 @@ export class GameService {
                                 case 1: //only rightWeapon hits
                                     if (((rightAttackDepart.yIndex + i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down 1');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
                                         break loopAttackRange;
                                     }
                                     break;
 
                                 case 0: // both weapon hits
                                     if (((leftAttackDepart.yIndex + i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down0l');
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         console.log('Department '+ findNeibourDepart(k,-1) + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
                                     }
                                     if (((rightAttackDepart.yIndex + i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down0r haha');
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         console.log('Department '+ findNeibourDepart(k,1) + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
                                     }
@@ -243,7 +230,7 @@ export class GameService {
 
                                 case -1:// only leftWeapon hits
                                     if (((leftAttackDepart.yIndex + i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
-                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down-1');
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
                                     }
                                     break;
@@ -323,6 +310,20 @@ export class GameService {
                 } // end for (k);
             } // end for (j)
         } // end for(i)
+
+        function findNeibourDepart( k:number,offset: number){ // kth department plus offset
+            let result = k + offset;
+            if( result > 3 || result < 0 ){
+                return mod(result, 4);
+            }else {
+                return result;
+            }
+
+            function mod(n, m) {
+                return ((n % m) + m) % m;
+            }
+        }
+
     } // end shoot
 
 
