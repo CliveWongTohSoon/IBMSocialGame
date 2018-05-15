@@ -32,6 +32,7 @@
         <button  type="button" class="btn btn-default " id="ShieldLeft" (click)="shieldLeft(ship)"> Shield Left </button>
     </div>
 
+
     <!--<div class="btn-group-vertical col-sm-3" role="group" aria-label="...">-->
         <!--<h4> PLAYER 2 </h4>-->
         <!--<button  type="button" class="btn btn-primary " (click)="move()"> Move </button>-->
@@ -44,7 +45,7 @@
         <!--<button  type="button" class="btn btn-default "> Shield Left </button>-->
     <!--</div>-->
 
-    <div align="center" class="col-sm-6">
+    <div align="center" class="col-sm-8">
         <table id="drawing-table">
             <tr *ngFor="let row of battleField?.rowGrid">
                 <td *ngFor="let content of row" [ngStyle]="{backgroundColor: content.color ? content.color : 'white'}">&nbsp;</td>

@@ -49,7 +49,6 @@ export class GameService {
             });
 
         this.updateGridWithAllShip();
-        console.log("LOL");
         console.log(this.allBattleShips.length);
         return Observable.of(this.allBattleShips);
     }
@@ -137,7 +136,7 @@ export class GameService {
         for (i = 0; i < this.allBattleShips.length; i++) {
             k = 0;
             for (var j = 0; j < this.allBattleShips.length; j++) {
-                if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == 24)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == 24)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
+                if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == fieldSize-1)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == fieldSize-1)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
                     this.allBattleShips[i].collidedShip[k++] = this.allBattleShips[j].shipPosition;
                 }
             }
@@ -146,7 +145,7 @@ export class GameService {
         console.log(this.allBattleShips);
 
         for (i = 0; i < this.allBattleShips.length; i++) {
-            var resultantX = 0, resultantY = 0;
+            var resultant: ShipPosition = new ShipPosition(0,0);
 
             if (this.allBattleShips[i].collidedShip[0]!== null) {
                 let newPosition: ShipPosition = new ShipPosition(this.allBattleShips[i].shipPosition.xIndex, this.allBattleShips[i].shipPosition.yIndex);
@@ -156,29 +155,33 @@ export class GameService {
 
                 for(j = 0; j< this.allBattleShips[i].collidedShip.length; j++) {
                     k = 0;
+                    /*resultantX += newPosition.xIndex - this.allBattleShips[i].collidedShip[j].xIndex;
+                    resultantY += newPosition.yIndex - this.allBattleShips[i].collidedShip[j].yIndex;
+                    console.log("resultantx1 = "+resultantX);
+                    console.log("resultanty1 = "+resultantY);
+                    k = 1;
+*/
                     while(k < kickback) {
-                        resultantX += newPosition.xIndex - this.allBattleShips[i].collidedShip[j].xIndex;
-                        resultantY += newPosition.yIndex - this.allBattleShips[i].collidedShip[j].yIndex;
+                        resultant.xIndex += newPosition.xIndex - this.allBattleShips[i].collidedShip[j].xIndex;
+                        resultant.yIndex += newPosition.yIndex - this.allBattleShips[i].collidedShip[j].yIndex;
+                        resultant = this.worldRound(resultant, fieldSize);
                         k++;
-                        console.log("resultantx = "+resultantX);
-                        console.log("resultanty = "+resultantY);
+                        console.log("resultantx = "+resultant.xIndex);
+                        console.log("resultanty = "+resultant.yIndex);
                     }
                     this.allBattleShips[i].collidedShip[j] = null;
                 }
 
-                newPosition.xIndex += resultantX;
-                newPosition.yIndex += resultantY;
+                newPosition.xIndex += resultant.xIndex;
+                newPosition.yIndex += resultant.yIndex;
                 console.log(newPosition);
                 newPosition = this.worldRound(newPosition, fieldSize);
-                //const direction : ShipDirection = this.randomDir(4);
+
+
                 this.updateShip(this.allBattleShips[i], newPosition, this.allBattleShips[i].shipDirection);
 
             }
         }
-    }
-
-    randomCollisionDir(): number{
-         return Math.floor(Math.random() * 3);
     }
 
     rotate(ship: ShipModel, clockwise: boolean) {
