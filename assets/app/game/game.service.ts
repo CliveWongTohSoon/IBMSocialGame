@@ -130,18 +130,15 @@ export class GameService {
 
     }
 
-    // pass in the position of the current ship
     checkCollision(fieldSize : number) {
 
-        // use filter to filter out all other ships that has the same index
-        // save it to the collidedShip
         var i = 0, j = 0, k = 0;
 
         for (i = 0; i < this.allBattleShips.length; i++) {
             k = 0;
             for (var j = 0; j < this.allBattleShips.length; j++) {
                 if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == 24)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == 24)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
-                    this.allBattleShips[i].collidedShip[k++] = j;
+                    this.allBattleShips[i].collidedShip[k++] = this.allBattleShips[j].shipPosition;
                 }
             }
         }
@@ -155,17 +152,18 @@ export class GameService {
                 let newPosition: ShipPosition = new ShipPosition(this.allBattleShips[i].shipPosition.xIndex, this.allBattleShips[i].shipPosition.yIndex);
                 const kickback = Math.floor(Math.random() * 3 + 3);
                 console.log(this.allBattleShips[i].shipPosition);
-                console.log(this.allBattleShips[this.allBattleShips[i].collidedShip[0]].shipPosition);
+                console.log(this.allBattleShips[i].collidedShip[0]);
 
                 for(j = 0; j< this.allBattleShips[i].collidedShip.length; j++) {
                     k = 0;
                     while(k < kickback) {
-                        resultantX += newPosition.xIndex - this.allBattleShips[this.allBattleShips[i].collidedShip[j]].shipPosition.xIndex;
-                        resultantY += newPosition.yIndex - this.allBattleShips[this.allBattleShips[i].collidedShip[j]].shipPosition.yIndex;
+                        resultantX += newPosition.xIndex - this.allBattleShips[i].collidedShip[j].xIndex;
+                        resultantY += newPosition.yIndex - this.allBattleShips[i].collidedShip[j].yIndex;
                         k++;
                         console.log("resultantx = "+resultantX);
                         console.log("resultanty = "+resultantY);
                     }
+                    this.allBattleShips[i].collidedShip[j] = null;
                 }
 
                 newPosition.xIndex += resultantX;
@@ -174,6 +172,7 @@ export class GameService {
                 newPosition = this.worldRound(newPosition, fieldSize);
                 //const direction : ShipDirection = this.randomDir(4);
                 this.updateShip(this.allBattleShips[i], newPosition, this.allBattleShips[i].shipDirection);
+
             }
         }
     }
