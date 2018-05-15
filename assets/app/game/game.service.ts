@@ -39,7 +39,7 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir();
                 const initShipDirection = new ShipDirection(randomDir);
-                const initShipStats = new ShipStats (null,500,3,0);
+                const initShipStats = new ShipStats (null,500,5,0);
 
                 const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStats, randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
@@ -154,52 +154,177 @@ export class GameService {
 
 
     shoot(ship:ShipModel){
-        // let newDirection:ShipDirection = new ShipDirection(ship.shipDirection.dir);
-        // if (newDirection.dir == Direction.Up){
-            //loopAttackRange:
-            for(let i = 1; i < ship.shipStats.attackRange+1;i++){ //check all attack range
-                for(let j = 0; j < this.allBattleShips.length;j++){ //check all ships
-                    for (let k = 0; k < 4; k++) {//check all four department being hit, also 4 directions. directions are anti-clockwise, and four department are clockwise
-                        switch(ship.shipDirection.dir){//check four attacking ship direction
-                            case Direction.Up:
 
-                                let relativePosition = ship.shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
-                                switch (relativePosition) {
-                                    case 1:
-                                    console.log( (ship.shipDepartment.departmentArray[2].yIndex + i)+' : ship.shipDepartment.departmentArray[2].yIndex'+ship.shipDepartment.departmentArray[2].yIndex+'; i: '+ i+';'     );
-                                    console.log( (this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex) +' : this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex' )
-                                    console.log((ship.shipDepartment.departmentArray[2].xIndex)+': ship.shipDepartment.departmentArray[2].xIndex');
-                                    console.log( (this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex)+'this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex')
-                                    console.log('\n');
-                                }
-                                /*let relativePosition = ship.shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
-                                switch(relativePosition){
-                                    case 1://only leftWeapon hits
-                                        if (((ship.shipDepartment.departmentArray[2].yIndex + i) == this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex) && (ship.shipDepartment.departmentArray[2].xIndex == this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex)) {
-                                            if (this.allBattleShips[j].shipDepartment.departmentArray[k].health != 0) {
-                                                //write your update health function here, I already checked this particular department should be attacked
-                                                //this.allBattleShips[j].shipDepartment[k] is damaged
-                                                //...
-                                               // ship.shipDepartment.
-                                                console.log('Department '+ k + 'of shop '+ j +' is being hit');
-                                                break loopAttackRange;
-                                            }else{
-                                                //this.allBattleShips[j].shipDepartment[k-1] is damaged
-                                                //...
-                                                console.log('Department '+ (k-1) + 'of shop '+ j +' is being hit');
-                                                break loopAttackRange;
-                                            }
-                                        }
-                                    default:
-                                        break loopAttackRange;
-                                }*/
+        function findNeibourDepart( k:number,offset: number){ // kth department plus offset
+            let result = k + offset;
+            if( result > 3 || result < 0 ){
+                return mod(result, 4);
+            }else {
+                return result;
+            }
 
-                        }
-                    }
-                }
+            function mod(n, m) {
+                return ((n % m) + m) % m;
             }
         }
-    //}
+
+        loopAttackRange:
+        for(let i = 1; i < ship.shipStats.attackRange+1; i++){ //check all attack range
+            for(let j = 0; j < this.allBattleShips.length; j++){ // check all ships (for being attacked)
+                for (let k = 0; k < 4; k++) { //check all four department being hit, also 4 directions. directions are anti-clockwise, and four department are clockwise
+                    let horizontalRelativePosition = ship.shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
+                    let verticalRelativePosition = ship.shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
+                    let leftAttackDepart = ship.shipDepartment.departmentArray[2];
+                    let rightAttackDepart = ship.shipDepartment.departmentArray[3];
+                    let defendDepart = this.allBattleShips[j].shipDepartment.departmentArray[k];
+
+                    switch(ship.shipDirection.dir){ //check four attacking ship direction
+
+                        case Direction.Up:
+                            switch(horizontalRelativePosition){
+
+                                case 1: //only leftWeapon hits
+                                    if (((leftAttackDepart.yIndex - i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                        //write your update health function here, I already checked this particular department should be attacked
+                                        //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up1');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case 0: // both weapon hits
+                                    if (((leftAttackDepart.yIndex - i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up0l');
+                                        console.log('Department '+ findNeibourDepart(k,-1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    if (((rightAttackDepart.yIndex - i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up0r');
+                                        console.log('Department '+ findNeibourDepart(k,1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case -1: // only right weapon hits
+                                    if (((rightAttackDepart.yIndex - i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                        //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit up-1');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                default:
+                            }
+                            break; //end case Direction.Up
+
+                        case Direction.Down:
+                            switch(horizontalRelativePosition){
+                                case 1: //only rightWeapon hits
+                                    if (((rightAttackDepart.yIndex + i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                        //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down 1');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case 0: // both weapon hits
+                                    if (((leftAttackDepart.yIndex + i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down0l');
+                                        console.log('Department '+ findNeibourDepart(k,-1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    if (((rightAttackDepart.yIndex + i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down0r haha');
+                                        console.log('Department '+ findNeibourDepart(k,1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case -1:// only leftWeapon hits
+                                    if (((leftAttackDepart.yIndex + i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit down-1');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                default:
+                            }
+                            break; //end case Direction.Down;
+
+                        case Direction.Left:
+                            switch(verticalRelativePosition){
+                                case 1: //only rightWeapon hits
+                                    if (((rightAttackDepart.xIndex - i) == defendDepart.xIndex) && (rightAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case 0: // both weapon hits
+                                    if (((leftAttackDepart.xIndex - i) == defendDepart.xIndex) && (leftAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        console.log('Department '+ findNeibourDepart(k,-1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    if (((rightAttackDepart.xIndex - i) == defendDepart.xIndex) && (rightAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        console.log('Department '+ findNeibourDepart(k,1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case -1:// only leftWeapon hits
+                                    if (((leftAttackDepart.xIndex - i) == defendDepart.xIndex) && (leftAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                default:
+                            }
+                            break; // end case Direction.Left;
+
+                        case Direction.Right:
+                            switch(verticalRelativePosition){
+                                case 1: //only leftWeapon hits
+                                    if (((leftAttackDepart.xIndex + i) == defendDepart.xIndex) && (leftAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case 0: // both weapon hits
+                                    if (((leftAttackDepart.xIndex + i) == defendDepart.xIndex) && (leftAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        console.log('Department '+ findNeibourDepart(k,-1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    if (((rightAttackDepart.xIndex + i) == defendDepart.xIndex) && (rightAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        console.log('Department '+ findNeibourDepart(k,1) + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                case -1:// only rightWeapon hits
+                                    if (((rightAttackDepart.xIndex + i) == defendDepart.xIndex) && (rightAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                        console.log('Department '+ k + ' of ship '+ j +' is being hit');
+                                        break loopAttackRange;
+                                    }
+                                    break;
+
+                                default:
+                            }
+                            // end case Direction.Right;
+                    } // end switch(ship.shipDirection.dir);
+                } // end for (k);
+            } // end for (j)
+        } // end for(i)
+    } // end shoot
+
 
     randomDir(): number{
         return Math.floor(Math.random() * 4);

@@ -18,10 +18,10 @@ export class ShipPosition {
 }
 
 export enum Direction {
-    Up,
-    Left,
-    Down,
-    Right,
+    Up ,
+    Left ,
+    Down ,
+    Right ,
 }
 export class ShipDirection {
     constructor(public dir: Direction) {}
