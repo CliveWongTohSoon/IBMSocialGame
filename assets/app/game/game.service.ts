@@ -40,7 +40,7 @@ export class GameService {
                 const randomDir = this.randomDir(4);
                 const initShipDirection = new ShipDirection(randomDir);
                 const  initShipStat = new shipStats(5,5,5,5,false,0);
-                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, initShipStat,randomColorFront, randomColorBack);
+                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection, null, initShipStat,randomColorFront, randomColorBack);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 i++;
 
@@ -125,70 +125,108 @@ export class GameService {
         newPosition = this.worldRound(newPosition, fieldSize);
         this.updateShip(ship, newPosition, ship.shipDirection);
 
-        this.checkCollision(ship,fieldSize);
+        //this.checkCollision(fieldSize);
 
     }
 
-    checkCollision(ship: ShipModel,fieldSize : number,) {
+    // pass in the position of the current ship
+    checkCollision(fieldSize : number,) {
 
-        const collidedShip1 = this.allBattleShips.filter(aShip => (((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)<=1) || (Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)==24)) && ((Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)<=1) || (Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)==24))) && aShip.shipId !== ship.shipId)[0];
-        const collidedShip2 = this.allBattleShips.filter(aShip => (((Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)<=1) || (Math.abs(aShip.shipPosition.xIndex - ship.shipPosition.xIndex)==24)) && ((Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)<=1) || (Math.abs(aShip.shipPosition.yIndex - ship.shipPosition.yIndex)==24))) && aShip.shipId !== ship.shipId)[1];
+        // use filter to filter out all other ships that has the same index
+        // save it to the collidedShip
 
-        console.log(collidedShip1);
-        console.log(collidedShip2);
 
-        if(collidedShip1) {
+        var i = 0, j = 0, k = 0;
+        let collidedShips: Array<ShipModel[]> = [];
 
-            collidedShip1.shipDirection.dir = ship.shipDirection.dir;
-
-            ship.shipDirection.dir += 2;
-
-            if(ship.shipDirection.dir > 3)
-                ship.shipDirection.dir -= 4;
-            console.log("shipDir =" + ship.shipDirection.dir);
-
-            const kickback = Math.floor(Math.random() * 3 + 3);
-            var i =0;
-
-            if(collidedShip2) {
-                collidedShip2.shipDirection.dir = ship.shipDirection.dir;
-                while (i < kickback) {
-                    this.move(collidedShip1, fieldSize);
-                    this.move(collidedShip2, fieldSize);
-                    this.move(ship, fieldSize);
-                    i++;
+        for (i = 0; i < this.allBattleShips.length; i++) {
+            collidedShips.push(this.allBattleShips[i]);
+            // collidedShips[i][0] = this.allBattleShips[i];
+            k = 1;
+            for (var j = this.allBattleShips.length - 1; j > i; j--) {
+                if (((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == 24)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == 24))) {
+                    collidedShips[i][k++] = this.allBattleShips[j];
                 }
-                collidedShip2.shipDirection.dir = this.randomDir(4);
-                this.updateShip(collidedShip2, collidedShip2.shipPosition, ship.shipDirection);
-
-                collidedShip1.shipDirection.dir = this.randomDir(4);
-                this.updateShip(collidedShip1, collidedShip1.shipPosition, ship.shipDirection);
+                collidedShips[i][0].shipCollision = k;
             }
-            else {
-                while (i < kickback) {
-                    this.move(collidedShip1, fieldSize);
-                    this.move(ship, fieldSize);
-                    i++;
+        }
+
+        console.log(collidedShips);
+
+        for (i = 0; i < this.allBattleShips.length; i++) {
+            var resultantX = 0, resultantY = 0;
+
+            if (collidedShips[i][1]) {
+                let newPosition: ShipPosition = new ShipPosition(collidedShips[i][0].shipPosition.xIndex, collidedShips[i][0].shipPosition.yIndex);
+                const kickback = Math.floor(Math.random() * 3 + 1);
+
+                for(j = 1; j< collidedShips[i][0].shipCollision; j++) {
+                    k = 0;
+                    while(k < kickback) {
+                        resultantX += newPosition.xIndex - collidedShips[i][j].shipPosition.xIndex;
+                        resultantY += newPosition.yIndex - collidedShips[i][j].shipPosition.yIndex;
+                        k++;
+                    }
                 }
-                collidedShip1.shipDirection.dir = this.randomDir(4);
-                this.updateShip(collidedShip1, collidedShip1.shipPosition, ship.shipDirection);
+                newPosition.xIndex += resultantX;
+                newPosition.yIndex += resultantY;
+
+                newPosition = this.worldRound(newPosition, fieldSize);
+
+                /*
+                ship.shipDirection.dir = this.randomDir(4);
+                this.updateShip(ship, newPosition, ship.shipDirection);
+
+                collidedShips[0].shipDirection.dir += 2;
+
+                if (collidedShips[0].shipDirection.dir > 3)
+                    collidedShips[0].shipDirection.dir -= 4;
+                console.log("shipDir =" + collidedShips[0].shipDirection.dir);
+
+                const kickback = Math.floor(Math.random() * 3 + 3);
+                var i = 0;
+
+                if (collidedShip2) {
+                    collidedShip2.shipDirection.dir = ship.shipDirection.dir;
+                    while (i < kickback) {
+                        this.move(collidedShip1, fieldSize);
+                        this.move(collidedShip2, fieldSize);
+                        this.move(collidedShips[0], fieldSize);
+                        i++;
+                    }
+                    collidedShip2.shipDirection.dir = this.randomDir(4);
+                    this.updateShip(collidedShip2, collidedShip2.shipPosition, ship.shipDirection);
+
+                    collidedShip1.shipDirection.dir = this.randomDir(4);
+                    this.updateShip(collidedShip1, collidedShip1.shipPosition, ship.shipDirection);
+                }
+                else {
+                    while (i < kickback) {
+                        this.move(collidedShip1, fieldSize);
+                        this.move(ship, fieldSize);
+                        i++;
+                    }
+                    collidedShip1.shipDirection.dir = this.randomDir(4);
+                    this.updateShip(collidedShip1, collidedShip1.shipPosition, ship.shipDirection);
+                }
+
+                let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
+                const spinDistance = Math.floor(Math.random() * 5) - 3;
+
+                console.log(spinDistance);
+
+                if (ship.shipDirection.dir == Direction.Up || ship.shipDirection.dir == Direction.Down) {
+                    newPosition.xIndex = newPosition.xIndex + spinDistance;
+                }
+                else if (ship.shipDirection.dir == Direction.Left || ship.shipDirection.dir == Direction.Right) {
+                    newPosition.yIndex = newPosition.yIndex + spinDistance;
+                }
+                newPosition = this.worldRound(newPosition, fieldSize);
+
+                ship.shipDirection.dir = this.randomDir(4);
+                this.updateShip(ship, newPosition, ship.shipDirection);
+                */
             }
-
-            let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
-            const spinDistance = Math.floor(Math.random() * 5) - 3;
-
-            console.log(spinDistance);
-
-            if(ship.shipDirection.dir == Direction.Up || ship.shipDirection.dir == Direction.Down){
-                newPosition.xIndex = newPosition.xIndex + spinDistance;
-            }
-            else if(ship.shipDirection.dir == Direction.Left || ship.shipDirection.dir == Direction.Right){
-                newPosition.yIndex = newPosition.yIndex + spinDistance;
-            }
-            newPosition = this.worldRound(newPosition, fieldSize);
-
-            ship.shipDirection.dir = this.randomDir(4);
-            this.updateShip(ship, newPosition, ship.shipDirection);
         }
     }
 

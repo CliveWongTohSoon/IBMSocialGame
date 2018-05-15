@@ -1,8 +1,10 @@
 export class ShipModel {
     public shipDepartment: ShipDepartment;
+    public collidedShip: ShipModel[] = [];
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
+                public shipCollision: number,
                 public shipStats: shipStats,
                 public colorFront: string,
                 public colorBack: string) {
