@@ -33,6 +33,21 @@ export class shipStats {
                 public shieldDirection: Direction) {}
 }
 
+export enum Action {
+    FrontShield,
+    LeftShield,
+    BackShield,
+    RightShield,
+    ShootFront,
+    MoveFront,
+    RightTurn,
+    LeftTurn,
+    DoNothing
+}
+
+export class ShipActions {
+    constructor(public act: Action[]) {}
+}
 // Can make each department specific
 export class ShipDepartment {
     constructor(public leftWeapon: Department,
