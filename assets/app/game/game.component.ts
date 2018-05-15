@@ -21,9 +21,7 @@ export class GameComponent {
 
     renderMe = true;
 
-    constructor(private gameService: GameService) {
-        gameService.init(25).subscribe(battleField => this.battleField = battleField);
-    }
+
 
     renderBackgroundColor(col: TableContent) {
         if (col.color) {
@@ -32,16 +30,47 @@ export class GameComponent {
         return 'white';
     }
 
+    constructor(private gameService: GameService) {
+        gameService.init(25).subscribe(battleField => this.battleField = battleField);
+    }
+
+
     start(numberOfPlayers: string) {
         // randomDir();
         console.log(numberOfPlayers);
 
         console.log("Working123");
 
+        if (Number(numberOfPlayers) <= 2) {
+            this.gameService.init(25)
+                .subscribe(battleField => {
+                    this.battleField = battleField;
+                    this.gameService.createShip(Number(numberOfPlayers))
+                        .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+                });
+        }
 
-        this.gameService.createShip(Number(numberOfPlayers))
-            .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+        else if (Number(numberOfPlayers) == 3) {
+            this.gameService.init(30)
+                .subscribe(battleField => {
+                    this.battleField = battleField;
+                    this.gameService.createShip(Number(numberOfPlayers))
+                        .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+                });
+        }
+
+       else if (Number(numberOfPlayers) >= 4) {
+            this.gameService.init(36)
+                .subscribe(battleField => {
+                    this.battleField = battleField;
+                    this.gameService.createShip(Number(numberOfPlayers))
+                        .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+                });
+        }
+
     }
+
+
 
     rotateRight(ship: ShipModel) {
         console.log('Rotating...');
