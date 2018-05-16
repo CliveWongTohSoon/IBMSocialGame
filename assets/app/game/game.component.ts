@@ -56,7 +56,7 @@ export class GameComponent {
     }
 
     shoot(ship:ShipModel){
-        this.gameService.shoot(ship);
+        this.gameService.shoot(ship, this.battleField.rowGrid.length);
     }
 
 }

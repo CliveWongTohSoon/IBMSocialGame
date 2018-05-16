@@ -153,7 +153,7 @@ export class GameService {
 
 
 
-    shoot(ship:ShipModel){
+    shoot(ship:ShipModel, fieldSize:number){
 
         loopAttackRange:
         for(let i = 1; i < ship.shipStats.attackRange+1; i++){ //check all attack range
@@ -164,13 +164,13 @@ export class GameService {
                     let leftAttackDepart = ship.shipDepartment.departmentArray[2];
                     let rightAttackDepart = ship.shipDepartment.departmentArray[3];
                     let defendDepart = this.allBattleShips[j].shipDepartment.departmentArray[k];
-
                     switch(ship.shipDirection.dir){ //check four attacking ship direction
 
                         case Direction.Up:
                             switch(horizontalRelativePosition){
 
-                                case 1: //only leftWeapon hits
+                                case 1: //only leftWeapon hits, normal case
+                                case 1-fieldSize://case where defendShip is split by edge
                                     if (((leftAttackDepart.yIndex - i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
                                         //write your update health function here, I already checked this particular department should be attacked
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
@@ -194,6 +194,7 @@ export class GameService {
                                     break;
 
                                 case -1: // only right weapon hits
+                                case fieldSize-1:
                                     if (((rightAttackDepart.yIndex - i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
                                         console.log('Department '+ k + ' of ship '+ j +' is being hit');
@@ -208,6 +209,7 @@ export class GameService {
                         case Direction.Down:
                             switch(horizontalRelativePosition){
                                 case 1: //only rightWeapon hits
+                                case 1-fieldSize:
                                     if (((rightAttackDepart.yIndex + i) == defendDepart.yIndex) && (rightAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
                                         console.log('Department '+ k + ' of ship '+ j +' is being hit');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
@@ -229,6 +231,7 @@ export class GameService {
                                     break;
 
                                 case -1:// only leftWeapon hits
+                                case fieldSize-1:
                                     if (((leftAttackDepart.yIndex + i) == defendDepart.yIndex) && (leftAttackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
                                         console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
@@ -242,6 +245,7 @@ export class GameService {
                         case Direction.Left:
                             switch(verticalRelativePosition){
                                 case 1: //only rightWeapon hits
+                                case 1-fieldSize:
                                     if (((rightAttackDepart.xIndex - i) == defendDepart.xIndex) && (rightAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
                                         console.log('Department '+ k + ' of ship '+ j +' is being hit');
@@ -263,6 +267,7 @@ export class GameService {
                                     break;
 
                                 case -1:// only leftWeapon hits
+                                case fieldSize-1:
                                     if (((leftAttackDepart.xIndex - i) == defendDepart.xIndex) && (leftAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
                                         console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
@@ -276,6 +281,7 @@ export class GameService {
                         case Direction.Right:
                             switch(verticalRelativePosition){
                                 case 1: //only leftWeapon hits
+                                case 1-fieldSize:
                                     if (((leftAttackDepart.xIndex + i) == defendDepart.xIndex) && (leftAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
                                         //this.allBattleShips[j].shipDepartment.departmentArray[k] is damaged
                                         console.log('Department '+ k + ' of ship '+ j +' is being hit');
@@ -297,6 +303,7 @@ export class GameService {
                                     break;
 
                                 case -1:// only rightWeapon hits
+                                case fieldSize-1:
                                     if (((rightAttackDepart.xIndex + i) == defendDepart.xIndex) && (rightAttackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
                                         console.log('Department '+ k + ' of ship '+ j +' is being hit');
                                         break loopAttackRange;
