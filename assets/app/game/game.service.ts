@@ -237,7 +237,6 @@ export class GameService {
                         let defendShip = this.allBattleShips[j];
                         let defendDepart = defendShip.shipDepartment.departmentArray[k];
                         let attackDepart = ship.shipDepartment.departmentArray[l];
-
                         let bothDepartExist:boolean = (defendDepart.health > 0) && (attackDepart.health > 0);
                         let positionCorrectUp:boolean = ((attackDepart.yIndex - i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
                         let positionCorrectDown:boolean = ((attackDepart.yIndex + i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
@@ -245,34 +244,33 @@ export class GameService {
                         let positionCorrectRight:boolean = ((attackDepart.xIndex + i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex);
 
                         switch (ship.shipDirection.dir) { //check four attacking ship direction
-
                             case Direction.Up:
                                 if ( positionCorrectUp && bothDepartExist ) {
-                                    //     this.updateHealth(ship, defendShip, k);
-                                        console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                    this.updateHealth(ship, defendShip, k);
+                                    console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Down:
                                 if ( positionCorrectDown && bothDepartExist ) {
-                                    console.log('Department ' + k + ' of ship ' + j + ' is being hit');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
+                                    this.updateHealth(ship, defendShip, k);
+                                    console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
-
                             case Direction.Left:
                                 if ( positionCorrectLeft && bothDepartExist ) {
+                                    this.updateHealth(ship, defendShip, k);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
-
                             case Direction.Right:
                                 if ( positionCorrectRight && bothDepartExist ) {
+                                    this.updateHealth(ship, defendShip, k);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
-                                break;
                         }
                     }
                 }
