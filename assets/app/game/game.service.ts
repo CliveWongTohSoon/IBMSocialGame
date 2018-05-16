@@ -229,8 +229,6 @@ export class GameService {
     }
 
     shoot(ship:ShipModel, fieldSize:number){
-
-
         for(let l =2;l<4;l++){
             loopAttackRange:
             for(let i = 1; i < ship.shipStats.attackRange+1; i++){ //check all attack range
@@ -240,33 +238,37 @@ export class GameService {
                         let defendDepart = defendShip.shipDepartment.departmentArray[k];
                         let attackDepart = ship.shipDepartment.departmentArray[l];
 
+                        let bothDepartExist:boolean = (defendDepart.health > 0) && (attackDepart.health > 0);
+                        let positionCorrectUp:boolean = ((attackDepart.yIndex - i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
+                        let positionCorrectDown:boolean = ((attackDepart.yIndex + i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
+                        let positionCorrectLeft:boolean = ((attackDepart.xIndex - i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex);
+                        let positionCorrectRight:boolean = ((attackDepart.xIndex + i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex);
+
                         switch (ship.shipDirection.dir) { //check four attacking ship direction
 
                             case Direction.Up:
-                                if (((attackDepart.yIndex - i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
-                                    // if (attackDepart.health > 0) {
+                                if ( positionCorrectUp && bothDepartExist ) {
                                     //     this.updateHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
-                                    // }
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Down:
-                                if (((attackDepart.yIndex + i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex) && (defendDepart.health != 0)) {
+                                if ( positionCorrectDown && bothDepartExist ) {
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');// notice I didn't add 1 for player's ship,so if j is 1 then actually player2's ship is being hit
                                     break loopAttackRange;
                                 }
                                 break;
 
                             case Direction.Left:
-                                if (((attackDepart.xIndex - i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                if ( positionCorrectLeft && bothDepartExist ) {
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
 
                             case Direction.Right:
-                                if (((attackDepart.xIndex + i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex) && (defendDepart.health != 0)) {
+                                if ( positionCorrectRight && bothDepartExist ) {
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
