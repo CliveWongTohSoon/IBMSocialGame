@@ -23,6 +23,8 @@ export class GameComponent {
 
 
 
+
+
     renderBackgroundColor(col: TableContent) {
         if (col.color) {
             return col.color;
@@ -33,6 +35,7 @@ export class GameComponent {
     constructor(private gameService: GameService) {
         gameService.init(25).subscribe(battleField => this.battleField = battleField);
     }
+
 
 
     start(numberOfPlayers: string) {
@@ -102,6 +105,11 @@ export class GameComponent {
     shieldRight(ship: ShipModel) {
         this.gameService.shield(ship,3)
     }
+
+    shoot(ship:ShipModel){
+        this.gameService.shoot(ship, this.battleField.rowGrid.length);
+    }
+
     // fullTurns(){
     //     let turn: number;
     //     let i : number;
@@ -144,3 +152,8 @@ export class GameComponent {
     //     }
     // }
 }
+
+
+
+
+
