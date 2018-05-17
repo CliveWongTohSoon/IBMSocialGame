@@ -85,8 +85,7 @@ export class GameService {
         ship.shipDirection = newDirection;
         ship.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
         this.updateGridWithAllShip();
-        console.log("IN UPDATE SHIP");
-        console.log(ship.shipPosition);
+        //console.log(ship.shipPosition);
     }
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
@@ -250,7 +249,7 @@ export class GameService {
 
         while (validCheck == true) {
             for (i = 0; i < this.allBattleShips.length; i++) {
-                while (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
                     console.log("move count perform =" + this.allBattleShips[i].collisionInfo.moveCount);
 
                     this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
@@ -258,8 +257,7 @@ export class GameService {
                     this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
                     this.allBattleShips[i].collisionInfo.moveCount--;
                     this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
-
-                    console.log("newPosition");
+                    console.log(i);
                     console.log(this.allBattleShips[i].shipPosition);
 
                 }
@@ -268,16 +266,13 @@ export class GameService {
             this.checkCollision(fieldSize);
             validCheck = false;
             for (i = 0; i<this.allBattleShips.length; i++){
+                console.log("inside check condition " +this.allBattleShips[i].collisionInfo.moveCount);
                 if(this.allBattleShips[i].collisionInfo.moveCount > 0){
                     validCheck = true;
                 }
             }
             //validCheck = false;
 
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
-                this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
-            }
 
             // Loop through all ships
             // Check if currentShip collides with any other ships using filter
@@ -290,6 +285,11 @@ export class GameService {
             // stop
             // else
             // continue to move
+        }
+
+        for (i = 0; i < this.allBattleShips.length; i++) {
+            this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
+            this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
         }
     }
 
@@ -316,8 +316,10 @@ export class GameService {
                     this.allBattleShips[i].collisionInfo.resultantMove.xIndex += overflow.xIndex;
                     this.allBattleShips[i].collisionInfo.resultantMove.yIndex += overflow.yIndex;
                     this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 2);
+                    console.log("Assigned move in check " + this.allBattleShips[i].collisionInfo.moveCount );
                 }
             }
+          //  console.log("Assigned move in check " + this.allBattleShips[i].collisionInfo.moveCount );
         }
     }
 
