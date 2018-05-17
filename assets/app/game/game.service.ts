@@ -85,6 +85,8 @@ export class GameService {
         ship.shipDirection = newDirection;
         ship.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
         this.updateGridWithAllShip();
+        console.log("IN UPDATE SHIP");
+        console.log(ship.shipPosition);
     }
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
@@ -214,25 +216,53 @@ export class GameService {
     performCollision(fieldSize: number) {
         var validCheck = false;
         var i = 0;
-        var newPosition: ShipPosition = new ShipPosition(0,0);
-        for (i = 0; i<this.allBattleShips.length; i++){
-            if(this.allBattleShips[i].collisionInfo.moveCount > 0){
+        //var newPosition: Array<ShipPosition> = new ShipPosition(0, 0);
+        //var newPosition1: ShipPosition = new ShipPosition(0, 0);
+        for (i = 0; i < this.allBattleShips.length; i++) {
+            if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
                 validCheck = true;
             }
         }
-        while(validCheck == true){
-            for (i = 0; i < this.allBattleShips.length; i++){
-              if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
-                  newPosition.xIndex = this.allBattleShips[i].shipPosition.xIndex + this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
-                  newPosition.yIndex = this.allBattleShips[i].shipPosition.yIndex + this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
-                  this.allBattleShips[i].collisionInfo.moveCount--;
-                  this.updateShip(this.allBattleShips[i], newPosition, this.allBattleShips[i].shipDirection);
-                  console.log(this.allBattleShips[i].collisionInfo.moveCount);
-                  console.log(this.allBattleShips[0].collisionInfo.resultantMove);
-                  console.log(this.allBattleShips[1].collisionInfo.resultantMove);
-                  console.log(newPosition.xIndex);
-                  console.log(newPosition.yIndex);
-              }
+        console.log(this.allBattleShips[0].collisionInfo.resultantMove);
+        console.log(this.allBattleShips[1].collisionInfo.resultantMove);
+
+        // while(validCheck == true){
+        //     while (this.allBattleShips[0].collisionInfo.moveCount > 0) {
+        //         console.log("move count perform =" + this.allBattleShips[0].collisionInfo.moveCount);
+        //
+        //         newPosition.xIndex = this.allBattleShips[0].shipPosition.xIndex + this.allBattleShips[0].collisionInfo.resultantMove.xIndex;
+        //         newPosition.yIndex = this.allBattleShips[0].shipPosition.yIndex + this.allBattleShips[0].collisionInfo.resultantMove.yIndex;
+        //         newPosition = this.worldRound(newPosition, fieldSize);
+        //         this.allBattleShips[0].collisionInfo.moveCount--;
+        //         this.updateShip(this.allBattleShips[0], newPosition, this.allBattleShips[0].shipDirection);
+        //     }
+        //     while (this.allBattleShips[1].collisionInfo.moveCount > 0) {
+        //         console.log("move count perform =" + this.allBattleShips[1].collisionInfo.moveCount);
+        //
+        //         newPosition1.xIndex = this.allBattleShips[1].shipPosition.xIndex + this.allBattleShips[1].collisionInfo.resultantMove.xIndex;
+        //         newPosition1.yIndex = this.allBattleShips[1].shipPosition.yIndex + this.allBattleShips[1].collisionInfo.resultantMove.yIndex;
+        //         newPosition1= this.worldRound(newPosition1, fieldSize);
+        //         this.allBattleShips[1].collisionInfo.moveCount--;
+        //         this.updateShip(this.allBattleShips[1], newPosition1, this.allBattleShips[1].shipDirection);
+        //     }
+        //     validCheck = false;
+        // }
+
+        while (validCheck == true) {
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                while (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+                    console.log("move count perform =" + this.allBattleShips[i].collisionInfo.moveCount);
+
+                    this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
+                    this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
+                    this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
+                    this.allBattleShips[i].collisionInfo.moveCount--;
+                    this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
+
+                    console.log("newPosition");
+                    console.log(this.allBattleShips[i].shipPosition);
+
+                }
             }
 
             this.checkCollision(fieldSize);
@@ -242,27 +272,27 @@ export class GameService {
                     validCheck = true;
                 }
             }
-            validCheck = false; //test
-        }
-        for (i = 0; i<this.allBattleShips.length; i++){
-            this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
-            this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
-        }
+            //validCheck = false;
 
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
+                this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
+            }
 
-
-        // Loop through all ships
-        // Check if currentShip collides with any other ships using filter
-        // Work out the number of steps for the currentShip and all other ships in collision
-        // update 1 step for each ship
-        // get leftOver steps (by minus 1 step from total steps)
-        // checkAllCollision
+            // Loop through all ships
+            // Check if currentShip collides with any other ships using filter
+            // Work out the number of steps for the currentShip and all other ships in collision
+            // update 1 step for each ship
+            // get leftOver steps (by minus 1 step from total steps)
+            // checkAllCollision
             // if collision
-        // if leftOver == 0
+            // if leftOver == 0
             // stop
-        // else
+            // else
             // continue to move
+        }
     }
+
 
     checkCollision(fieldSize :number){
 
@@ -277,10 +307,6 @@ export class GameService {
                     if(Math.abs(overflow.xIndex) == fieldSize - 1){
                         overflow.xIndex = -1 * Math.abs(overflow.xIndex)/overflow.xIndex;
                     }
-                    else if(overflow.xIndex == 0){
-                        if(this.allBattleShips[i].shipDirection.dir == N )
-                        overflow.xIndex = this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex + i;
-                    }
                     overflow.yIndex = this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
                     if(Math.abs(overflow.yIndex) == fieldSize - 1){
                         overflow.yIndex = -1 * Math.abs(overflow.yIndex)/overflow.yIndex;
@@ -293,7 +319,6 @@ export class GameService {
                 }
             }
         }
-        console.log(this.allBattleShips);
     }
 
 
