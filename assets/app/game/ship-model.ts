@@ -3,11 +3,11 @@ export class ShipModel {
     //public collidedShip: Array<ShipPosition>;
     //public collidedShipId: string[];
     public collisionInfo: CollisionInfo;
+    public shipAction: ShipAction;
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
                 public shipStats: ShipStats,
-
                 public colorFront: string,
                 public colorBack: string) {
     }
@@ -22,8 +22,8 @@ export enum Direction {
     Left,
     Down,
     Right
-
 }
+
 export class ShipDirection {
     constructor(public dir: Direction) {}
 }
@@ -51,7 +51,7 @@ export enum Action {
     DoNothing
 }
 
-export class ShipActions {
+export class ShipAction {
     constructor(public act: Action[]) {}
 }
 // Can make each department specific

@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {ShipModel} from "./ship-model";
+import {ShipModel, Action} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
 
@@ -71,6 +71,8 @@ export class GameComponent {
                 });
         }
 
+        this.fullTurns();
+
     }
 
 
@@ -110,47 +112,49 @@ export class GameComponent {
         this.gameService.shoot(ship, this.battleField.rowGrid.length);
     }
 
-    // fullTurns(){
-    //     let turn: number;
-    //     let i : number;
-    //     let relevantShips: ShipModel [];
-    //     for (turn = 1; turn <= 3; turn++){
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.FrontShield));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             this.shieldUp(relevantShips[i])
-    //         }
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.LeftShield));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             this.shieldLeft(relevantShips[i])
-    //         }
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.BackShield));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             this.shieldDown(relevantShips[i])
-    //         }
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.RightShield));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             this.shieldRight(relevantShips[i])
-    //         }
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.ShootFront));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             //this.shoot(relevantShips[i])
-    //         }
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.MoveFront));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             this.move(relevantShips[i])
-    //         }
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.RightTurn));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             this.rotateRight(relevantShips[i])
-    //         }
-    //         relevantShips = this.allBattleShip.filter (aShip => (aShip.shipActions.act[(turn-1)] == Action.LeftTurn));
-    //         for (i = 0; i < relevantShips.length; i++){
-    //             this.rotateLeft(relevantShips[i])
-    //         }
-    //         //this.gameService.checkCollision()
-    //         // check for ships with the same x,y coordinate!!!!
-    //     }
-    // }
+    fullTurns(){
+        let turn: number;
+        let i : number;
+        let relevantShips: ShipModel [];
+        for (turn = 1; turn <= 3; turn++){
+            console.log(turn);
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].FrontShield));
+            for (i = 0; i < relevantShips.length; i++){
+                this.shieldUp(relevantShips[i]);
+            }
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].LeftShield));
+            for (i = 0; i < relevantShips.length; i++){
+                this.shieldLeft(relevantShips[i]);
+            }
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].BackShield));
+            for (i = 0; i < relevantShips.length; i++){
+                this.shieldDown(relevantShips[i]);
+            }
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].RightShield));
+            for (i = 0; i < relevantShips.length; i++){
+                this.shieldRight(relevantShips[i]);
+            }
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].ShootFront));
+            for (i = 0; i < relevantShips.length; i++){
+                this.shoot(relevantShips[i]);
+            }
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].MoveFront));
+            for (i = 0; i < relevantShips.length; i++){
+                this.move(relevantShips[i]);
+            }
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].RightTurn));
+            for (i = 0; i < relevantShips.length; i++){
+                this.rotateRight(relevantShips[i]);
+            }
+            relevantShips = this.allBattleShip.filter (aShip => (aShip.shipAction.act[(turn-1)] == Action[turn-1].LeftTurn));
+            for (i = 0; i < relevantShips.length; i++){
+                this.rotateLeft(relevantShips[i]);
+            }
+            this.gameService.checkCollision(this.battleField.rowGrid.length);
+            this.gameService.performCollision(this.battleField.rowGrid.length);
+            // check for ships with the same x,y coordinate!!!!
+        }
+    }
 }
 
 
