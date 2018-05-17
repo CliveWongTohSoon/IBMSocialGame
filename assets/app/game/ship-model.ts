@@ -1,6 +1,8 @@
 export class ShipModel {
     public shipDepartment: ShipDepartment;
-    public collidedShip: Array<ShipPosition>;
+    //public collidedShip: Array<ShipPosition>;
+    //public collidedShipId: string[];
+    public collisionInfo: CollisionInfo;
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
@@ -111,4 +113,8 @@ export class Department {
 
 export class Character {
     constructor(public name: string, question: string[]) {}
+}
+
+export class CollisionInfo {
+    constructor(public resultantMove: ShipPosition, public moveCount: number) {}
 }

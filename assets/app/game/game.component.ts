@@ -39,7 +39,7 @@ export class GameComponent {
         // randomDir();
         console.log(numberOfPlayers);
 
-        console.log("Working123");
+        console.log("Working");
 
         if (Number(numberOfPlayers) <= 2) {
             this.gameService.init(25)
