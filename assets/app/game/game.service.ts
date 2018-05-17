@@ -1,6 +1,8 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
+
 import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, shipStats, CollisionInfo} from "./ship-model";
+
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -38,8 +40,10 @@ export class GameService {
                 const initShipPosition = new ShipPosition(randomX, randomY);
                 const randomDir = this.randomDir(4);
                 const initShipDirection = new ShipDirection(randomDir);
-                const  initShipStat = new shipStats(5,5,5,5,false,0);
+
+                const  initShipStat = new ShipStats(1000,500,5,0,5,false,0);
                 const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat,randomColorFront, randomColorBack);
+
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 const newShipPosition = new ShipPosition(0,0);
                 newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
@@ -89,6 +93,7 @@ export class GameService {
     }
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
+
         let newPosition: ShipPosition = position;
 
         if (position.xIndex >= fieldSize) {
@@ -368,10 +373,74 @@ export class GameService {
 
 
 
-    randomDir(range : number): number{
+    randomDir(range : number): number {
         return Math.floor(Math.random() * range);
-
     }
+
+    shoot(ship:ShipModel, fieldSize:number){
+        for(let l =2;l<4;l++){
+            loopAttackRange:
+            for(let i = 1; i < ship.shipStats.attackRange+1; i++){ //check all attack range
+                for(let j = 0; j < this.allBattleShips.length; j++){ // check all ships (for being attacked)
+                    for (let k = 0; k < 4; k++) { //check all four department being hit, also 4 directions. directions are anti-clockwise, and four department are clockwise
+                        let defendShip = this.allBattleShips[j];
+                        let defendDepart = defendShip.shipDepartment.departmentArray[k];
+                        let attackDepart = ship.shipDepartment.departmentArray[l];
+                        let bothDepartExist:boolean = (defendDepart.health > 0) && (attackDepart.health > 0);
+                        let positionCorrectUp:boolean = ((attackDepart.yIndex - i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
+                        let positionCorrectDown:boolean = ((attackDepart.yIndex + i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
+                        let positionCorrectLeft:boolean = ((attackDepart.xIndex - i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex);
+                        let positionCorrectRight:boolean = ((attackDepart.xIndex + i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex);
+
+                        switch (ship.shipDirection.dir) { //check four attacking ship direction
+                            case Direction.Up:
+                                if ( positionCorrectUp && bothDepartExist ) {
+                                    this.updateHealth(ship, defendShip, k);
+                                    console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                    break loopAttackRange;
+                                }
+                                break;
+                            case Direction.Down:
+                                if ( positionCorrectDown && bothDepartExist ) {
+                                    this.updateHealth(ship, defendShip, k);
+                                    console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                    break loopAttackRange;
+                                }
+                                break;
+                            case Direction.Left:
+                                if ( positionCorrectLeft && bothDepartExist ) {
+                                    this.updateHealth(ship, defendShip, k);
+                                    console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                    break loopAttackRange;
+                                }
+                                break;
+                            case Direction.Right:
+                                if ( positionCorrectRight && bothDepartExist ) {
+                                    this.updateHealth(ship, defendShip, k);
+                                    console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                    break loopAttackRange;
+                                }
+                        }
+                    }
+                }
+            }
+        }
+
+        function findNeibourDepart( k:number,offset: number){ // kth department plus offset
+            let result = k + offset;
+            if( result > 3 || result < 0 ){
+                return mod(result, 4);
+            }else {
+                return result;
+            }
+
+            function mod(n, m) {
+                return ((n % m) + m) % m;
+            }
+        }
+
+    } // end shoot
+
 
 
     randomCoor(max: number, start: number){ //}, prevPos : number, range : number){
@@ -385,47 +454,18 @@ export class GameService {
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
 
-    updateHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number, damage: number) {
-        if (victimShip.shipStats.shieldActive == true) {
+    updateHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
+        let damage = shooterShip.shipStats.attack;
+
+        if (victimShip.shipStats.shieldActive) {
             damage = this.shieldCheck(shooterShip, victimShip, damage)
         }
-        // if victimShip.shipDepartment[affectedDep].health < shooterShip.shipStats.attack){
-        //     victimShip.shipDepartment[affectedDep].health = 0;
-        // }
-        // else{
-        //     victimShip.shipDepartment[affectedDep].health = victimShip.shipDepartment[affectedDep].health - damage;
-        // }
-        if (affectedDep == 0) {
-            if (victimShip.shipDepartment.leftWeapon.health < shooterShip.shipStats.attack) {
-                victimShip.shipDepartment.leftWeapon.health = 0;
-            }
-            else{
-                victimShip.shipDepartment.leftWeapon.health = victimShip.shipDepartment.leftWeapon.health - damage;
-            }
+
+        if (victimShip.shipDepartment.departmentArray[affectedDep].health < shooterShip.shipStats.attack) {
+            victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
         }
-        if (affectedDep == 1) {
-            if (victimShip.shipDepartment.rightWeapon.health < shooterShip.shipStats.attack) {
-                victimShip.shipDepartment.rightWeapon.health = 0;
-            }
-            else{
-                victimShip.shipDepartment.rightWeapon.health = victimShip.shipDepartment.rightWeapon.health - damage;
-            }
-        }
-        if (affectedDep == 2) {
-            if (victimShip.shipDepartment.leftEngine.health < shooterShip.shipStats.attack) {
-                victimShip.shipDepartment.leftEngine.health = 0;
-            }
-            else{
-                victimShip.shipDepartment.leftEngine.health = victimShip.shipDepartment.leftEngine.health - damage;
-            }
-        }
-        if (affectedDep == 3) {
-            if (victimShip.shipDepartment.rightEngine.health < shooterShip.shipStats.attack) {
-                victimShip.shipDepartment.rightEngine.health = 0;
-            }
-            else{
-                victimShip.shipDepartment.rightEngine.health = victimShip.shipDepartment.rightEngine.health - damage;
-            }
+        else{
+            victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
         }
     }
 
