@@ -299,28 +299,28 @@ export class GameService {
                         switch (ship.shipDirection.dir) { //check four attacking ship direction
                             case Direction.Up:
                                 if ( positionCorrectUp && bothDepartExist ) {
-                                    this.updateHealth(ship, defendShip, k);
+                                    this.updateHealth(ship, defendShip, k, true);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Down:
                                 if ( positionCorrectDown && bothDepartExist ) {
-                                    this.updateHealth(ship, defendShip, k);
+                                    this.updateHealth(ship, defendShip, k, true);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Left:
                                 if ( positionCorrectLeft && bothDepartExist ) {
-                                    this.updateHealth(ship, defendShip, k);
+                                    this.updateHealth(ship, defendShip, k,true);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Right:
                                 if ( positionCorrectRight && bothDepartExist ) {
-                                    this.updateHealth(ship, defendShip, k);
+                                    this.updateHealth(ship, defendShip, k, true);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
@@ -363,15 +363,12 @@ export class GameService {
         if(shoot ==true){
             damage = shooterShip.shipStats.attack;
         }
-        edamage =
-        }
 
-        if (victimShip.shipStats.shieldActive == true && shoot = true)  {
+        if (victimShip.shipStats.shieldActive == true && shoot == true)  {
             damage = this.shootShieldCheck(shooterShip, victimShip, damage)
         }
-        else if (victimShip.shipStats.shieldActive == true && shoot = false){
-            damage = this.collisionShieldCheck(victimShip, shooterShip, damage )
-        }
+        //else if (victimShip.shipStats.shieldActive == true && shoot = false){
+            //damage = this.collisionShieldCheck(victimShip, shooterShip, damage )}
 
         if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
             victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
@@ -379,6 +376,7 @@ export class GameService {
         else{
             victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
         }
+
     }
 
     // shieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
@@ -489,28 +487,28 @@ export class GameService {
                 reducedDamage = damage * (1 - updatingShip.shipStats.defence);
             }
         }
-        else if (updatingShip.shipAction.act[turn-1] == Action.LeftTurn || updatingShip.shipAction.act[turn-1] == Action.RightTurn){
-            if (xDiff > 0){
-                if (shieldGridDirection == Direction.Left){
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-            else if (xDiff < 0){
-                if (shieldGridDirection == Direction.Right){
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-            if (yDiff > 0){
-                if (shieldGridDirection == Direction.Up) {
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-            else if (yDiff < 0){
-                if (shieldGridDirection == Direction.Down){
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-        }
+        // else if (updatingShip.shipAction.act[turn-1] == Action.LeftTurn || updatingShip.shipAction.act[turn-1] == Action.RightTurn){
+        //     if (xDiff > 0){
+        //         if (shieldGridDirection == Direction.Left){
+        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+        //         }
+        //     }
+        //     else if (xDiff < 0){
+        //         if (shieldGridDirection == Direction.Right){
+        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+        //         }
+        //     }
+        //     if (yDiff > 0){
+        //         if (shieldGridDirection == Direction.Up) {
+        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+        //         }
+        //     }
+        //     else if (yDiff < 0){
+        //         if (shieldGridDirection == Direction.Down){
+        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+        //         }
+        //     }
+        // }
         return reducedDamage;
     }
 
