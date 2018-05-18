@@ -49,4 +49,20 @@ export class GameComponent {
     move(ship: ShipModel) {
         this.gameService.move(ship, this.battleField.rowGrid.length);
     }
+
+    shieldUp(ship: ShipModel) {
+        this.gameService.shield(ship, 0);
+    }
+
+    shieldLeft(ship: ShipModel) {
+        this.gameService.shield(ship, 1);
+    }
+
+    shieldDown(ship: ShipModel) {
+        this.gameService.shield(ship,2)
+    }
+
+    shieldRight(ship: ShipModel) {
+        this.gameService.shield(ship,3)
+    }
 }

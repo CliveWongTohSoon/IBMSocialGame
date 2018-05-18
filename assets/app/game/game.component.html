@@ -26,10 +26,10 @@
         <button  type="button" class="btn btn-default " id="right1" (click)="rotateRight(ship)"> Turn Right </button>
         <button  type="button" class="btn btn-default " id="left1" (click)="rotateLeft(ship)"> Turn Left </button>
         <button  type="button" class="btn btn-default "> Shoot </button>
-        <button  type="button" class="btn btn-default "> Shield Front </button>
-        <button  type="button" class="btn btn-default "> Shield Back </button>
-        <button  type="button" class="btn btn-default "> Shield Right</button>
-        <button  type="button" class="btn btn-default "> Shield Left </button>
+        <button  type="button" class="btn btn-default " id="ShieldFront" (click)="shieldUp(ship)" >Shield Front </button>
+        <button  type="button" class="btn btn-default " id="ShieldBack" (click)="shieldDown(ship)"> Shield Back </button>
+        <button  type="button" class="btn btn-default " id="ShieldRight"(click)="shieldRight(ship)"> Shield Right</button>
+        <button  type="button" class="btn btn-default " id="ShieldLeft" (click)="shieldLeft(ship)"> Shield Left </button>
     </div>
 
     <!--<div class="btn-group-vertical col-sm-3" role="group" aria-label="...">-->

@@ -52,7 +52,8 @@ const micParams = {
     rate: 44100,
     channels: 2,
     debug: false,
-    exitOnSilence: 6
+    exitOnSilence: 6,
+    device: pulse
 };
 
 const micInstance = mic(micParams);
