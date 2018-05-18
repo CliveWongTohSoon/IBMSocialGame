@@ -12,30 +12,33 @@
     <!--<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>-->
     <!--<script src='Test.js'>  </script>-->
 <!--</head>-->
-<h1>AI Social Game</h1>
 <body align="center">
+<h1>AI Social Game</h1>
 <div class="row">
     <label for="player" class="col-md-8 col-offset-2">Number of players</label>
     <input type="number" class="col-md-4 form-control" id="player" #player>
     <button  type="button" class="btn btn-default " (click)="start(player.value)"> START </button><br>
     <br>
 
-    <div class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
+    <div  role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
         <h4> PLAYER {{i+1}} </h4>
-        <p>Left Weapon Health: {{ship.shipDepartment.departmentArray[2].health}}</p>
-        <p>Right Weapon Health: {{ship.shipDepartment.departmentArray[3].health}}</p>
-        <p>Left Engine Health: {{ship.shipDepartment.departmentArray[1].health}}</p>
-        <p>Right Engine Health: {{ship.shipDepartment.departmentArray[0].health}}</p>
-        <button  type="button" class="btn btn-danger  " id="move1" (click)="move(ship)"> Move </button>
-        <button  type="button" class="btn btn-default " id="right1" (click)="rotateRight(ship)"> Turn Right </button>
-        <button  type="button" class="btn btn-default " id="left1" (click)="rotateLeft(ship)"> Turn Left </button>
+        <p class="demonstrateHealth">Left Weapon: {{ship.shipDepartment.departmentArray[2].health}}&nbsp;&nbsp;Right Weapon: {{ship.shipDepartment.departmentArray[3].health}}</p>
+        <p class="demonstrateHealth">Left Engine: {{ship.shipDepartment.departmentArray[1].health}}&nbsp;&nbsp;Right Engine: {{ship.shipDepartment.departmentArray[0].health}}</p>
 
-        <button  type="button" class="btn btn-default " id="shoot" (click)="shoot(ship)"> Shoot </button>
-        <button  type="button" class="btn btn-default " id="ShieldFront" (click)="shieldUp(ship)" >Shield Front </button>
-        <button  type="button" class="btn btn-default " id="ShieldBack" (click)="shieldDown(ship)"> Shield Back </button>
-        <button  type="button" class="btn btn-default " id="ShieldRight"(click)="shieldRight(ship)"> Shield Right</button>
-        <button  type="button" class="btn btn-default " id="ShieldLeft" (click)="shieldLeft(ship)"> Shield Left </button>
-
+        <div class="btn-group">
+            <button  type="button" class="btn btn-danger  "  id="move1" (click)="move(ship)"> Move </button>
+            <button  type="button" class="btn btn-default "  id="shoot" (click)="shoot(ship)"> Shoot </button>
+        </div>
+        <div class="btn-group">
+            <button  type="button" class="btn btn-default " id="left1" (click)="rotateLeft(ship)"> Turn Left </button>
+            <button  type="button" class="btn btn-default " id="right1" (click)="rotateRight(ship)"> Turn Right </button>
+        </div>
+        <div class="btn-group">
+            <button  type="button" class="btn btn-default " id="ShieldFront" (click)="shieldUp(ship)" >Shield Front </button>
+            <button  type="button" class="btn btn-default " id="ShieldBack" (click)="shieldDown(ship)"> Shield Back </button>
+            <button  type="button" class="btn btn-default " id="ShieldLeft" (click)="shieldLeft(ship)"> Shield Left </button>
+            <button  type="button" class="btn btn-default " id="ShieldRight"(click)="shieldRight(ship)"> Shield Right</button>
+        </div>
     </div>
 
 

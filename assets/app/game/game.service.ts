@@ -12,8 +12,6 @@ import {
     ShipAction
 } from "./ship-model";
 
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo} from "./ship-model";
-
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -102,7 +100,7 @@ export class GameService {
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
-        ship.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
+        ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length,ship);
         this.updateGridWithAllShip();
         //console.log(ship.shipPosition);
     }
@@ -147,8 +145,6 @@ export class GameService {
         this.updateShip(ship, newPosition, ship.shipDirection);
         this.checkCollision(fieldSize);
         this.performCollision(fieldSize);
-
-
 
     }
 
@@ -292,7 +288,11 @@ export class GameService {
                         let defendShip = this.allBattleShips[j];
                         let defendDepart = defendShip.shipDepartment.departmentArray[k];
                         let attackDepart = ship.shipDepartment.departmentArray[l];
+
                         let bothDepartExist:boolean = (defendDepart.health > 0) && (attackDepart.health > 0);
+                        //let bothDepartExist:boolean = (defendDepart.alive) && (attackDepart.alive);
+                        //once you implement the changing of alive, uncomment the line above and comment old bothDepartmentExist
+
                         let positionCorrectUp:boolean = ((attackDepart.yIndex - i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
                         let positionCorrectDown:boolean = ((attackDepart.yIndex + i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
                         let positionCorrectLeft:boolean = ((attackDepart.xIndex - i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex);
