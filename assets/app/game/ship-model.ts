@@ -132,30 +132,35 @@ export class ShipDepartment {
         let cordDY = shipPosition.yIndex + 0.5;
         if (cordDY == fieldSize){cordDY = cordDY - fieldSize};
 
+        let departRE = ship.shipDepartment.departmentArray[0];
+        let departLE = ship.shipDepartment.departmentArray[1];
+        let departLW = ship.shipDepartment.departmentArray[2];
+        let departRW = ship.shipDepartment.departmentArray[3];
+
         if (shipDirection.dir == Direction.Left) {
-            const rightEngine = new Department(cordBX, cordBY, ship.shipDepartment.departmentArray[0].health, ship.shipDepartment.departmentArray[0].character,ship.shipDepartment.departmentArray[0].alive);
-            const leftEngine = new Department(cordDX, cordDY, ship.shipDepartment.departmentArray[1].health, ship.shipDepartment.departmentArray[1].character,ship.shipDepartment.departmentArray[1].alive);
-            const rightWeapon = new Department(cordAX, cordAY,ship.shipDepartment.departmentArray[3].health, ship.shipDepartment.departmentArray[3].character,ship.shipDepartment.departmentArray[3].alive);
-            const leftWeapon = new Department(cordCX, cordCY, ship.shipDepartment.departmentArray[2].health, ship.shipDepartment.departmentArray[2].character,ship.shipDepartment.departmentArray[2].alive);
+            const rightEngine = new Department(cordBX, cordBY, departRE.health, departRE.character,departRE.alive);
+            const leftEngine = new Department(cordDX, cordDY, departLE.health, departLE.character,departLE.alive);
+            const rightWeapon = new Department(cordAX, cordAY,departRW.health, departRW.character,departRW.alive);
+            const leftWeapon = new Department(cordCX, cordCY, departLW.health, departLW.character,departLW.alive);
             return new ShipDepartment(  [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         } else if (shipDirection.dir == Direction.Right) {
-            const leftWeapon = new Department(cordBX, cordBY, ship.shipDepartment.departmentArray[2].health, ship.shipDepartment.departmentArray[2].character,ship.shipDepartment.departmentArray[2].alive);
-            const rightWeapon = new Department(cordDX, cordDY, ship.shipDepartment.departmentArray[3].health, ship.shipDepartment.departmentArray[3].character,ship.shipDepartment.departmentArray[3].alive);
-            const leftEngine = new Department(cordAX, cordAY, ship.shipDepartment.departmentArray[1].health, ship.shipDepartment.departmentArray[1].character,ship.shipDepartment.departmentArray[1].alive);
-            const rightEngine = new Department(cordCX, cordCY, ship.shipDepartment.departmentArray[0].health, ship.shipDepartment.departmentArray[0].character,ship.shipDepartment.departmentArray[0].alive);
+            const leftWeapon = new Department(cordBX, cordBY, departLW.health, departLW.character,departLW.alive);
+            const rightWeapon = new Department(cordDX, cordDY, departRW.health, departRW.character,departRW.alive);
+            const leftEngine = new Department(cordAX, cordAY,  departLE.health, departLE.character,departLE.alive);
+            const rightEngine = new Department(cordCX, cordCY, departRE.health, departRE.character,departRE.alive);
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         } else if (shipDirection.dir == Direction.Up) {
-            const leftEngine = new Department(cordCX, cordCY, ship.shipDepartment.departmentArray[1].health, ship.shipDepartment.departmentArray[1].character,ship.shipDepartment.departmentArray[1].alive);
-            const leftWeapon = new Department(cordAX, cordAY, ship.shipDepartment.departmentArray[2].health, ship.shipDepartment.departmentArray[2].character,ship.shipDepartment.departmentArray[2].alive);
-            const rightEngine = new Department(cordDX, cordDY, ship.shipDepartment.departmentArray[0].health, ship.shipDepartment.departmentArray[0].character,ship.shipDepartment.departmentArray[0].alive);
-            const rightWeapon = new Department(cordBX, cordBY, ship.shipDepartment.departmentArray[3].health, ship.shipDepartment.departmentArray[3].character,ship.shipDepartment.departmentArray[3].alive);
+            const leftEngine = new Department(cordCX, cordCY,  departLE.health, departLE.character,departLE.alive);
+            const leftWeapon = new Department(cordAX, cordAY,  departLW.health, departLW.character,departLW.alive);
+            const rightEngine = new Department(cordDX, cordDY,departRE.health, departRE.character,departRE.alive);
+            const rightWeapon = new Department(cordBX, cordBY,departRW.health, departRW.character,departRW.alive);
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         }
         else if (shipDirection.dir == Direction.Down) {
-            const rightWeapon = new Department(cordCX, cordCY,ship.shipDepartment.departmentArray[3].health, ship.shipDepartment.departmentArray[3].character,ship.shipDepartment.departmentArray[3].alive);
-            const rightEngine = new Department(cordAX, cordAY,ship.shipDepartment.departmentArray[0].health, ship.shipDepartment.departmentArray[0].character,ship.shipDepartment.departmentArray[0].alive);
-            const leftWeapon = new Department(cordDX, cordDY, ship.shipDepartment.departmentArray[2].health, ship.shipDepartment.departmentArray[2].character,ship.shipDepartment.departmentArray[2].alive);
-            const leftEngine = new Department(cordBX, cordBY, ship.shipDepartment.departmentArray[1].health, ship.shipDepartment.departmentArray[1].character,ship.shipDepartment.departmentArray[1].alive);
+            const rightWeapon = new Department(cordCX, cordCY,departRW.health, departRW.character,departRW.alive);
+            const rightEngine = new Department(cordAX, cordAY,departRE.health, departRE.character,departRE.alive);
+            const leftWeapon = new Department(cordDX, cordDY,  departLW.health, departLW.character,departLW.alive);
+            const leftEngine = new Department(cordBX, cordBY, departLE.health, departLE.character,departLE.alive);
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         }
     }
