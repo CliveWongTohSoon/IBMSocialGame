@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, shipStats, CollisionInfo} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo} from "./ship-model";
 
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
