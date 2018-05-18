@@ -1,7 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 
-<<<<<<< HEAD
 import {
     ShipDepartment,
     Action,
@@ -12,9 +11,8 @@ import {
     CollisionInfo,
     ShipAction
 } from "./ship-model";
-=======
+
 import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo} from "./ship-model";
->>>>>>> 0b926507716302e8dce37609d86cb5133127c5cd
 
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
