@@ -480,16 +480,16 @@ export class GameService {
             }
         }
         else if (referShip.collisionInfo.moveCount != 0){
-            if (referShip.collisionInfo.resultantMove.xIndex > 0 && shieldGridDirection == Direction.Up) {
+            if (referShip.collisionInfo.resultantMove.yIndex > 0 && shieldGridDirection == Direction.Up) {
                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
             }
-            if (referShip.collisionInfo.resultantMove.xIndex < 0 && shieldGridDirection == Direction.Down){
+            if (referShip.collisionInfo.resultantMove.yIndex < 0 && shieldGridDirection == Direction.Down){
                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
             }
-            if (referShip.collisionInfo.resultantMove.yIndex > 0 && shieldGridDirection == Direction.Left){
+            if (referShip.collisionInfo.resultantMove.xIndex > 0 && shieldGridDirection == Direction.Left){
                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
             }
-            if (referShip.collisionInfo.resultantMove.yIndex < 0 && shieldGridDirection == Direction.Right){
+            if (referShip.collisionInfo.resultantMove.xIndex < 0 && shieldGridDirection == Direction.Right){
                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
             }
         }
