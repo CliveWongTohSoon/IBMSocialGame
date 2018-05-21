@@ -5,9 +5,9 @@ export class BattleFieldModel {
 
     static renderGrid(shipDepartment: ShipDepartment, battleField: BattleFieldModel, colourFront: string, colourBack: string) {
 
-        const leftWeaponRowIndex = shipDepartment.departmentArray[2].yIndex, leftWeaponColIndex = shipDepartment.departmentArray[2].xIndex;
-
         const rightWeaponRowIndex = shipDepartment.departmentArray[3].yIndex, rightWeaponColIndex = shipDepartment.departmentArray[3].xIndex;
+
+        const leftWeaponRowIndex = shipDepartment.departmentArray[2].yIndex, leftWeaponColIndex = shipDepartment.departmentArray[2].xIndex;
 
         const leftEngineRowIndex = shipDepartment.departmentArray[1].yIndex, leftEngineColIndex = shipDepartment.departmentArray[1].xIndex;
 

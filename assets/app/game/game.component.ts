@@ -42,7 +42,7 @@ export class GameComponent {
         // randomDir();
         console.log(numberOfPlayers);
 
-        console.log("Working!");
+        console.log("Working");
 
         if (Number(numberOfPlayers) <= 2) {
             this.gameService.init(25)
@@ -145,42 +145,43 @@ export class GameComponent {
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.LeftShield){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shieldLeft(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.BackShield){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shieldDown(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.RightShield){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shieldRight(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.ShootFront){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shoot(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.MoveFront){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.move(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.RightTurn){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.rotateRight(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.LeftTurn){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.rotateLeft(this.allBattleShip[i]);
                 }
             }
             //this.gameService.checkCollision(this.battleField.rowGrid.length);
             //this.gameService.performCollision(this.battleField.rowGrid.length);
             // check for ships with the same x,y coordinate!!!!
+            //shield deassert
         }
     }
 }

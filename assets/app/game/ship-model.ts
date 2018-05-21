@@ -84,29 +84,28 @@ export class ShipDepartment {
         if (cordDY == fieldSize){cordDY = cordDY - fieldSize};
 
         if (shipDirection.dir == Direction.Left) {
-            const rightEngine = new Department(cordBX, cordBY, 1000, null);
-            const leftEngine = new Department(cordDX, cordDY, 1000, null);
-            const rightWeapon = new Department(cordAX, cordAY, 1000, null);
-            const leftWeapon = new Department(cordCX, cordCY, 1000, null);
+            const rightEngine = new Department(cordBX, cordBY, deptArray[0].health, null);
+            const leftEngine = new Department(cordDX, cordDY, deptArray[1].health, null);
+            const rightWeapon = new Department(cordAX, cordAY, deptArray[3].health, null);
+            const leftWeapon = new Department(cordCX, cordCY, deptArray[2].health, null);
             return new ShipDepartment(  [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         } else if (shipDirection.dir == Direction.Right) {
-            const leftWeapon = new Department(cordBX, cordBY, 1000, null);
-            const rightWeapon = new Department(cordDX, cordDY, 1000, null);
-            const leftEngine = new Department(cordAX, cordAY, 1000, null);
-            const rightEngine = new Department(cordCX, cordCY, 1000, null);
+            const leftWeapon = new Department(cordBX, cordBY, deptArray[2].health, null);
+            const rightWeapon = new Department(cordDX, cordDY, deptArray[3].health, null);
+            const leftEngine = new Department(cordAX, cordAY, deptArray[1].health, null);
+            const rightEngine = new Department(cordCX, cordCY, deptArray[0].health, null);
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         } else if (shipDirection.dir == Direction.Up) {
-            const leftEngine = new Department(cordCX, cordCY, 1000, null);
-            const leftWeapon = new Department(cordAX, cordAY, 1000, null);
-            const rightEngine = new Department(cordDX, cordDY, 1000, null);
-            const rightWeapon = new Department(cordBX, cordBY, 1000, null);
+            const leftEngine = new Department(cordCX, cordCY, deptArray[1].health, null);
+            const leftWeapon = new Department(cordAX, cordAY, deptArray[2].health, null);
+            const rightEngine = new Department(cordDX, cordDY, deptArray[0].health, null);
+            const rightWeapon = new Department(cordBX, cordBY, deptArray[3].health, null);
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
-        }
-        else if (shipDirection.dir == Direction.Down) {
-            const rightWeapon = new Department(cordCX, cordCY, 1000, null);
-            const rightEngine = new Department(cordAX, cordAY, 1000, null);
-            const leftWeapon = new Department(cordDX, cordDY, 1000, null);
-            const leftEngine = new Department(cordBX, cordBY, 1000, null);
+        } else if (shipDirection.dir == Direction.Down) {
+            const rightWeapon = new Department(cordCX, cordCY, deptArray[3].health, null);
+            const rightEngine = new Department(cordAX, cordAY, deptArray[0].health, null);
+            const leftWeapon = new Department(cordDX, cordDY, deptArray[2].health, null);
+            const leftEngine = new Department(cordBX, cordBY, deptArray[1].health, null);
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         }
     }
