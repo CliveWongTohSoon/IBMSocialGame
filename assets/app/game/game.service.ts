@@ -1,21 +1,17 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {
-    ShipDepartment,
-    ShipDirection,
-    ShipModel,
-    ShipPosition,
-    ShipStats,
-    CollisionInfo,
-    ShipAction, Action
-} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo, ShipAction, Action} from "./ship-model";
 
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
+import {Instruction, InstructionModel} from "./instruction-model";
+import {HttpClient} from "@angular/common/http";
 
 @Injectable()
 export class GameService {
+
+    constructor(private http: HttpClient) {}
 
     // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
@@ -33,9 +29,52 @@ export class GameService {
             rowContent.push(colContent);
         }
         this.battleField = new BattleFieldModel(rowContent);
+        // Make battleField an Observable, so whenever the battleField model changes, it will update
         return Observable.of(this.battleField);
     }
 
+    createShipFromDatabase(): Observable<ShipModel[]> {
+        // TODO:- Dynamically change the numberOfShips
+        return this.http.get('http://localhost:3000/start')
+            .map((response: Response, i) => { // For each ship
+                const data = response['obj'];
+                const numberOfShips = Object.keys(data).length;
+                const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
+                const maxY = this.battleField.rowGrid.length;
+                return Object.keys(data).map(key => {
+                    const shipId = data[key]['shipId'];
+
+                    const start = data[key]['phase'] === 'start'; // Check what I can do with this
+                    console.log(start);
+                    const randomColorBack = this.genRandomColor();
+                    const randomColorFront = this.shadeColor(randomColorBack, 20);
+                    const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
+                    const initShipPosition = new ShipPosition(randomX, randomY);
+                    const randomDir = this.randomDir(4);
+                    const initShipDirection = new ShipDirection(randomDir);
+
+                    // TODO:- Change initShipStat to dynamically change according to emotion
+                    const initShipStat = new ShipStats(1000,500,5,0,5,false,0);
+
+                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
+                    newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
+                    const newShipPosition = new ShipPosition(0,0);
+                    newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
+                    newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
+                        .map(_ => Action.DoNothing)
+                    );
+                    return start ? newShip : null;
+                });
+            })
+            .map(allShip => allShip.filter(ship => ship !== null))
+            .map(allShip => {
+                this.allBattleShips = allShip;
+                this.updateGridWithAllShip();
+                return allShip;
+            });
+    }
+
+    // TODO:- OLD
     createShip(numberOfShips: number): Observable<ShipModel[]> {
         const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
         const maxY = this.battleField.rowGrid.length;
@@ -49,7 +88,7 @@ export class GameService {
                 const randomDir = this.randomDir(4);
                 const initShipDirection = new ShipDirection(randomDir);
 
-                const  initShipStat = new ShipStats(1000,500,5,0,5,false,0);
+                const initShipStat = new ShipStats(1000,500,5,0,5,false,0);
 
                 const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
 
@@ -59,13 +98,53 @@ export class GameService {
                 newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
                     .map(_ => Action.DoNothing)
                 );
-                // i++;
-
                 return newShip;
             });
         this.updateGridWithAllShip();
-        console.log(this.allBattleShips.length);
         return Observable.of(this.allBattleShips);
+    }
+
+    listenToInstruction(): Observable<InstructionModel> {
+        return this.http.get('http://localhost:3000/instruction')
+            .map((response: Response) => {
+                const instruction = response['obj'];
+                const instructionArray: Instruction[] = Array
+                    .apply(null, {length: 3})
+                    .map(arr => {
+                       arr[0] = this.getInstruction(instruction['instruction0']);
+                       arr[1] = this.getInstruction(instruction['instruction1']);
+                       arr[2] = this.getInstruction(instruction['instruction2']);
+                    });
+                const shipId = response['shipId'];
+                // Make sure the ship is in action phase
+                const phase = instruction['phase'] === 'action';
+                const instructionModel = new InstructionModel(shipId, instructionArray);
+                return phase ? instructionModel : null;
+            });
+    }
+
+    // ------------------------------------- Static functions ------------------------------------------------------- //
+    getInstruction(instruction: string): Instruction {
+        if (instruction === 'move') return Instruction.Move;
+        else if (instruction === 'turnLeft') return Instruction.TurnLeft;
+        else if (instruction === 'turnRight') return Instruction.TurnRight;
+        else if (instruction === 'shoot') return Instruction.Shoot;
+        else if (instruction === 'shieldLeft') return Instruction.ShieldLeft;
+        else if (instruction === 'shieldRight') return Instruction.ShieldRight;
+        else if (instruction === 'shieldBack') return Instruction.ShieldBack;
+        else if (instruction === 'shieldFront') return Instruction.ShieldFront;
+        else return Instruction.DoNothing
+    }
+
+    executeInstruction(ship: ShipModel, instruction: Instruction) {
+        if (instruction === Instruction.Move) this.move(ship)
+        else if (instruction === Instruction.ShieldFront) this.shield(ship, Direction.Up);
+        else if (instruction === Instruction.ShieldBack) this.shield(ship, Direction.Down);
+        else if (instruction === Instruction.ShieldRight) this.shield(ship, Direction.Right);
+        else if (instruction === Instruction.ShieldLeft) this.shield(ship, Direction.Left);
+        else if (instruction === Instruction.Shoot) this.shoot(ship);
+        else if (instruction === Instruction.TurnRight) this.rotate(ship, true);
+        else if (instruction === Instruction.TurnLeft) this.rotate(ship, false);
     }
 
     // --------------------------------------- Update Data ---------------------------------------------------------- //
@@ -86,9 +165,8 @@ export class GameService {
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
-        ship.shipDepartment = ShipDepartment.getDepartment(newPosition, newDirection, this.battleField.rowGrid.length);
+        ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length,ship);
         this.updateGridWithAllShip();
-        //console.log(ship.shipPosition);
     }
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
@@ -110,7 +188,8 @@ export class GameService {
         return newPosition;
     }
 
-    move(ship: ShipModel, fieldSize: number) {
+    move(ship: ShipModel) {
+        const fieldSize = this.battleField.rowGrid.length;
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
 
         if (ship.shipDirection.dir == Direction.Up) {
@@ -132,9 +211,6 @@ export class GameService {
         this.updateShip(ship, newPosition, ship.shipDirection);
         this.checkCollision(fieldSize);
         this.performCollision(fieldSize);
-
-
-
     }
 
     performCollision(fieldSize: number) {
@@ -182,7 +258,6 @@ export class GameService {
         }
     }
 
-
     checkCollision(fieldSize :number){
 
         var i = 0, j = 0 ;
@@ -219,7 +294,6 @@ export class GameService {
         }
     }
 
-
     rotate(ship: ShipModel, clockwise: boolean) {
         let newDirection: ShipDirection = new ShipDirection(ship.shipDirection.dir);
         if (clockwise) {
@@ -229,8 +303,7 @@ export class GameService {
             else {
                 newDirection.dir = ship.shipDirection.dir - 1;
             }
-        }
-        else {
+        } else {
             if (newDirection.dir == 3) {
                 newDirection.dir = 0;
             }
@@ -268,7 +341,8 @@ export class GameService {
         return Math.floor(Math.random() * range);
     }
 
-    shoot(ship:ShipModel, fieldSize:number){
+    shoot(ship:ShipModel){
+
         for(let l =2;l<4;l++){
             loopAttackRange:
             for(let i = 1; i < ship.shipStats.attackRange+1; i++){ //check all attack range
@@ -277,7 +351,11 @@ export class GameService {
                         let defendShip = this.allBattleShips[j];
                         let defendDepart = defendShip.shipDepartment.departmentArray[k];
                         let attackDepart = ship.shipDepartment.departmentArray[l];
+
                         let bothDepartExist:boolean = (defendDepart.health > 0) && (attackDepart.health > 0);
+                        //let bothDepartExist:boolean = (defendDepart.alive) && (attackDepart.alive);
+                        //once you implement the changing of alive, uncomment the line above and comment old bothDepartmentExist
+
                         let positionCorrectUp:boolean = ((attackDepart.yIndex - i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
                         let positionCorrectDown:boolean = ((attackDepart.yIndex + i) == defendDepart.yIndex) && (attackDepart.xIndex == defendDepart.xIndex);
                         let positionCorrectLeft:boolean = ((attackDepart.xIndex - i) == defendDepart.xIndex) && (attackDepart.yIndex == defendDepart.yIndex);
@@ -332,8 +410,6 @@ export class GameService {
 
     } // end shoot
 
-
-
     randomCoor(max: number, start: number){ //}, prevPos : number, range : number){
         return Math.floor((Math.random() * max) + start) + 0.5; // + (prevPos + range)) (9 + adjustment)) + prevX + 8) + 0.5;
     }
@@ -364,16 +440,12 @@ export class GameService {
         if (victimShip.shipStats.shieldActive == true && shoot == true)  {
             damage = this.shootShieldCheck(shooterShip, victimShip, damage)
         }
-        //else if (victimShip.shipStats.shieldActive == true && shoot = false){
-            //damage = this.collisionShieldCheck(victimShip, shooterShip, damage )}
 
         if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
             victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
-        }
-        else{
+        } else{
             victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
         }
-
     }
 
     // shieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
@@ -443,6 +515,7 @@ export class GameService {
         // }
         return reducedDamage;
     }
+
     collisionShieldCheck(updatingShip: ShipModel, referShip: ShipModel, damage: number, turn: number){
         let shieldGridDirection: Direction;
         let reducedDamage = damage;

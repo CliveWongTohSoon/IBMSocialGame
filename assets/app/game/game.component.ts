@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {ShipModel, Action} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
@@ -11,14 +11,13 @@ import {GameService} from "./game.service";
     providers: [GameService]
 })
 
-export class GameComponent {
+export class GameComponent implements OnInit {
 
     text: string = 'Right';
     disabledBool = true;
 
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
-
 
     constructor(private gameService: GameService) {
         gameService.init(25).subscribe(battleField => this.battleField = battleField);
@@ -76,7 +75,7 @@ export class GameComponent {
     }
 
     move(ship: ShipModel) {
-        this.gameService.move(ship, this.battleField.rowGrid.length);
+        this.gameService.move(ship);
         //this.gameService.checkCollision(ship, this.battleField.rowGrid.length);
     }
 
@@ -97,9 +96,8 @@ export class GameComponent {
     }
 
     shoot(ship:ShipModel){
-        this.gameService.shoot(ship, this.battleField.rowGrid.length);
+        this.gameService.shoot(ship);
     }
-
 
     inputAction(ship: ShipModel, act: Action):boolean{
         let maxActions = 3;
@@ -166,7 +164,20 @@ export class GameComponent {
                     this.shieldUp(this.allBattleShip[i]);
                 }
             }
+            for(i = 0;i<this.allBattleShip.length;i++){
+                for( let k = 0;k < 4; k++){
+                    if(this.allBattleShip[i].shipDepartment.departmentArray[k].health>0){
+                        this.allBattleShip[i].shipDepartment.departmentArray[k].alive=true;
+                    }else{
+                        this.allBattleShip[i].shipDepartment.departmentArray[k].alive=false;
+                    }
+                }
+            }
         }
+    }
+
+    ngOnInit() {
+        this.gameService.createShipFromDatabase().subscribe();
     }
 }
 

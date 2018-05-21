@@ -1,3 +1,15 @@
 export class InstructionModel {
-    constructor() {}
+    constructor(shipId: string, instructionSet: Instruction[]) {}
+}
+
+export enum Instruction {
+    Move,
+    Shoot,
+    TurnLeft,
+    TurnRight,
+    ShieldFront,
+    ShieldBack,
+    ShieldLeft,
+    ShieldRight,
+    DoNothing
 }
