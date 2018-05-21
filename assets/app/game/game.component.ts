@@ -260,9 +260,8 @@ export class GameComponent {
         }
         for(i = 0; i < this.allBattleShip.length; i++) {
             this.allBattleShip[i].shipAction = new ShipAction(Array.apply(null, {length: 0})
-                .map(_ =>)
+                .map(_ =>null)
             );
-
         }
     }
 }
