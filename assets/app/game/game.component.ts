@@ -178,6 +178,15 @@ export class GameComponent {
                     this.rotateLeft(this.allBattleShip[i]);
                 }
             }
+            for(i = 0;i<this.allBattleShip.length;i++){
+                for( let k = 0;k < 4; k++){
+                    if(this.allBattleShip[i].shipDepartment.departmentArray[k].health>0){
+                        this.allBattleShip[i].shipDepartment.departmentArray[k].alive=true;
+                    }else{
+                        this.allBattleShip[i].shipDepartment.departmentArray[k].alive=false;
+                    }
+                }
+            }
             //this.gameService.checkCollision(this.battleField.rowGrid.length);
             //this.gameService.performCollision(this.battleField.rowGrid.length);
             // check for ships with the same x,y coordinate!!!!
