@@ -260,8 +260,8 @@ export class GameComponent {
                     }
                 }
             }
-            //this.gameService.checkCollision(this.battleField.rowGrid.length);
-            //this.gameService.performCollision(this.battleField.rowGrid.length);
+            this.gameService.checkCollision(this.battleField.rowGrid.length);
+            this.gameService.performCollision(this.battleField.rowGrid.length);
             // check for ships with the same x,y coordinate!!!!
             //shield deassert
         }
@@ -270,6 +270,7 @@ export class GameComponent {
                 .map(_ => null)
             );
             this.allBattleShip[i].shipStats.shieldActive = false;
+
         }
     }
 }

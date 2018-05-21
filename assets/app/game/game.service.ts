@@ -57,7 +57,7 @@ export class GameService {
                 const newShipPosition = new ShipPosition(0,0);
                 newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
                 newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
-                    .map(_ => )
+                    .map(_ => null)
                 );
                 return newShip;
             });
@@ -141,8 +141,6 @@ export class GameService {
 
         newPosition = this.worldRound(newPosition, fieldSize);
         this.updateShip(ship, newPosition, ship.shipDirection);
-        this.checkCollision(fieldSize);
-        this.performCollision(fieldSize);
 
     }
 
@@ -190,11 +188,15 @@ export class GameService {
             for (var j = 0; j < this.allBattleShips.length; j++) {
                 if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == fieldSize-1)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == fieldSize-1)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
                     this.checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j]);
+                    if(this.allBattleShips[i].shipPosition.xIndex-this.allBattleShips[j].shipPosition.xIndex == 0 && this.allBattleShips[i].shipPosition.yIndex- this.allBattleShips[j].shipPosition.yIndex == 0){
+                        this.assignResultant(this.allBattleShips[i]);
+                    }
                     resultant.xIndex = this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
+                    resultant.yIndex = this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
+
                     if(Math.abs(resultant.xIndex) == fieldSize - 1){
                         resultant.xIndex = -1 * this.adjustOverflow(resultant.xIndex);
                     }
-                    resultant.yIndex = this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
                     if(Math.abs(resultant.yIndex) == fieldSize - 1){
                         resultant.yIndex = -1 * this.adjustOverflow(resultant.yIndex);
                     }
@@ -210,9 +212,32 @@ export class GameService {
                     }
 
                     this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+
                 }
             }
         }
+    }
+    assignResultant(ship: ShipModel) {
+        if(ship.collisionInfo.moveCount == 0) {
+            if (ship.shipDirection.dir == Direction.Up) {
+                ship.collisionInfo.resultantMove.yIndex = 1;
+
+            } else if (ship.shipDirection.dir == Direction.Down) {
+                ship.collisionInfo.resultantMove.yIndex = -1;
+
+            } else if (ship.shipDirection.dir == Direction.Right) {
+                ship.collisionInfo.resultantMove.xIndex = -1;
+
+            } else if (ship.shipDirection.dir == Direction.Left) {
+                ship.collisionInfo.resultantMove.xIndex = 1;
+            }
+        }
+        else{
+            console.log("ELSE");
+            ship.collisionInfo.resultantMove.xIndex *= -1;
+            ship.collisionInfo.resultantMove.yIndex *= -1;
+        }
+
     }
 
     checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel){
@@ -300,28 +325,28 @@ export class GameService {
                         switch (ship.shipDirection.dir) { //check four attacking ship direction
                             case Direction.Up:
                                 if ( positionCorrectUp && bothDepartExist ) {
-                                    this.updateShootHealth(ship, defendShip, k, 1);
+                                    this.updateShootHealth(ship, defendShip, k);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Down:
                                 if ( positionCorrectDown && bothDepartExist ) {
-                                    this.updateShootHealth(ship, defendShip, k, 1);
+                                    this.updateShootHealth(ship, defendShip, k);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Left:
                                 if ( positionCorrectLeft && bothDepartExist ) {
-                                    this.updateShootHealth(ship, defendShip, k, 1);
+                                    this.updateShootHealth(ship, defendShip, k);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
                                 break;
                             case Direction.Right:
                                 if ( positionCorrectRight && bothDepartExist ) {
-                                    this.updateShootHealth(ship, defendShip, k, 1);
+                                    this.updateShootHealth(ship, defendShip, k);
                                     console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                     break loopAttackRange;
                                 }
@@ -381,7 +406,7 @@ export class GameService {
 
     }
 
-    updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number, turn :number) {
+    updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
         let damage: number;
 
         damage = shooterShip.shipStats.attack;
