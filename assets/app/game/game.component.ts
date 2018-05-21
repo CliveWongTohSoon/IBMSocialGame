@@ -229,6 +229,15 @@ export class GameComponent {
                     this.shoot(this.allBattleShip[i]);
                 }
             }
+
+            for(i = 0;i<this.allBattleShip.length;i++){
+                for( let k = 0;k < 4; k++){
+                    if(this.allBattleShip[i].shipDepartment.departmentArray[k].health <= 0){
+                        this.allBattleShip[i].shipDepartment.departmentArray[k].alive=false;
+                    }
+                }
+            }
+
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.MoveFront){
                     this.move(this.allBattleShip[i]);
@@ -246,9 +255,7 @@ export class GameComponent {
             }
             for(i = 0;i<this.allBattleShip.length;i++){
                 for( let k = 0;k < 4; k++){
-                    if(this.allBattleShip[i].shipDepartment.departmentArray[k].health>0){
-                        this.allBattleShip[i].shipDepartment.departmentArray[k].alive=true;
-                    }else{
+                    if(this.allBattleShip[i].shipDepartment.departmentArray[k].health <= 0){
                         this.allBattleShip[i].shipDepartment.departmentArray[k].alive=false;
                     }
                 }
@@ -260,9 +267,9 @@ export class GameComponent {
         }
         for(i = 0; i < this.allBattleShip.length; i++) {
             this.allBattleShip[i].shipAction = new ShipAction(Array.apply(null, {length: 0})
-                .map(_ =>)
+                .map(_ => null)
             );
-
+            this.allBattleShip[i].shipStats.shieldActive = false;
         }
     }
 }

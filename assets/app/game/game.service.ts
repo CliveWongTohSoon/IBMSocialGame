@@ -189,6 +189,7 @@ export class GameService {
         for (i = 0; i < this.allBattleShips.length; i++) {
             for (var j = 0; j < this.allBattleShips.length; j++) {
                 if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == fieldSize-1)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == fieldSize-1)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
+                    this.checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j]);
                     resultant.xIndex = this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
                     if(Math.abs(resultant.xIndex) == fieldSize - 1){
                         resultant.xIndex = -1 * this.adjustOverflow(resultant.xIndex);
@@ -208,7 +209,6 @@ export class GameService {
                         this.allBattleShips[i].collisionInfo.resultantMove.yIndex = this.adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.yIndex);
                     }
 
-                    this.checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j]);
                     this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
                 }
             }
@@ -436,67 +436,90 @@ export class GameService {
     collisionShieldCheck(updatingShip: ShipModel, referShip: ShipModel, damage: number, turn: number){
         let shieldGridDirection: Direction;
         let reducedDamage = damage;
-        let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
-        let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+        // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
+        // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
         shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
         if (shieldGridDirection > 3) {
             shieldGridDirection = shieldGridDirection - 4;
         }
-        if (referShip.shipAction.act[turn-1] == Action.MoveFront){
-            if (Math.abs(shieldGridDirection - referShip.shipDirection.dir) == 2){
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+        if (updatingShip.collisionInfo.moveCount == 0 && referShip.collisionInfo.moveCount == 0) {
+            if (referShip.shipAction.act[turn - 1] == Action.MoveFront) {
+                if (Math.abs(shieldGridDirection - referShip.shipDirection.dir) == 2) {
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+                }
+            }
+            else if (updatingShip.shipAction.act[turn - 1] == Action.MoveFront) {
+                if (updatingShip.shipDirection.dir == shieldGridDirection) {
+                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+                }
             }
         }
-        // else if (referShip.shipAction.act[turn-1] == Action.RightTurn || referShip.shipAction.act[turn-1] == Action.LeftTurn){
-        //     if (xDiff > 0){
-        //         if (shieldGridDirection == Direction.Left){
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        //     else if (xDiff < 0){
-        //         if (shieldGridDirection == Direction.Right){
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        //     if (yDiff > 0){
-        //         if (shieldGridDirection == Direction.Up) {
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        //     else if (yDiff < 0){
-        //         if (shieldGridDirection == Direction.Down){
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        // }
-        else if (updatingShip.shipAction.act[turn-1] == Action.MoveFront){
-            if(updatingShip.shipDirection.dir == shieldGridDirection){
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+        else if (referShip.collisionInfo.moveCount != 0){
+            if (referShip.collisionInfo.resultantMove.xIndex > 0 && shieldGridDirection == Direction.Up) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (referShip.collisionInfo.resultantMove.xIndex < 0 && shieldGridDirection == Direction.Down){
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (referShip.collisionInfo.resultantMove.yIndex > 0 && shieldGridDirection == Direction.Left){
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (referShip.collisionInfo.resultantMove.yIndex < 0 && shieldGridDirection == Direction.Right){
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
             }
         }
-        // else if (updatingShip.shipAction.act[turn-1] == Action.LeftTurn || updatingShip.shipAction.act[turn-1] == Action.RightTurn){
-        //     if (xDiff > 0){
-        //         if (shieldGridDirection == Direction.Left){
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        //     else if (xDiff < 0){
-        //         if (shieldGridDirection == Direction.Right){
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        //     if (yDiff > 0){
-        //         if (shieldGridDirection == Direction.Up) {
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        //     else if (yDiff < 0){
-        //         if (shieldGridDirection == Direction.Down){
-        //             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-        //         }
-        //     }
-        // }
+        else if (updatingShip.collisionInfo.moveCount != 0){
+            if (updatingShip.shipStats.shieldDirection == Direction.Up){
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+        }
         return reducedDamage;
     }
 
 }
+
+// else if (referShip.shipAction.act[turn-1] == Action.RightTurn || referShip.shipAction.act[turn-1] == Action.LeftTurn){
+//     if (xDiff > 0){
+//         if (shieldGridDirection == Direction.Left){
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+//     else if (xDiff < 0){
+//         if (shieldGridDirection == Direction.Right){
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+//     if (yDiff > 0){
+//         if (shieldGridDirection == Direction.Up) {
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+//     else if (yDiff < 0){
+//         if (shieldGridDirection == Direction.Down){
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+// }
+
+// else if (updatingShip.shipAction.act[turn-1] == Action.LeftTurn || updatingShip.shipAction.act[turn-1] == Action.RightTurn){
+//     if (xDiff > 0){
+//         if (shieldGridDirection == Direction.Left){
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+//     else if (xDiff < 0){
+//         if (shieldGridDirection == Direction.Right){
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+//     if (yDiff > 0){
+//         if (shieldGridDirection == Direction.Up) {
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+//     else if (yDiff < 0){
+//         if (shieldGridDirection == Direction.Down){
+//             reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+//         }
+//     }
+// }
