@@ -141,8 +141,6 @@ export class GameService {
 
         newPosition = this.worldRound(newPosition, fieldSize);
         this.updateShip(ship, newPosition, ship.shipDirection);
-        this.checkCollision(fieldSize);
-        this.performCollision(fieldSize);
 
     }
 
@@ -190,10 +188,14 @@ export class GameService {
             for (var j = 0; j < this.allBattleShips.length; j++) {
                 if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == fieldSize-1)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == fieldSize-1)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
                     resultant.xIndex = this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
+                    resultant.yIndex = this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
+
                     if(Math.abs(resultant.xIndex) == fieldSize - 1){
                         resultant.xIndex = -1 * this.adjustOverflow(resultant.xIndex);
                     }
-                    resultant.yIndex = this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
+                    else if(resultant.xIndex == 0 && resultant.yIndex == 0){
+                        resultant = this.assignResultant(this.allBattleShips[i]);
+                    }
                     if(Math.abs(resultant.yIndex) == fieldSize - 1){
                         resultant.yIndex = -1 * this.adjustOverflow(resultant.yIndex);
                     }
@@ -213,6 +215,27 @@ export class GameService {
                 }
             }
         }
+    }
+    assignResultant(ship: ShipModel) :ShipPosition{
+        let resultant = new ShipPosition;
+        if (ship.shipDirection.dir == Direction.Up) {
+            resultant.xIndex = 0;
+            resultant.yIndex = 1;
+            return resultant;
+        } else if (ship.shipDirection.dir == Direction.Down) {
+            resultant.xIndex = 0;
+            resultant.yIndex = -1;
+            return resultant;
+        } else if (ship.shipDirection.dir == Direction.Right) {
+            resultant.xIndex = -1;
+            resultant.yIndex = 0;
+            return resultant;
+        } else if (ship.shipDirection.dir == Direction.Left) {
+            resultant.xIndex = 1;
+            resultant.yIndex = 0;
+            return resultant;
+        }
+
     }
 
     checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel){
