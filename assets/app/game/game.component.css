@@ -1,6 +1,6 @@
 #drawing-table {
-    width: 87%;
-    height: 100%;
+    table-layout: fixed;
+    width: 100%;
     border-collapse: collapse;
 }
 
@@ -11,3 +11,4 @@
 body {
     font: 12px Arial, serif;
 }
+

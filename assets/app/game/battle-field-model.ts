@@ -5,18 +5,18 @@ export class BattleFieldModel {
 
     static renderGrid(shipDepartment: ShipDepartment, battleField: BattleFieldModel, colourFront: string, colourBack: string) {
 
-        const leftWeaponRowIndex = shipDepartment.leftWeapon.yIndex, leftWeaponColIndex = shipDepartment.leftWeapon.xIndex;
+        const leftWeaponRowIndex = shipDepartment.departmentArray[2].yIndex, leftWeaponColIndex = shipDepartment.departmentArray[2].xIndex;
 
-        const rightWeaponRowIndex = shipDepartment.rightWeapon.yIndex, rightWeaponColIndex = shipDepartment.rightWeapon.xIndex;
+        const rightWeaponRowIndex = shipDepartment.departmentArray[3].yIndex, rightWeaponColIndex = shipDepartment.departmentArray[3].xIndex;
 
-        const leftEngineRowIndex = shipDepartment.leftEngine.yIndex, leftEngineColIndex = shipDepartment.leftEngine.xIndex;
+        const leftEngineRowIndex = shipDepartment.departmentArray[1].yIndex, leftEngineColIndex = shipDepartment.departmentArray[1].xIndex;
 
-        const rightEngineRowIndex = shipDepartment.rightEngine.yIndex, rightEngineColIndex = shipDepartment.rightEngine.xIndex;
+        const rightEngineRowIndex = shipDepartment.departmentArray[0].yIndex, rightEngineColIndex = shipDepartment.departmentArray[0].xIndex;
 
-        console.log('Left weapon: (', leftWeaponColIndex, ', ', leftWeaponRowIndex, ') ; ',
+        /*console.log('Left weapon: (', leftWeaponColIndex, ', ', leftWeaponRowIndex, ') ; ',
              'Right Weapon: (' , rightWeaponColIndex, ', ', rightWeaponRowIndex, ') ; ',
                         'Left Engine: (', leftEngineColIndex, ', ', leftEngineRowIndex, ') ; ',
-                       'Right Engine: (', rightEngineColIndex, ', ', rightEngineRowIndex, ')');
+                       'Right Engine: (', rightEngineColIndex, ', ', rightEngineRowIndex, ')');*/
 
         battleField.rowGrid[leftWeaponRowIndex][leftWeaponColIndex].color = colourFront;
         battleField.rowGrid[rightWeaponRowIndex][rightWeaponColIndex].color = colourFront;
