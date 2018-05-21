@@ -52,10 +52,8 @@ export class GameService {
                 const initShipDirection = new ShipDirection(randomDir);
                 const initShipStat = new ShipStats(1000,500,5,0.5,5,false,0);
 
-                const initHealth = new Department({,{},[1000, 1000, 1000, 1000]);
-
                 const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
-                newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, initHealth, this.battleField.rowGrid.length);
+                newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 const newShipPosition = new ShipPosition(0,0);
                 newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
                 newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
@@ -96,7 +94,7 @@ export class GameService {
     }
 
 
-    updateShip(ship: ShipModel, newPosition: ShipPosition, deptHealth: Direction[], newDirection: ShipDirection) {
+    updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
         ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length,ship);
@@ -141,7 +139,7 @@ export class GameService {
         }
 
         newPosition = this.worldRound(newPosition, fieldSize);
-        this.updateShip(ship, newPosition, ship.shipDepartment.departmentArray, ship.shipDirection);
+        this.updateShip(ship, newPosition, ship.shipDirection);
         this.checkCollision(fieldSize);
         this.performCollision(fieldSize);
 
@@ -163,7 +161,7 @@ export class GameService {
                     this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
                     this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
                     this.allBattleShips[i].collisionInfo.moveCount--;
-                    this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition,this.allBattleShips[i].shipDepartment.departmentArray, this.allBattleShips[i].shipDirection);
+                    this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
                 }
             }
 
@@ -249,7 +247,7 @@ export class GameService {
                 newDirection.dir = ship.shipDirection.dir + 1;
             }
         }
-        this.updateShip(ship, ship.shipPosition,ship.shipDepartment.departmentArray, newDirection);
+        this.updateShip(ship, ship.shipPosition,newDirection);
     }
 
     shield(ship: ShipModel, shieldDirection: Direction) {
