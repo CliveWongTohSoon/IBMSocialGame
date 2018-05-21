@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {ShipModel, Action} from "./ship-model";
+import {ShipModel, Action, ShipAction} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
 
@@ -115,18 +115,84 @@ export class GameComponent {
 
     inputAction(ship: ShipModel, act: Action):boolean{
         let maxActions = 3;
+        console.log(this.allBattleShip);
         if (ship.shipAction.act.length >= maxActions){
+            console.log("Length" + ship.shipAction.act.length);
             return false;
         }
         else {
             ship.shipAction.act.push(act);
             return true;
         }
+
     }
 
     inputShieldUp(ship: ShipModel){
         let valid:boolean;
         valid = this.inputAction(ship, Action.FrontShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+    inputShieldLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldDown(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.BackShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShoot(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.ShootFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputMove(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.MoveFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputDoNothing(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.DoNothing);
         if (valid == false){
             console.log('Too many actions')
         }
@@ -137,7 +203,7 @@ export class GameComponent {
         let i : number;
         let relevantShips: ShipModel [];
         for (turn = 1; turn <= 3; turn++){
-            console.log(turn);
+            console.log("turn" + turn);
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.FrontShield){
                     this.shieldUp(this.allBattleShip[i]);
@@ -191,6 +257,12 @@ export class GameComponent {
             //this.gameService.performCollision(this.battleField.rowGrid.length);
             // check for ships with the same x,y coordinate!!!!
             //shield deassert
+        }
+        for(i = 0; i < this.allBattleShip.length; i++) {
+            this.allBattleShip[i].shipAction = new ShipAction(Array.apply(null, {length: 0})
+                .map(_ =>)
+            );
+
         }
     }
 }

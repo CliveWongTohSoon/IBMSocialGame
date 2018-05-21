@@ -56,13 +56,14 @@ export class GameService {
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 const newShipPosition = new ShipPosition(0,0);
                 newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-                newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
-                    .map(_ => Action.DoNothing)
+                newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
+                    .map(_ => )
                 );
                 return newShip;
             });
 
         this.updateGridWithAllShip();
+        console.log(this.allBattleShips);
         return Observable.of(this.allBattleShips);
     }
 
@@ -361,7 +362,7 @@ export class GameService {
     updateCollisionHealth(rammerShip: ShipModel, affectedRammerDep: number, victimShip: ShipModel, affectedVictimDep: number, turn :number) {
         let damage: number;
         damage = 300;
-        if(rammerShip.shipDepartment.departmentArray[affectedRammerDep].health == 0){
+        if(rammerShip.shipDepartment.departmentArray[affectedRammerDep].alive == false){
             damage = 50/100 * damage;
         }
 
@@ -385,7 +386,7 @@ export class GameService {
 
         damage = shooterShip.shipStats.attack;
         if (victimShip.shipStats.shieldActive == true){
-            damage = this.shootShieldCheck(shooterShip, victimShip, damage)
+            damage = this.shootShieldCheck(shooterShip, victimShip, damage);
             }
 
         if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
