@@ -4,6 +4,7 @@ export class ShipModel {
     //public collidedShipId: string[];
     public collisionInfo: CollisionInfo;
     public shipAction: ShipAction;
+
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
@@ -11,6 +12,7 @@ export class ShipModel {
                 public colorFront: string,
                 public colorBack: string) {
     }
+
 }
 
 export class ShipPosition {

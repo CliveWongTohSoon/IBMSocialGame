@@ -277,7 +277,7 @@ export class GameService {
         return Math.floor(Math.random() * range);
     }
 
-    shoot(ship:ShipModel, fieldSize:number){
+    shoot(ship:ShipModel){
         for(let l =2;l<4;l++){
             loopAttackRange:
             for(let i = 1; i < ship.shipStats.attackRange+1; i++){ //check all attack range
@@ -345,6 +345,57 @@ export class GameService {
 
     } // end shoot
 
+
+    relativePosition(ship:ShipModel){
+        let dir = ship.shipDirection.dir;
+        for( let i = 0; i < this.allBattleShips.length; i++ ){
+            let x0 = ship.shipPosition.xIndex;
+            let y0 = ship.shipPosition.yIndex;
+
+            let x = this.allBattleShips[i].shipPosition.xIndex;
+            let y = this.allBattleShips[i].shipPosition.yIndex;
+            let xd = x - x0;
+            let yd = y - y0;
+
+            if(!( xd == 0 &&  yd == 0)){
+                if( xd == 0 ){
+                    if( yd < 0 ){ logPolar( i,0, yd); }
+                    else{ logPolar( i,180,-yd ); }
+                }else if( yd == 0 ){
+                    if( xd < 0 ){ logPolar( i,270, -xd );}
+                    else{ logPolar( i,90, xd ); }
+                }else{
+                    if( xd < 0 && yd < 0 ){ calPolar(i,xd,yd,0); } // second quadrant
+                    else if( xd < 0 && yd > 0 ){ calPolar(i,xd,yd,180); } // third quadrant
+                    else if( xd > 0 && yd > 0 ){ calPolar(i,xd,yd,180); } // fourth quadrant
+                    else{ calPolar(i,xd,yd,0); } //if( xd > 0 && yd < 0 )  first quadrant
+                }
+            }else{
+                console.log("current ship is " + i )
+            }
+        }
+        console.log("\n")
+
+        function calPolar(i:number,xd:number,yd:number,sub:number){
+            let rad = Math.atan(xd/yd);
+            let deg = rad*180/Math.PI;
+            let d = distance( xd, yd );
+            logPolar( i, adjustByDir(dir,sub - deg ), d);
+        }
+        function distance(a:number,b:number){
+            return Math.sqrt( Math.pow(a,2) + Math.pow(b,2) );
+        }
+        function logPolar(i:number,deg:number,distance:number){
+            console.log("ship " + i +" 's relative position from this ship is: " + deg +" degree, distance is "+ distance );
+        }
+        function adjustByDir(dir:Direction,deg:number){
+            return mod(dir*90 + deg,360 );
+        }
+        function mod(n, m) {
+            return ((n % m) + m) % m;
+        }
+
+    }
 
 
     randomCoor(max: number, start: number){ //}, prevPos : number, range : number){
@@ -497,5 +548,6 @@ export class GameService {
         // }
         return reducedDamage;
     }
+
 
 }

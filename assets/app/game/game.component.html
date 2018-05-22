@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--<head>-->
     <!--<h1 align="center">AI SOCIAL GAME</h1>-->
     <!--<title>AI SOCIAL GAME</title>-->
@@ -13,6 +14,8 @@
     <!--<script src='Test.js'>  </script>-->
 <!--</head>-->
 <body align="center">
+<div class="bg"></div>
+<!--<p><img src="a.jpg"></p>-->
 <h1>AI Social Game</h1>
 <div class="row">
     <label for="player" class="col-md-8 col-offset-2">Number of players</label>
@@ -28,6 +31,7 @@
         <div class="btn-group">
             <button  type="button" class="btn btn-danger  "  id="move1" (click)="move(ship)"> Move </button>
             <button  type="button" class="btn btn-default "  id="shoot" (click)="shoot(ship)"> Shoot </button>
+            <button  type="button" class="btn btn-default "  id="relativePostion" (click)="relativePosition(ship)"> RP </button>
         </div>
         <div class="btn-group">
             <button  type="button" class="btn btn-default " id="left1" (click)="rotateLeft(ship)"> Turn Left </button>

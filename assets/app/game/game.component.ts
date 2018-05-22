@@ -109,9 +109,12 @@ export class GameComponent {
     }
 
     shoot(ship:ShipModel){
-        this.gameService.shoot(ship, this.battleField.rowGrid.length);
+        this.gameService.shoot(ship);
     }
 
+    relativePosition(ship:ShipModel){
+        this.gameService.relativePosition(ship);
+    }
 
     inputAction(ship: ShipModel, act: Action):boolean{
         let maxActions = 3;
