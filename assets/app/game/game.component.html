@@ -23,43 +23,25 @@
     <button  type="button" class="btn btn-default " (click)="start(player.value)"> START </button><br>
     <br>
 
-    <div  role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
+    <div align = "center" class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
         <h4> PLAYER {{i+1}} </h4>
-        <p class="demonstrateHealth">Left Weapon: {{ship.shipDepartment.departmentArray[2].health}}&nbsp;&nbsp;Right Weapon: {{ship.shipDepartment.departmentArray[3].health}}</p>
-        <p class="demonstrateHealth">Left Engine: {{ship.shipDepartment.departmentArray[1].health}}&nbsp;&nbsp;Right Engine: {{ship.shipDepartment.departmentArray[0].health}}</p>
+        <p class="demonstrateHealth"><small>Left Weapon: {{ship.shipDepartment.departmentArray[2].health}}<br>Right Weapon: {{ship.shipDepartment.departmentArray[3].health}}</small></p>
+        <p class="demonstrateHealth"><small>Left Engine: {{ship.shipDepartment.departmentArray[1].health}}<br>&nbsp;Right Engine: {{ship.shipDepartment.departmentArray[0].health}}</small></p>
 
-        <div class="btn-group">
-            <button  type="button" class="btn btn-danger  "  id="move1" (click)="move(ship)"> Move </button>
-            <button  type="button" class="btn btn-default "  id="shoot" (click)="shoot(ship)"> Shoot </button>
-            <button  type="button" class="btn btn-default "  id="relativePostion" (click)="relativePosition(ship)"> RP </button>
-        </div>
-        <div class="btn-group">
-            <button  type="button" class="btn btn-default " id="left1" (click)="rotateLeft(ship)"> Turn Left </button>
-            <button  type="button" class="btn btn-default " id="right1" (click)="rotateRight(ship)"> Turn Right </button>
-        </div>
-        <br/>
-        <br/>
-        <div class="btn-group">
-            <button  type="button" class="btn btn-default " id="ShieldFront" (click)="shieldUp(ship)" >Shield Front </button>
-            <button  type="button" class="btn btn-default " id="ShieldBack" (click)="shieldDown(ship)"> Shield Back </button>
-            <button  type="button" class="btn btn-default " id="ShieldLeft" (click)="shieldLeft(ship)"> Shield Left </button>
-            <button  type="button" class="btn btn-default " id="ShieldRight"(click)="shieldRight(ship)"> Shield Right</button>
+        <div class="btn-group-vertical">
+            <button  type="button" class="btn btn-default  "  id="move1" (click)="inputMove(ship)"> Move </button>
+            <button  type="button" class="btn btn-default " id="left1" (click)="inputRotateLeft(ship)"> Turn Left </button>
+            <button  type="button" class="btn btn-default " id="right1" (click)="inputRotateRight(ship)"> Turn Right </button>
+            <button  type="button" class="btn btn-default "  id="shoot" (click)="inputShoot(ship)"> Shoot </button>
+            <button  type="button" class="btn btn-default " id="ShieldFront" (click)="inputShieldUp(ship)" >Shield Front </button>
+            <button  type="button" class="btn btn-default " id="ShieldBack" (click)="inputShieldDown(ship)"> Shield Back </button>
+            <button  type="button" class="btn btn-default " id="ShieldLeft" (click)="inputShieldLeft(ship)"> Shield Left </button>
+            <button  type="button" class="btn btn-default " id="ShieldRight"(click)="inputShieldRight(ship)"> Shield Right</button>
+            <button  type="button" class="btn btn-success " id="Done"(click)="fullTurns(ship)"> Done</button>
+
         </div>
     </div>
     <br/>
-
-
-    <!--<div class="btn-group-vertical col-sm-3" role="group" aria-label="...">-->
-        <!--<h4> PLAYER 2 </h4>-->
-        <!--<button  type="button" class="btn btn-primary " (click)="move()"> Move </button>-->
-        <!--<button  type="button" class="btn btn-default " id="right2"> Turn Right </button>-->
-        <!--<button  type="button" class="btn btn-default " id="left2"> Turn Left </button>-->
-        <!--<button  type="button" class="btn btn-default "> Shoot </button>-->
-        <!--<button  type="button" class="btn btn-default "> Shield Front </button>-->
-        <!--<button  type="button" class="btn btn-default "> Shield Back </button>-->
-        <!--<button  type="button" class="btn btn-default "> Shield Right</button>-->
-        <!--<button  type="button" class="btn btn-default "> Shield Left </button>-->
-    <!--</div>-->
 
     <div align="center" class="col-sm-8">
         <table id="drawing-table">
