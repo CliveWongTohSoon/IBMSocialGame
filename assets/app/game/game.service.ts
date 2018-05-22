@@ -85,6 +85,7 @@ export class GameService {
            this.socket.on('start', data => {
                console.log('Entered Start');
                const allShips: ShipModel[] = Object.keys(data).map(key => {
+                   // console.log(key, data[key]);
                    const shipId = data[key]['shipId'], randomX = data[key]['x'], randomY = data[key]['y'],
                        randomDir = data[key]['dir'];
 
@@ -95,7 +96,8 @@ export class GameService {
                    const initShipDirection = new ShipDirection(randomDir);
 
                    // TODO:- Change initShipStat to dynamically change according to emotion
-                   // TODO:- Update the health points
+
+                   // TODO:- Update the health points of department
                    const initShipStat = new ShipStats(1000, 500, 5, 0, 5, false, 0);
 
                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, randomColorFront, randomColorBack);
@@ -203,10 +205,11 @@ export class GameService {
         return BattleFieldModel.renderGrid(currentShip.shipDepartment, this.battleField, currentShip.colorFront, currentShip.colorBack);
     }
 
+    // TODO:-  Just need to update the final position to the cloud
     updateShip(ship: ShipModel, newPosition: ShipPosition, newDirection: ShipDirection) {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
-        ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length,ship);
+        ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length, ship);
 
         this.socket.emit('update', {shipId: ship.shipId, x: ship.shipPosition.xIndex, y: ship.shipPosition.yIndex, dir: ship.shipDirection.dir});
 
