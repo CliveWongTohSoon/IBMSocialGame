@@ -79,6 +79,7 @@ export class ShipDepartment {
         if (cordDY == fieldSize){cordDY = cordDY - fieldSize};
 
         if (shipDirection.dir == Direction.Left) {
+
             const rightEngine = new Department(cordBX, cordBY, 1000, null,true);
             const leftEngine = new Department(cordDX, cordDY, 1000, null,true);
             const rightWeapon = new Department(cordAX, cordAY, 1000, null,true);
@@ -102,6 +103,7 @@ export class ShipDepartment {
             const rightEngine = new Department(cordAX, cordAY, 1000, null,true);
             const leftWeapon = new Department(cordDX, cordDY, 1000, null,true);
             const leftEngine = new Department(cordBX, cordBY, 1000, null,true);
+
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         }
     }

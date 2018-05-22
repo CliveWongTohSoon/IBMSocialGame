@@ -1,8 +1,7 @@
 import {Component, OnInit} from "@angular/core";
-import {ShipModel, Action} from "./ship-model";
+import {ShipModel, Action, ShipAction} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
-
 
 @Component({
     selector: 'app-game',
@@ -31,7 +30,7 @@ export class GameComponent implements OnInit {
         // randomDir();
         console.log(numberOfPlayers);
 
-        console.log("Working!");
+        console.log("Working");
 
         if (Number(numberOfPlayers) <= 2) {
             this.gameService.init(25)
@@ -102,9 +101,9 @@ export class GameComponent implements OnInit {
     inputAction(ship: ShipModel, act: Action):boolean{
         let maxActions = 3;
         if (ship.shipAction.act.length >= maxActions){
+            console.log("Length" + ship.shipAction.act.length);
             return false;
-        }
-        else {
+        } else {
             ship.shipAction.act.push(act);
             return true;
         }
@@ -117,13 +116,74 @@ export class GameComponent implements OnInit {
             console.log('Too many actions')
         }
     }
+    inputShieldLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
 
-    fullTurns(){
+    inputShieldRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldDown(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.BackShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShoot(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.ShootFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputMove(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.MoveFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputDoNothing(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.DoNothing);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    fullTurns() {
         let turn: number;
         let i : number;
-        let relevantShips: ShipModel [];
-        for (turn = 1; turn <= 3; turn++){
-            console.log(turn);
+        for (turn = 1; turn <= 3; turn++) {
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.FrontShield){
                     this.shieldUp(this.allBattleShip[i]);
@@ -131,37 +191,37 @@ export class GameComponent implements OnInit {
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.LeftShield){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shieldLeft(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.BackShield){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shieldDown(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.RightShield){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shieldRight(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.ShootFront){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.shoot(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.MoveFront){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.move(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.RightTurn){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.rotateRight(this.allBattleShip[i]);
                 }
             }
             for (i = 0; i < this.allBattleShip.length; i++){
                 if (this.allBattleShip[i].shipAction.act[(turn-1)] == Action.LeftTurn){
-                    this.shieldUp(this.allBattleShip[i]);
+                    this.rotateLeft(this.allBattleShip[i]);
                 }
             }
             for(i = 0;i<this.allBattleShip.length;i++){
@@ -173,11 +233,44 @@ export class GameComponent implements OnInit {
                     }
                 }
             }
+            this.gameService.checkCollision(this.battleField.rowGrid.length);
+            this.gameService.performCollision(this.battleField.rowGrid.length);
+            // check for ships with the same x,y coordinate!!!!
+            // shield deassert
         }
+
+        // this.gameService.updateShipToDatabase();
+
+        // reset all action
+        this.allBattleShip.map(ship => {
+            ship.shipAction = new ShipAction([]);
+        });
     }
 
     ngOnInit() {
-        this.gameService.createShipFromDatabase().subscribe();
+        // this.gameService.createShipFromSocket().subscribe(console.log);
+        this.gameService.createShipFromSocket().subscribe(shipModel => {
+            const numberOfPlayers = shipModel.length;
+            // if (numberOfPlayers <= 2) {
+            //     this.gameService.init(25)
+            //         .subscribe(battleField => {
+            //             this.battleField = battleField;
+            //         });
+            // } else if (numberOfPlayers === 3) {
+            //     this.gameService.init(30)
+            //         .subscribe(battleField => {
+            //             this.battleField = battleField;
+            //         });
+            // } else if (numberOfPlayers >= 4) {
+            //     this.gameService.init(36)
+            //         .subscribe(battleField => {
+            //             this.battleField = battleField;
+            //         });
+            // }
+
+            this.allBattleShip = shipModel;
+            this.fullTurns();
+        });
     }
 }
 
