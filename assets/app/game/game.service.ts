@@ -372,7 +372,7 @@ export class GameService {
     } // end shoot
 
 
-    relativePosition(ship:ShipModel){
+    relativePosition(ship:ShipModel,l:number){
         let dir = ship.shipDirection.dir;
         for( let i = 0; i < this.allBattleShips.length; i++ ){
             let x0 = ship.shipPosition.xIndex;
@@ -385,16 +385,18 @@ export class GameService {
 
             if(!( xd == 0 &&  yd == 0)){
                 if( xd == 0 ){
-                    if( yd < 0 ){ logPolar( i,0, yd); }
-                    else{ logPolar( i,180,-yd ); }
+                    if( yd < 0 ){ logPolar( i,0, -yd); }
+                    else{ logPolar( i,180,yd ); }
                 }else if( yd == 0 ){
-                    if( xd < 0 ){ logPolar( i,270, -xd );}
-                    else{ logPolar( i,90, xd ); }
+                    if( xd < 0 ){ logPolar( i,270, xd );}
+                    else{ logPolar( i,90, -xd ); }
                 }else{
-                    if( xd < 0 && yd < 0 ){ calPolar(i,xd,yd,0); } // second quadrant
-                    else if( xd < 0 && yd > 0 ){ calPolar(i,xd,yd,180); } // third quadrant
-                    else if( xd > 0 && yd > 0 ){ calPolar(i,xd,yd,180); } // fourth quadrant
-                    else{ calPolar(i,xd,yd,0); } //if( xd > 0 && yd < 0 )  first quadrant
+                    if(  yd < 0 ) {
+                        { calPolar(i,wrapDistance(xd),wrapDistance(yd),wrapSub(yd)); }
+                    }
+                    else{
+                        { calPolar(i,wrapDistance(xd),wrapDistance(yd),wrapSub(yd)); }
+                    }
                 }
             }else{
                 console.log("current ship is " + i )
@@ -402,6 +404,22 @@ export class GameService {
         }
         console.log("\n")
 
+        function wrapDistance(xd:number){
+            if( Math.abs( xd ) < l/2 ){ return xd; }
+            else{
+                if( xd < 0 ){ return l + xd; }
+                else{ return  -( l - xd ); }
+            }
+        }
+        function wrapSub(yd:number){
+            if( Math.abs( yd ) < l/2 ){
+                if( yd < 0 ){ return  0; }
+                else{ return  180; }
+            } else{
+                if( yd < 0 ){ return  180; }
+                else{ return   0;}
+            }
+        }
         function calPolar(i:number,xd:number,yd:number,sub:number){
             let rad = Math.atan(xd/yd);
             let deg = rad*180/Math.PI;
