@@ -15,6 +15,7 @@ import {SigninComponent} from "./auth/signin.component";
 import {LogoutComponent} from "./auth/logout.component";
 import {HttpClientModule} from "@angular/common/http";
 import {GameComponent} from "./game/game.component";
+import {AuthService} from "./auth/auth.service";
 
 @NgModule({
     declarations: [
@@ -35,7 +36,11 @@ import {GameComponent} from "./game/game.component";
         FormsModule,
         routing,
         ReactiveFormsModule,
-        HttpClientModule],
+        HttpClientModule
+    ],
+    providers: [
+        AuthService
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {
