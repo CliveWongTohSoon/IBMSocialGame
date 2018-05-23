@@ -188,7 +188,6 @@ export class GameComponent implements OnInit {
         let turn: number;
         let i : number;
         for (turn = 1; turn <= 3; turn++) {
-
             for (i = 0; i < this.allBattleShip.length; i++) {
                 if (this.allBattleShip[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
                     this.shieldUp(this.allBattleShip[i]);
@@ -214,7 +213,6 @@ export class GameComponent implements OnInit {
                     this.shoot(this.allBattleShip[i]);
                 }
             }
-
             for (i = 0; i < this.allBattleShip.length; i++) {
                 for (let k = 0; k < 4; k++) {
                     if (this.allBattleShip[i].shipDepartment.departmentArray[k].health <= 0) {
@@ -222,7 +220,6 @@ export class GameComponent implements OnInit {
                     }
                 }
             }
-
             for (i = 0; i < this.allBattleShip.length; i++) {
                 if (this.allBattleShip[i].shipAction.act[(turn - 1)] == Action.MoveFront) {
                     this.move(this.allBattleShip[i]);
@@ -251,6 +248,7 @@ export class GameComponent implements OnInit {
             // check for ships with the same x,y coordinate!!!!
             // shield deassert
         }
+
         // reset all action
         this.allBattleShip.map(ship => {
             ship.shipAction = new ShipAction([]);

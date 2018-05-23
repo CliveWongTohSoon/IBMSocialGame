@@ -11,9 +11,7 @@ export class ShipModel {
                 public shipStats: ShipStats,
                 public colorFront: string,
 
-                public colorBack: string) {
-    }
-
+                public colorBack: string) {}
 }
 
 export class ShipPosition {
