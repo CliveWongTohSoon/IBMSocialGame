@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {MessageModel} from "./messages/message.model";
+// import * as io from 'socket.io-client';
 import {MessageService} from "./messages/message.service";
 
 @Component({
@@ -9,5 +9,10 @@ import {MessageService} from "./messages/message.service";
     providers: [MessageService]
 })
 export class AppComponent {
-    constructor() {}
+    // private socket: SocketIOClient.Socket;
+
+    constructor() {
+        // this.socket = io();
+        // this.socket.on('hello', data => console.log(data));
+    }
 }
