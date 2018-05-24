@@ -166,10 +166,6 @@ export class ShipDepartment {
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         }
     }
-
-
-
-
 }
 
 export class Department {

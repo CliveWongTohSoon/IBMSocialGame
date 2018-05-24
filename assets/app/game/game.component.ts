@@ -269,6 +269,7 @@ export class GameComponent {
             this.allBattleShip[i].shipStats.shieldActive = false;
 
         }
+        //update new variable
     }
 }
 

@@ -356,18 +356,18 @@ export class GameService {
             }
         }
 
-        function findNeibourDepart( k:number,offset: number){ // kth department plus offset
-            let result = k + offset;
-            if( result > 3 || result < 0 ){
-                return mod(result, 4);
-            }else {
-                return result;
-            }
-
-            function mod(n, m) {
-                return ((n % m) + m) % m;
-            }
-        }
+        // function findNeibourDepart( k:number,offset: number){ // kth department plus offset
+        //     let result = k + offset;
+        //     if( result > 3 || result < 0 ){
+        //         return mod(result, 4);
+        //     }else {
+        //         return result;
+        //     }
+        //
+        //     function mod(n, m) {
+        //         return ((n % m) + m) % m;
+        //     }
+        // }
 
     } // end shoot
 
@@ -402,8 +402,6 @@ export class GameService {
         else{
             victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
         }
-
-
     }
 
     updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
