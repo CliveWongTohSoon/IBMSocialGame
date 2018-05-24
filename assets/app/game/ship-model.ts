@@ -9,7 +9,8 @@ export class ShipModel {
                 public shipDirection: ShipDirection,
                 public shipStats: ShipStats,
                 public colorFront: string,
-                public colorBack: string) {
+                public colorBack: string,
+                public AIOpponent: boolean) {
     }
 }
 

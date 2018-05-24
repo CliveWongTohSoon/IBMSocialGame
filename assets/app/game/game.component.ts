@@ -44,6 +44,15 @@ export class GameComponent {
 
         console.log("Working");
 
+        if (Number(numberOfPlayers) == 1) {
+            this.gameService.init(25)
+                .subscribe(battleField => {
+                    this.battleField = battleField;
+                    this.gameService.createShip(Number(numberOfPlayers+1))
+                        .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+                });
+        }
+
         if (Number(numberOfPlayers) <= 2) {
             this.gameService.init(25)
                 .subscribe(battleField => {

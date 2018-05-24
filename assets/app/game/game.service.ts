@@ -52,7 +52,7 @@ export class GameService {
                 const initShipDirection = new ShipDirection(randomDir);
                 const initShipStat = new ShipStats(1000,500,5,0.5,5,false,0);
 
-                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
+                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack, false);
                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                 const newShipPosition = new ShipPosition(0,0);
                 newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
@@ -66,7 +66,6 @@ export class GameService {
         console.log(this.allBattleShips);
         return Observable.of(this.allBattleShips);
     }
-
 
     updateGridWithAllShip() {
         this.battleField.rowGrid.map(col => col.map(c => c.color = null));
@@ -434,35 +433,12 @@ export class GameService {
         if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2){
             reducedDamage = damage * (1 - victimShip.shipStats.defence)
         }
-        // let xDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.xIndex;
-        // let yDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.yIndex;
-        // if (Math.abs(xDiff) < 1) {
-        //     if (yDiff > 0) {
-        //         enemyDirection = Direction.Up;
-        //     }
-        //     else {
-        //         enemyDirection = Direction.Down;
-        //     }
-        // }
-        // else if (Math.abs(yDiff) < 1) {
-        //     if (xDiff > 0) {
-        //         enemyDirection = Direction.Left;
-        //     }
-        //     else {
-        //         enemyDirection = Direction.Right;
-        //     }
-        // }
-        //
-        // if (shieldGridDirection == enemyDirection) {
-        //     reducedDamage = damage * (1 - victimShip.shipStats.defence);
-        // }
         return reducedDamage;
     }
     collisionShieldCheck(updatingShip: ShipModel, referShip: ShipModel, damage: number, turn: number){
         let shieldGridDirection: Direction;
         let reducedDamage = damage;
-        // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
-        // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+
         shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
         if (shieldGridDirection > 3) {
             shieldGridDirection = shieldGridDirection - 4;
