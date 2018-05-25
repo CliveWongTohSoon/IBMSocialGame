@@ -20,25 +20,6 @@ router.get('/', (req, res, next) => {
         });
 });
 
-// router.post('/', (req, res, next) => {
-//     const message = new Message({
-//         content: req.body.content
-//     });
-//
-//     message.save((err, result) => {
-//         if (err) {
-//             return res.status(500).json({
-//                 title: 'An error occurred',
-//                 error: err
-//             });
-//         }
-//         res.status(201).json({
-//             message: 'Saved message',
-//             obj: result
-//         });
-//     });
-// });
-
 router.patch('/:id', (req, res, next) => {
     Instruction.findOne({shipId: req.params.id}, (err, instruction) => {
         if (err) {

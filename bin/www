@@ -19,6 +19,7 @@ app.set('port', port);
  */
 const server = http.createServer(app);
 const io = socketIO(server);
+
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -28,7 +29,7 @@ const io = socketIO(server);
  */
 io.on('connection', (socket) => {
     console.log('Socket connected');
-
+    socket.emit('hello', {message: 'Can you hear me?'});
     // First time it runs
     Start.find() // Find all ships initially
         .exec((err, start) => {
@@ -57,21 +58,6 @@ io.on('connection', (socket) => {
                 }
             });
         });
-
-
-        // message.content = req.body.content;
-        // message.save(err, result => {
-        //     if (err) {
-        //         return res.status(500).json({
-        //             title: 'An error occurred',
-        //             error: err
-        //         });
-        //     }
-        //     res.status(201).json({
-        //         message: 'Updated message',
-        //         obj: result
-        //     });
-        // });
     });
 
     socket.on('disconnect', () => {

@@ -22,6 +22,9 @@ export class GameService {
 
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
+
+        // this.socket.on('hello', console.log);
+
         let rowContent: Array<TableContent[]> = [];
         for (let i = 0; i < length; i++) {
             let colContent: TableContent[] = [];
