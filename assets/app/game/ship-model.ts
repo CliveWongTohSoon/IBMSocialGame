@@ -4,13 +4,14 @@ export class ShipModel {
     //public collidedShipId: string[];
     public collisionInfo: CollisionInfo;
     public shipAction: ShipAction;
+
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
                 public shipStats: ShipStats,
                 public colorFront: string,
-                public colorBack: string) {
-    }
+
+                public colorBack: string) {}
 }
 
 export class ShipPosition {
@@ -56,10 +57,6 @@ export class ShipAction {
 }
 // Can make each department specific
 export class ShipDepartment {
-    // constructor(public leftWeapon: Department,
-    //             public rightWeapon: Department,
-    //             public leftEngine: Department,
-    //             public rightEngine: Department) {}
     constructor(public departmentArray: Department[]){}
 
     static getDepartment(shipPosition: ShipPosition, shipDirection: ShipDirection, fieldSize: number ): ShipDepartment {

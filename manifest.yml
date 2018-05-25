@@ -1,0 +1,7 @@
+application:
+  name: IBMSG2018
+  memory: 256M
+  disk_quota: 512M
+  buildpack: nodejs_buildpack
+  domain: mybluemix.net
+  command: npm start

@@ -6,7 +6,8 @@
 const app = require('../app');
 const debug = require('debug')('node-rest:server');
 const http = require('http');
-
+const socketIO = require('socket.io');
+const Start = require('../models/start');
 /**
  * Get port from environment and store in Express.
  */
@@ -17,14 +18,72 @@ app.set('port', port);
  * Create HTTP server.
  */
 const server = http.createServer(app);
-
+const io = socketIO(server);
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+/**
+ * Socket events
+ */
+io.on('connection', (socket) => {
+    console.log('Socket connected');
+
+    // First time it runs
+    Start.find() // Find all ships initially
+        .exec((err, start) => {
+            if (err) throw err;
+            // console.log('All ships: ', start);
+            socket.emit('start', start);
+        });
+
+    // if someone call start => emit new ship
+    socket.on('update', battleShipData => {
+        // console.log(newBattleShipArray);
+        Start.findOne({shipId: battleShipData.shipId}, (err, ship) => {
+            // console.log('Before: ', ship);
+            ship.x = battleShipData.x;
+            ship.y = battleShipData.y;
+            ship.dir = battleShipData.dir;
+            // console.log('After: ', ship);
+            // console.log(ship);
+            ship.save(err, _ => {
+                if (!err) {
+                    Start.find()
+                        .exec((err, start) => {
+                           if (err) throw err;
+                           io.sockets.emit('start', start);
+                        });
+                }
+            });
+        });
+
+
+        // message.content = req.body.content;
+        // message.save(err, result => {
+        //     if (err) {
+        //         return res.status(500).json({
+        //             title: 'An error occurred',
+        //             error: err
+        //         });
+        //     }
+        //     res.status(201).json({
+        //         message: 'Updated message',
+        //         obj: result
+        //     });
+        // });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+server.listen(port, () => console.log('Listening to port: ', port));
 server.on('error', onError);
 server.on('listening', onListening);
+
+
 
 /**
  * Normalize a port into a number, string, or false.

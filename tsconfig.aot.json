@@ -18,5 +18,9 @@
   ],
   "angularCompilerOptions": {
     "skipMetadataEmit": true
-  }
+  },
+  "files": [
+    "./assets/app/app.module.ts",
+    "./assets/app/main-aot.ts"
+  ]
 }
