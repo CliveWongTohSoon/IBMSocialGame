@@ -99,7 +99,7 @@ export class GameComponent implements OnInit {
     }
 
     relativePosition(ship:ShipModel){
-        this.gameService.relativePosition(ship);
+        this.gameService.relativePosition(ship,this.battleField.rowGrid.length);
     }
 
     inputAction(ship: ShipModel, act: Action):boolean{

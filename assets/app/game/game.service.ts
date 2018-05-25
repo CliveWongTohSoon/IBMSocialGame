@@ -101,7 +101,7 @@ export class GameService {
                    // TODO:- Change initShipStat to dynamically change according to emotion
 
                    // TODO:- Update the health points of department
-                   const initShipStat = new ShipStats(1000, 500, 5, 0, 5, false, 0);
+                   const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
 
                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, randomColorFront, randomColorBack);
                    newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
@@ -485,7 +485,8 @@ export class GameService {
 
     } // end shoot
 
-    relativePosition(ship:ShipModel){
+    relativePosition(ship:ShipModel,l:number){
+
         let dir = ship.shipDirection.dir;
         for( let i = 0; i < this.allBattleShips.length; i++ ){
             let x0 = ship.shipPosition.xIndex;
@@ -497,24 +498,29 @@ export class GameService {
             let yd = y - y0;
 
             if(!( xd == 0 &&  yd == 0)){
-                if( xd == 0 ){
-                    if( yd < 0 ){ logPolar( i,0, yd); }
-                    else{ logPolar( i,180,-yd ); }
-                } else if( yd == 0 ){
-                    if( xd < 0 ){ logPolar( i,270, -xd );}
-                    else{ logPolar( i,90, xd ); }
-                } else {
-                    if( xd < 0 && yd < 0 ){ calPolar(i,xd,yd,0); } // second quadrant
-                    else if( xd < 0 && yd > 0 ){ calPolar(i,xd,yd,180); } // third quadrant
-                    else if( xd > 0 && yd > 0 ){ calPolar(i,xd,yd,180); } // fourth quadrant
-                    else{ calPolar(i,xd,yd,0); } //if( xd > 0 && yd < 0 )  first quadrant
-                }
+                { calPolar(i,wrapDistance(xd),wrapDistance(yd),wrapSub(yd)); }
             } else{
                 console.log("current ship is " + i )
             }
         }
         console.log("\n")
 
+        function wrapDistance(xd:number){
+            if( Math.abs( xd ) < l/2 ){ return xd; }
+            else{
+                if( xd < 0 ){ return l + xd; }
+                else{ return  -( l - xd ); }
+            }
+        }
+        function wrapSub(yd:number){
+            if( Math.abs( yd ) < l/2 ){
+                if( yd < 0 ){ return  0; }
+                else{ return  180; }
+            } else{
+                if( yd < 0 ){ return  180; }
+                else{ return   0;}
+            }
+        }
         function calPolar(i:number,xd:number,yd:number,sub:number){
             let rad = Math.atan(xd/yd);
             let deg = rad*180/Math.PI;
