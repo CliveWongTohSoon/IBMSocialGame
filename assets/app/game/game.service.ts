@@ -689,6 +689,165 @@ export class GameService {
     }
 
 
+
+    inputAction(ship: ShipModel, act: Action):boolean{
+        let maxActions = 3;
+        if (ship.shipAction.act.length >= maxActions){
+            console.log("Length" + ship.shipAction.act.length);
+            return false;
+        } else {
+            ship.shipAction.act.push(act);
+            return true;
+        }
+    }
+
+    inputShieldUp(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.FrontShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+    inputShieldLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldDown(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.BackShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShoot(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.ShootFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputMove(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.MoveFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputDoNothing(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.DoNothing);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    fullTurns() {
+        let turn: number;
+        let i : number;
+        for (turn = 1; turn <= 3; turn++) {
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
+                    this.shield(this.allBattleShips[i],0);
+                }
+                //fb: shield successful : front side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftShield) {
+                    this.shield(this.allBattleShips[i],1);
+                }
+                //fb: shield successful: left side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.BackShield) {
+                    this.shield(this.allBattleShips[i], 2);
+                }
+                //fb: shield successful: back side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightShield) {
+                    this.shield(this.allBattleShips[i], 3);
+                }
+                //fb: shield successful: right side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.ShootFront) {
+                    this.shoot(this.allBattleShips[i]);
+                }
+                //fb: hit OR miss
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                for (let k = 0; k < 4; k++) {
+                    if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
+                        this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
+                    }
+                }
+                //fb: *department* destroyed
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.MoveFront) {
+                    this.move(this.allBattleShips[i]);
+                }
+                //fb? enemies in radar OR no enemies detected
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightTurn) {
+                    this.rotate(this.allBattleShips[i], true);
+                }
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftTurn) {
+                    this.rotate(this.allBattleShips[i], false);
+                }
+            }
+            this.checkCollision(this.battleField.rowGrid.length, turn);
+            this.performCollision(this.battleField.rowGrid.length, turn);
+            //fb: collision with enemy / successful move
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                for (let k = 0; k < 4; k++) {
+                    if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
+                        this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
+                    }
+                }
+                // fb: *department* destroyed
+                this.allBattleShips[i].shipStats.shieldActive = false;
+            }
+        }
+        // reset all action
+        this.allBattleShips.map(ship => {
+            ship.shipAction = new ShipAction([]);
+        });
+    }
 }
 
 // else if (referShip.shipAction.act[turn-1] == Action.RightTurn || referShip.shipAction.act[turn-1] == Action.LeftTurn){
@@ -736,4 +895,6 @@ export class GameService {
 //         }
 //     }
 // }
+
+
 
