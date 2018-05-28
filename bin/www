@@ -8,6 +8,7 @@ const debug = require('debug')('node-rest:server');
 const http = require('http');
 const socketIO = require('socket.io');
 const Start = require('../models/start');
+const Instruction = require('../models/instruction');
 /**
  * Get port from environment and store in Express.
  */
@@ -38,7 +39,32 @@ io.on('connection', (socket) => {
             socket.emit('start', start);
         });
 
+    Instruction.find()
+        .exec((err, instruction) => {
+           if (err) throw err;
+           socket.emit('instruction', instruction);
+        });
+
     // if someone call start => emit new ship
+    // socket.on('instruction', data => {
+    //
+    //    io.sockets.emit('instruction')
+    // });
+    socket.on('instruction', data => {
+        Instruction.findOne({shipId: data.shipId}, (err, instruction) => {
+            instruction.phase = 'report';
+            instruction.save(err, _ => {
+               if (!err) {
+                   Instruction.find()
+                       .exec((err, instruction) => {
+                          if (err) throw err;
+                          io.sockets.emit('instruction', instruction);
+                       });
+               }
+            });
+        });
+    });
+
     socket.on('update', battleShipData => {
         // console.log(newBattleShipArray);
         Start.findOne({shipId: battleShipData.shipId}, (err, ship) => {

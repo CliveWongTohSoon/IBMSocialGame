@@ -184,6 +184,10 @@ export class GameComponent implements OnInit {
         }
     }
 
+    sampleButton() {
+        this.gameService.sampleEmit();
+    }
+
     fullTurns() {
         let turn: number;
         let i : number;

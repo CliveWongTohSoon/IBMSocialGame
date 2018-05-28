@@ -23,7 +23,9 @@ export class GameService {
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
 
-        // this.socket.on('hello', console.log);
+        this.socket.on('instruction', data => {
+            console.log('Instruction received!', data);
+        });
 
         let rowContent: Array<TableContent[]> = [];
         for (let i = 0; i < length; i++) {
@@ -37,6 +39,10 @@ export class GameService {
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
         return Observable.of(this.battleField);
+    }
+
+    sampleEmit() {
+        this.socket.emit('instruction', {shipId: 'TestShipA'});
     }
 
     // createShipFromDatabase(): Observable<ShipModel[]> {
