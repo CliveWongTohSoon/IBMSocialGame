@@ -104,7 +104,7 @@ export class GameService {
                    newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                    const newShipPosition = new ShipPosition(0, 0);
                    newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-                   newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
+                   newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
                        .map(_ => Action.DoNothing)
                    );
                    return start ? newShip : null;
