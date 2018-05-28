@@ -42,15 +42,16 @@ io.on('connection', (socket) => {
     Instruction.find()
         .exec((err, instruction) => {
            if (err) throw err;
-           socket.emit('instruction', instruction);
+           socket.emit('instruction', {phase: 'action'});
         });
 
-    // if someone call start => emit new ship
-    // socket.on('instruction', data => {
-    //
-    //    io.sockets.emit('instruction')
-    // });
-    socket.on('instruction', data => {
+    socket.on('test', data => {
+       io.sockets.emit('test', {message: 'Received!', content: data});
+    });
+
+    // Listening to instruction given by pi
+    // Note: Cannot use _
+    socket.on('instruction_client', data => {
         Instruction.findOne({shipId: data.shipId}, (err, instruction) => {
             instruction.phase = 'report';
             instruction.save(err, _ => {
@@ -58,7 +59,7 @@ io.on('connection', (socket) => {
                    Instruction.find()
                        .exec((err, instruction) => {
                           if (err) throw err;
-                          io.sockets.emit('instruction', instruction);
+                          io.sockets.emit('instruction_client', instruction);
                        });
                }
             });
@@ -79,7 +80,11 @@ io.on('connection', (socket) => {
                     Start.find()
                         .exec((err, start) => {
                            if (err) throw err;
+                           // Send to front end to update the ship to sync with database
                            io.sockets.emit('start', start);
+
+                           // Send to pi to report the status of the ship
+                           io.sockets.emit('instruction', {phase: 'report', shipData: start});
                         });
                 }
             });

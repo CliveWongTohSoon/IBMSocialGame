@@ -261,6 +261,8 @@ export class GameComponent implements OnInit {
 
     ngOnInit() {
         // this.gameService.createShipFromSocket().subscribe(console.log);
+        this.gameService.listenToInstruction().subscribe(console.log);
+
         this.gameService.createShipFromSocket().subscribe(shipModel => {
             const numberOfPlayers = shipModel.length;
             // if (numberOfPlayers <= 2) {

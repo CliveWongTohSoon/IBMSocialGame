@@ -157,22 +157,14 @@ export class GameService {
     }
 
     listenToInstruction(): Observable<InstructionModel> {
-        return this.http.get('http://localhost:3000/instruction')
-            .map((response: Response) => {
-                const instruction = response['obj'];
-                const instructionArray: Instruction[] = Array
-                    .apply(null, {length: 3})
-                    .map(arr => {
-                       arr[0] = this.getInstruction(instruction['instruction0']);
-                       arr[1] = this.getInstruction(instruction['instruction1']);
-                       arr[2] = this.getInstruction(instruction['instruction2']);
-                    });
-                const shipId = response['shipId'];
-                // Make sure the ship is in action phase
-                const phase = instruction['phase'] === 'action';
-                const instructionModel = new InstructionModel(shipId, instructionArray);
-                return phase ? instructionModel : null;
+        let observable = new Observable<ShipModel[]>(observer => {
+            this.socket.on('instruction_client', instructionData => {
+                console.log('Entered Instruction_Client');
+                observer.next(instructionData);
             });
+            return () => {this.socket.disconnect()};
+        });
+        return observable;
     }
 
     // ------------------------------------- Static functions ------------------------------------------------------- //
