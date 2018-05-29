@@ -1,18 +1,27 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo, ShipAction, Action} from "./ship-model";
+import {
+    ShipDepartment,
+    ShipDirection,
+    ShipModel,
+    ShipPosition,
+    ShipStats,
+    CollisionInfo,
+    ShipAction,
+    Action,
+    ShipPhase
+} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import * as io from 'socket.io-client';
 import {Instruction, InstructionModel} from "./instruction-model";
-import {HttpClient} from "@angular/common/http";
 
 @Injectable()
 export class GameService {
     private socket: SocketIOClient.Socket;
 
-    constructor(private http: HttpClient) {
+    constructor() {
         this.socket = io();
     }
 
@@ -95,10 +104,13 @@ export class GameService {
                console.log('Entered Start');
                const allShips: ShipModel[] = Object.keys(data).map(key => {
                    // console.log(key, data[key]);
-                   const shipId = data[key]['shipId'], randomX = data[key]['x'], randomY = data[key]['y'],
-                       randomDir = data[key]['dir'];
+                   const shipId = data[key]['shipId'],
+                       randomX = data[key]['x'],
+                       randomY = data[key]['y'],
+                       randomDir = data[key]['dir'],
+                       phase = this.getPhase(data[key]['phase']); // Should give Start initially
 
-                   const start = data[key]['phase'] === 'start'; // Check what I can do with this
+                   const start = phase === ShipPhase.Start; // Check what I can do with this
                    const randomColorBack = this.genRandomColor();
                    const randomColorFront = this.shadeColor(randomColorBack, 20);
                    const initShipPosition = new ShipPosition(randomX, randomY);
@@ -109,13 +121,14 @@ export class GameService {
                    // TODO:- Update the health points of department
                    const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
 
-                   const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, randomColorFront, randomColorBack);
+                   const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, phase, randomColorFront, randomColorBack);
                    newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                    const newShipPosition = new ShipPosition(0, 0);
                    newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-                   newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
+                   newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
                        .map(_ => Action.DoNothing)
                    );
+
                    return start ? newShip : null;
                })
                    .filter(ship => ship !== null);
@@ -129,32 +142,39 @@ export class GameService {
         return observable;
     }
 
-    // TODO:- OLD
-    createShip(numberOfShips: number): Observable<ShipModel[]> {
-        const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
-        const maxY = this.battleField.rowGrid.length;
-
-        this.allBattleShips = Array.apply(null, {length: numberOfShips})
-            .map((_, i) => {
-                const randomColorBack = this.genRandomColor();
-                const randomColorFront = this.shadeColor(randomColorBack, 20);
-                const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
-                const initShipPosition = new ShipPosition(randomX, randomY);
-                const randomDir = this.randomDir(4);
-                const initShipDirection = new ShipDirection(randomDir);
-
-                const initShipStat = new ShipStats(1000,500,5,0.5,5,false,0);
-                const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
-                newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
-                const newShipPosition = new ShipPosition(0,0);
-                newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-                newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
-                    .map(_ => null));
-                return newShip;
-            });
-        this.updateGridWithAllShip();
-        return Observable.of(this.allBattleShips);
+    getPhase(phase: string): ShipPhase {
+        if (phase === 'start') return ShipPhase.Start;
+        else if (phase === 'end') return ShipPhase.End;
+        else if (phase === 'action') return ShipPhase.Action;
+        else if (phase === 'report') return ShipPhase.Report;
     }
+
+    // // TODO:- OLD
+    // createShip(numberOfShips: number): Observable<ShipModel[]> {
+    //     const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
+    //     const maxY = this.battleField.rowGrid.length;
+    //
+    //     this.allBattleShips = Array.apply(null, {length: numberOfShips})
+    //         .map((_, i) => {
+    //             const randomColorBack = this.genRandomColor();
+    //             const randomColorFront = this.shadeColor(randomColorBack, 20);
+    //             const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
+    //             const initShipPosition = new ShipPosition(randomX, randomY);
+    //             const randomDir = this.randomDir(4);
+    //             const initShipDirection = new ShipDirection(randomDir);
+    //
+    //             const initShipStat = new ShipStats(1000,500,5,0.5,5,false,0);
+    //             const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
+    //             newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
+    //             const newShipPosition = new ShipPosition(0,0);
+    //             newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
+    //             newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
+    //                 .map(_ => null));
+    //             return newShip;
+    //         });
+    //     this.updateGridWithAllShip();
+    //     return Observable.of(this.allBattleShips);
+    // }
 
     listenToInstruction(): Observable<InstructionModel> {
         let observable = new Observable<ShipModel[]>(observer => {
@@ -181,7 +201,7 @@ export class GameService {
     }
 
     executeInstruction(ship: ShipModel, instruction: Instruction) {
-        if (instruction === Instruction.Move) this.move(ship)
+        if (instruction === Instruction.Move) this.move(ship);
         else if (instruction === Instruction.ShieldFront) this.shield(ship, Direction.Up);
         else if (instruction === Instruction.ShieldBack) this.shield(ship, Direction.Down);
         else if (instruction === Instruction.ShieldRight) this.shield(ship, Direction.Right);
@@ -211,9 +231,6 @@ export class GameService {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
         ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length, ship);
-
-        this.socket.emit('update', {shipId: ship.shipId, x: ship.shipPosition.xIndex, y: ship.shipPosition.yIndex, dir: ship.shipDirection.dir});
-
         this.updateGridWithAllShip();
     }
 
@@ -259,7 +276,7 @@ export class GameService {
         this.updateShip(ship, newPosition, ship.shipDirection);
     }
 
-    performCollision(fieldSize: number) {
+    performCollision(fieldSize: number, turn: number) {
         var validCheck = false;
         var i = 0;
 
@@ -279,7 +296,7 @@ export class GameService {
                 }
             }
 
-            this.checkCollision(fieldSize);
+            this.checkCollision(fieldSize, turn);
             validCheck = false;
             for (i = 0; i<this.allBattleShips.length; i++){
                 if(this.allBattleShips[i].collisionInfo.moveCount > 0){
@@ -293,7 +310,7 @@ export class GameService {
         }
     }
 
-    checkCollision(fieldSize :number){
+    checkCollision(fieldSize :number, turn:number){
 
         var i = 0, j = 0 ;
         var resultant : ShipPosition = new ShipPosition(0,0);
@@ -301,7 +318,7 @@ export class GameService {
         for (i = 0; i < this.allBattleShips.length; i++) {
             for (var j = 0; j < this.allBattleShips.length; j++) {
                 if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == fieldSize-1)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == fieldSize-1)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
-                    this.checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j]);
+                    this.checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
                     if(this.allBattleShips[i].shipPosition.xIndex-this.allBattleShips[j].shipPosition.xIndex == 0 && this.allBattleShips[i].shipPosition.yIndex- this.allBattleShips[j].shipPosition.yIndex == 0){
                         this.assignResultant(this.allBattleShips[i]);
                     }
@@ -354,11 +371,11 @@ export class GameService {
         }
     }
 
-    checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel){
+    checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel, turn: number){
        for(let i = 0; i < 4; i++){
            for(let j = 0; j < 4; j++){
                if (rammerShip.shipDepartment.departmentArray[i].xIndex == victimShip.shipDepartment.departmentArray[j].xIndex && rammerShip.shipDepartment.departmentArray[i].yIndex == victimShip.shipDepartment.departmentArray[j].yIndex){
-                   this.updateCollisionHealth(rammerShip, i, victimShip, j,  1 );
+                   this.updateCollisionHealth(rammerShip, i, victimShip, j, turn);
                }
            }
        }
@@ -468,18 +485,18 @@ export class GameService {
             }
         }
 
-        function findNeibourDepart( k:number,offset: number){ // kth department plus offset
-            let result = k + offset;
-            if( result > 3 || result < 0 ){
-                return mod(result, 4);
-            }else {
-                return result;
-            }
-
-            function mod(n, m) {
-                return ((n % m) + m) % m;
-            }
-        }
+        // function findNeibourDepart( k:number,offset: number){ // kth department plus offset
+        //     let result = k + offset;
+        //     if( result > 3 || result < 0 ){
+        //         return mod(result, 4);
+        //     }else {
+        //         return result;
+        //     }
+        //
+        //     function mod(n, m) {
+        //         return ((n % m) + m) % m;
+        //     }
+        // }
 
     } // end shoot
 
@@ -676,6 +693,175 @@ export class GameService {
     }
 
 
+
+    inputAction(ship: ShipModel, act: Action):boolean{
+        let maxActions = 3;
+        if (ship.shipAction.act.length >= maxActions){
+            console.log("Length" + ship.shipAction.act.length);
+            return false;
+        } else {
+            ship.shipAction.act.push(act);
+            return true;
+        }
+    }
+
+    inputShieldUp(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.FrontShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+    inputShieldLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldDown(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.BackShield);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputShoot(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.ShootFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputMove(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.MoveFront);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateRight(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.RightTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateLeft(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.LeftTurn);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    inputDoNothing(ship: ShipModel){
+        let valid:boolean;
+        valid = this.inputAction(ship, Action.DoNothing);
+        if (valid == false){
+            console.log('Too many actions')
+        }
+    }
+
+    fullTurns() {
+        let turn: number;
+        let i : number;
+        for (turn = 1; turn <= 3; turn++) {
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
+                    this.shield(this.allBattleShips[i],0);
+                }
+                //fb: shield successful : front side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftShield) {
+                    this.shield(this.allBattleShips[i],1);
+                }
+                //fb: shield successful: left side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.BackShield) {
+                    this.shield(this.allBattleShips[i], 2);
+                }
+                //fb: shield successful: back side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightShield) {
+                    this.shield(this.allBattleShips[i], 3);
+                }
+                //fb: shield successful: right side
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.ShootFront) {
+                    this.shoot(this.allBattleShips[i]);
+                }
+                //fb: hit OR miss
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                for (let k = 0; k < 4; k++) {
+                    if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
+                        this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
+                    }
+                }
+                //fb: *department* destroyed
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.MoveFront) {
+                    this.move(this.allBattleShips[i]);
+                }
+                //fb? enemies in radar OR no enemies detected
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightTurn) {
+                    this.rotate(this.allBattleShips[i], true);
+                }
+            }
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftTurn) {
+                    this.rotate(this.allBattleShips[i], false);
+                }
+            }
+            this.checkCollision(this.battleField.rowGrid.length, turn);
+            this.performCollision(this.battleField.rowGrid.length, turn);
+            //fb: collision with enemy / successful move
+            for (i = 0; i < this.allBattleShips.length; i++) {
+                for (let k = 0; k < 4; k++) {
+                    if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
+                        this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
+                    }
+                }
+                // fb: *department* destroyed
+                this.allBattleShips[i].shipStats.shieldActive = false;
+            }
+        }
+
+        this.allBattleShips.map(ship => {
+            // Update the phase
+            this.socket.emit('update', {
+                shipId: ship.shipId,
+                x: ship.shipPosition.xIndex,
+                y: ship.shipPosition.yIndex,
+                dir: ship.shipDirection.dir});
+        });
+
+        // reset all action
+        this.allBattleShips.map(ship => {
+            ship.shipAction = new ShipAction([]);
+        });
+    }
 }
 
 // else if (referShip.shipAction.act[turn-1] == Action.RightTurn || referShip.shipAction.act[turn-1] == Action.LeftTurn){
@@ -723,4 +909,6 @@ export class GameService {
 //         }
 //     }
 // }
+
+
 

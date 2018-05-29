@@ -9,9 +9,16 @@ export class ShipModel {
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
                 public shipStats: ShipStats,
+                public phase: ShipPhase,
                 public colorFront: string,
-
                 public colorBack: string) {}
+}
+
+export enum ShipPhase {
+    Action,
+    Report,
+    Start,
+    End
 }
 
 export class ShipPosition {
@@ -163,10 +170,6 @@ export class ShipDepartment {
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         }
     }
-
-
-
-
 }
 
 export class Department {
