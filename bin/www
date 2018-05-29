@@ -87,6 +87,11 @@ io.on('connection', (socket) => {
             ship.x = battleShipData.x;
             ship.y = battleShipData.y;
             ship.dir = battleShipData.dir;
+            ship.reHealth = battleShipData.reHealth;
+            ship.leHealth =  battleShipData.leHealth;
+            ship.lwHealth = battleShipData.lwHealth;
+            ship.rwHealth = battleShipData.rwHealth;
+
             ship.phase = 'report';
             // console.log('After: ', ship);
             // console.log(ship);
