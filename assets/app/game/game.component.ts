@@ -138,6 +138,10 @@ export class GameComponent implements OnInit {
         this.gameService.fullTurns();
     }
 
+    test(){
+        this.gameService.getPersonality();
+    }
+
 
 
     ngOnInit() {
