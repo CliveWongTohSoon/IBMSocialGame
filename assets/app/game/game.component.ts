@@ -286,7 +286,7 @@ export class GameComponent implements OnInit {
             // }
 
             this.allBattleShip = shipModel;
-            this.fullTurns();
+            //this.fullTurns();
         });
     }
 }

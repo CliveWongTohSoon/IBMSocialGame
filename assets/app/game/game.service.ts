@@ -98,14 +98,14 @@ export class GameService {
                    // TODO:- Change initShipStat to dynamically change according to emotion
 
                    // TODO:- Update the health points of department
-                   const initShipStat = new ShipStats(1000, 500, 5, 0, 5, false, 0);
+                   const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
 
                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, randomColorFront, randomColorBack);
                    newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
                    const newShipPosition = new ShipPosition(0, 0);
                    newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-                   newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
-                       .map(_ => Action.DoNothing)
+                   newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
+                      .map(_ => null )
                    );
                    return start ? newShip : null;
                })
@@ -210,7 +210,7 @@ export class GameService {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
         ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length, ship);
-
+        console.log(this.allBattleShips;
         this.socket.emit('update', {shipId: ship.shipId, x: ship.shipPosition.xIndex, y: ship.shipPosition.yIndex, dir: ship.shipDirection.dir});
 
         this.updateGridWithAllShip();
@@ -495,21 +495,7 @@ export class GameService {
             let yd = y - y0;
 
             if(!( xd == 0 &&  yd == 0)){
-                if( xd == 0 ){
-                    if( yd < 0 ){ logPolar( i,0, -yd); }
-                    else{ logPolar( i,180,yd ); }
-                }else if( yd == 0 ){
-                    if( xd < 0 ){ logPolar( i,270, xd );}
-                    else{ logPolar( i,90, -xd ); }
-                }else{
-                    if(  yd < 0 ) {
-                        { calPolar(i,wrapDistance(xd),wrapDistance(yd),wrapSub(yd)); }
-                    }
-                    else{
-                        { calPolar(i,wrapDistance(xd),wrapDistance(yd),wrapSub(yd)); }
-                    }
-
-                }
+                { calPolar(i,wrapDistance(xd),wrapDistance(yd),wrapSub(yd)); }
             } else{
                 console.log("current ship is " + i )
             }
