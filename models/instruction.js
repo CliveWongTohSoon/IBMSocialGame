@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-    shipId: {type: String},
+    shipId: {type: String, required: true},
     phase: {type: String, required: true}, // phase can be either action or report
     instruction0: {type: String, required: true},
     instruction1: {type: String, required: true},
