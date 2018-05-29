@@ -773,67 +773,36 @@ export class GameService {
     }
 
     fullTurns() {
-        let turn: number;
-        let i : number;
-        for (turn = 1; turn <= 3; turn++) {
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
+        for (let turn = 0; turn < 3; turn++) {
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                let act = this.allBattleShips[i].shipAction.act[turn];
+                if ( act == Action.FrontShield) {//fb: shield successful : front side
                     this.shield(this.allBattleShips[i],0);
-                }
-                //fb: shield successful : front side
-            }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftShield) {
+                } else if (act == Action.LeftShield) {//fb: shield successful: left side
                     this.shield(this.allBattleShips[i],1);
-                }
-                //fb: shield successful: left side
-            }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.BackShield) {
+                }else if (act == Action.BackShield) {//fb: shield successful: back side
                     this.shield(this.allBattleShips[i], 2);
-                }
-                //fb: shield successful: back side
-            }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightShield) {
+                }else if (act == Action.RightShield) {//fb: shield successful: right side
                     this.shield(this.allBattleShips[i], 3);
-                }
-                //fb: shield successful: right side
-            }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.ShootFront) {
+                }else if (act == Action.ShootFront) {//fb: hit OR miss
                     this.shoot(this.allBattleShips[i]);
+                }else if (act == Action.MoveFront) { //fb? enemies in radar OR no enemies detected
+                    this.move(this.allBattleShips[i]);
+                }else if (act == Action.RightTurn) {
+                    this.rotate(this.allBattleShips[i], true);
+                }else if (act == Action.LeftTurn) {
+                    this.rotate(this.allBattleShips[i], false);
                 }
-                //fb: hit OR miss
-            }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                for (let k = 0; k < 4; k++) {
+                for (let k = 0; k < 4; k++) {//fb: *department* destroyed
                     if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
                         this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
                     }
                 }
-                //fb: *department* destroyed
             }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.MoveFront) {
-                    this.move(this.allBattleShips[i]);
-                }
-                //fb? enemies in radar OR no enemies detected
-            }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightTurn) {
-                    this.rotate(this.allBattleShips[i], true);
-                }
-            }
-            for (i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftTurn) {
-                    this.rotate(this.allBattleShips[i], false);
-                }
-            }
-            this.checkCollision(this.battleField.rowGrid.length, turn);
-            this.performCollision(this.battleField.rowGrid.length, turn);
+            this.checkCollision(this.battleField.rowGrid.length, turn+1);
+            this.performCollision(this.battleField.rowGrid.length, turn+1);
             //fb: collision with enemy / successful move
-            for (i = 0; i < this.allBattleShips.length; i++) {
+            for (let i = 0; i < this.allBattleShips.length; i++) {
                 for (let k = 0; k < 4; k++) {
                     if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
                         this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
