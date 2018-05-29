@@ -30,7 +30,7 @@ export class GameService {
      * ********************************************/
     test(shipId, instructionArray) {
         this.socket.emit('instruction_server', {
-           shipId: shipId,
+           shipId: shipId
            // instruction0: instructionArray[0],
            // instruction1: instructionArray[1],
            // instruction2: instructionArray[2]
@@ -111,10 +111,21 @@ export class GameService {
                        randomX = data[key]['x'],
                        randomY = data[key]['y'],
                        randomDir = data[key]['dir'],
+                       reHealth = data[key]['reHealth'],
+                       leHealth = data[key]['leHealth'],
+                       lwHealth = data[key]['lwHealth'],
+                       rwHealth = data[key]['rwHealth'],
+
+                       // reAlive = data[key]['reHealth'],
+                       // leAlive = data[key]['leHealth'],
+                       // lwAlive = data[key]['lwHealth'],
+                       // rwAlive = data[key]['rwHealth'],
+
                        phase = this.getPhase(data[key]['phase']); // Should give Start initially
                    // console.log(data);
+
                    const start = phase !== ShipPhase.End; // Check what I can do with this
-                   // console.log(start);
+
                    const randomColorBack = this.genRandomColor();
                    const randomColorFront = this.shadeColor(randomColorBack, 20);
                    const initShipPosition = new ShipPosition(randomX, randomY);
@@ -126,7 +137,7 @@ export class GameService {
                    const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
 
                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, phase, randomColorFront, randomColorBack);
-                   newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
+                   newShip.shipDepartment = ShipDepartment.updateDepartmentHealth(initShipPosition, initShipDirection, this.battleField.rowGrid.length, reHealth, leHealth,lwHealth,rwHealth);
                    const newShipPosition = new ShipPosition(0, 0);
                    newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
                    newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
@@ -488,20 +499,6 @@ export class GameService {
                 }
             }
         }
-
-        // function findNeibourDepart( k:number,offset: number){ // kth department plus offset
-        //     let result = k + offset;
-        //     if( result > 3 || result < 0 ){
-        //         return mod(result, 4);
-        //     }else {
-        //         return result;
-        //     }
-        //
-        //     function mod(n, m) {
-        //         return ((n % m) + m) % m;
-        //     }
-        // }
-
     } // end shoot
 
     relativePosition(ship:ShipModel,l:number){
@@ -854,11 +851,16 @@ export class GameService {
 
         this.allBattleShips.map(ship => {
             // Update the phase
+            let depart = ship.shipDepartment.departmentArray;
             this.socket.emit('update', {
                 shipId: ship.shipId,
                 x: ship.shipPosition.xIndex,
                 y: ship.shipPosition.yIndex,
-                dir: ship.shipDirection.dir});
+                dir: ship.shipDirection.dir,
+                reHealth: depart[0].health,
+                leHealth: depart[1].health,
+                lwHealth: depart[2].health,
+                rwHealth: depart[3].health    });
         });
 
         // reset all action

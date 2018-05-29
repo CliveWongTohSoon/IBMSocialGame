@@ -2,7 +2,6 @@ import {Component, OnInit} from "@angular/core";
 import {ShipModel, Action, ShipAction, ShipPhase} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
-import {sharedStylesheetJitUrl} from "@angular/compiler";
 
 @Component({
     selector: 'app-game',
@@ -174,6 +173,7 @@ export class GameComponent implements OnInit {
         });
 
         this.gameService.createShipFromSocket().subscribe(shipModel => {
+            console.log('Ship:', shipModel);
             const numberOfPlayers = shipModel.length;
             // if (numberOfPlayers <= 2) {
             //     this.gameService.init(25)
