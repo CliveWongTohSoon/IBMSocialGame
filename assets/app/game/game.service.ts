@@ -25,17 +25,24 @@ export class GameService {
         this.socket = io();
     }
 
+    /**********************************************
+     * Test for Raspberry Pi
+     * ********************************************/
+    test(shipId, instructionArray) {
+        this.socket.emit('instruction_server', {
+           shipId: shipId
+           // instruction0: instructionArray[0],
+           // instruction1: instructionArray[1],
+           // instruction2: instructionArray[2]
+        });
+    }
+
     // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
 
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
-
-        this.socket.on('instruction', data => {
-            console.log('Instruction received!', data);
-        });
-
         let rowContent: Array<TableContent[]> = [];
         for (let i = 0; i < length; i++) {
             let colContent: TableContent[] = [];
@@ -48,10 +55,6 @@ export class GameService {
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
         return Observable.of(this.battleField);
-    }
-
-    sampleEmit() {
-        this.socket.emit('instruction', {shipId: 'TestShipA'});
     }
 
     // createShipFromDatabase(): Observable<ShipModel[]> {
@@ -119,8 +122,10 @@ export class GameService {
                        // rwAlive = data[key]['rwHealth'],
 
                        phase = this.getPhase(data[key]['phase']); // Should give Start initially
+                   // console.log(data);
 
-                   const start = phase != ShipPhase.End; // Check what I can do with this
+                   const start = phase !== ShipPhase.End; // Check what I can do with this
+
                    const randomColorBack = this.genRandomColor();
                    const randomColorFront = this.shadeColor(randomColorBack, 20);
                    const initShipPosition = new ShipPosition(randomX, randomY);
@@ -189,7 +194,7 @@ export class GameService {
     listenToInstruction(): Observable<InstructionModel> {
         let observable = new Observable<ShipModel[]>(observer => {
             this.socket.on('instruction_client', instructionData => {
-                console.log('Entered Instruction_Client');
+                // console.log('Entered Instruction_Client', instructionData);
                 observer.next(instructionData);
             });
             return () => {this.socket.disconnect()};

@@ -46,13 +46,23 @@ io.on('connection', (socket) => {
         });
 
     socket.on('test', data => {
-       io.sockets.emit('test', {message: 'Received!', content: data});
+        Instruction.findOne({shipId: data.shipId}, (err, instruction) => {
+           if (err) throw err;
+           instruction.instruction0 = data.instruction0;
+           instruction.instruction1 = data.instruction1;
+           instruction.instruction2 = data.instruction2;
+           instruction.save(err, _ => {
+               // console.log(instruction);
+               if (!err) io.sockets.emit('instruction_server', {shipId: data.shipId});
+           });
+        });
     });
 
     // Listening to instruction given by pi
     // Note: Cannot use -
-    socket.on('instruction_client', data => {
+    socket.on('instruction_server', data => {
         // Update the ship to action phase
+        console.log('instruction_server reached!', data);
         Start.findOne({shipId: data.shipId}, (err, ship) => {
             ship.phase = 'action';
             ship.save(err, _ => {
@@ -65,12 +75,8 @@ io.on('connection', (socket) => {
                                 Start.find()
                                     .exec((err, start) => {
                                        if (err) throw err;
-                                       Instruction.find()
-                                           .exec((err, instruction) => {
-                                               if (err) throw err;
-                                               io.sockets.emit('start', start);
-                                               io.sockets.emit('instruction_client', instruction);
-                                           });
+                                       // io.sockets.emit('start', start);
+                                       io.sockets.emit('instruction_client', instruction);
                                     });
                             }
                         });
