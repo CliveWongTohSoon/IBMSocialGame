@@ -838,7 +838,6 @@ export class GameService {
         });
     }
 }
-
 // else if (referShip.shipAction.act[turn-1] == Action.RightTurn || referShip.shipAction.act[turn-1] == Action.LeftTurn){
 //     if (xDiff > 0){
 //         if (shieldGridDirection == Direction.Left){
