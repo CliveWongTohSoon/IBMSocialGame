@@ -116,10 +116,10 @@ export class GameService {
                        lwHealth = data[key]['lwHealth'],
                        rwHealth = data[key]['rwHealth'],
 
-                       // reAlive = data[key]['reHealth'],
-                       // leAlive = data[key]['leHealth'],
-                       // lwAlive = data[key]['lwHealth'],
-                       // rwAlive = data[key]['rwHealth'],
+                       reAlive = data[key]['reAlive'],
+                       leAlive = data[key]['leAlive'],
+                       lwAlive = data[key]['lwAlive'],
+                       rwAlive = data[key]['rwAlive'],
 
                        phase = this.getPhase(data[key]['phase']); // Should give Start initially
                    // console.log(data);
@@ -137,7 +137,10 @@ export class GameService {
                    const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
 
                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, phase, randomColorFront, randomColorBack);
-                   newShip.shipDepartment = ShipDepartment.updateDepartmentHealth(initShipPosition, initShipDirection, this.battleField.rowGrid.length, reHealth, leHealth,lwHealth,rwHealth);
+                   newShip.shipDepartment = ShipDepartment.updateDepartmentHealth(
+                       initShipPosition, initShipDirection, this.battleField.rowGrid.length,
+                       reHealth, leHealth, lwHealth, rwHealth, reAlive, leAlive, lwAlive, rwAlive
+                   );
                    const newShipPosition = new ShipPosition(0, 0);
                    newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
                    newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
@@ -822,7 +825,13 @@ export class GameService {
                 reHealth: depart[0].health,
                 leHealth: depart[1].health,
                 lwHealth: depart[2].health,
-                rwHealth: depart[3].health    });
+                rwHealth: depart[3].health,
+                reAlive: depart[0].alive,
+                leAlive: depart[1].alive,
+                lwAlive: depart[2].alive,
+                rwAlive: depart[3].alive
+
+            });
         });
 
         // reset all action
