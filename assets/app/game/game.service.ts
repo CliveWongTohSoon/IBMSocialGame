@@ -115,7 +115,6 @@ export class GameService {
                        leHealth = data[key]['leHealth'],
                        lwHealth = data[key]['lwHealth'],
                        rwHealth = data[key]['rwHealth'],
-
                        reAlive = data[key]['reAlive'],
                        leAlive = data[key]['leAlive'],
                        lwAlive = data[key]['lwAlive'],
@@ -253,22 +252,14 @@ export class GameService {
     }
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
-
         let newPosition: ShipPosition = position;
-
-        if (position.xIndex >= fieldSize) {
-            newPosition.xIndex = position.xIndex - fieldSize;
-        } else if (position.xIndex < 0) {
-            newPosition.xIndex = position.xIndex + fieldSize;
-        }
-
-        if (position.yIndex >= fieldSize) {
-            newPosition.yIndex = position.yIndex - fieldSize;
-        } else if (position.yIndex < 0) {
-            newPosition.yIndex = position.yIndex + fieldSize;
-        }
-
+        newPosition.xIndex = mod(position.xIndex, fieldSize);
+        newPosition.yIndex = mod(position.yIndex, fieldSize);
         return newPosition;
+
+        function mod(n, m) {
+            return ((n % m) + m) % m;
+        }
     }
 
     move(ship: ShipModel) {
