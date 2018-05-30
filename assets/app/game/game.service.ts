@@ -402,23 +402,15 @@ export class GameService {
     }
 
     rotate(ship: ShipModel, clockwise: boolean) {
-        let newDirection: ShipDirection = new ShipDirection(ship.shipDirection.dir);
+        let newDirection = ship.shipDirection.dir;
         if (clockwise) {
-            if (newDirection.dir == 0) {
-                newDirection.dir = 3;
-            }
-            else {
-                newDirection.dir = ship.shipDirection.dir - 1;
-            }
-        } else {
-            if (newDirection.dir == 3) {
-                newDirection.dir = 0;
-            }
-            else {
-                newDirection.dir = ship.shipDirection.dir + 1;
-            }
+            if ( newDirection == 0) {newDirection = 3; }
+            else{ newDirection = ship.shipDirection.dir - 1; }
+        }else{
+            if (newDirection == 3) { newDirection = 0;}
+            else{ newDirection = ship.shipDirection.dir + 1;}
         }
-        this.updateShip(ship, ship.shipPosition,newDirection);
+        this.updateShip(ship, ship.shipPosition, new ShipDirection(newDirection));
     }
 
     shield(ship: ShipModel, shieldDirection: Direction) {
