@@ -271,17 +271,18 @@ export class GameService {
     move(ship: ShipModel) {
         const fieldSize = this.battleField.rowGrid.length;
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
+        let dir = ship.shipDirection.dir;
 
-        if (ship.shipDirection.dir == Direction.Up) {
+        if ( dir == Direction.Up) {
             console.log('Enter up');
             newPosition.yIndex = newPosition.yIndex - 1;
-        } else if (ship.shipDirection.dir == Direction.Down) {
+        } else if ( dir == Direction.Down) {
             console.log('Enter down');
             newPosition.yIndex = newPosition.yIndex + 1;
-        } else if (ship.shipDirection.dir == Direction.Right) {
+        } else if ( dir == Direction.Right) {
             console.log('Enter right');
             newPosition.xIndex = newPosition.xIndex + 1;
-        } else if (ship.shipDirection.dir == Direction.Left) {
+        } else if ( dir == Direction.Left) {
             console.log('Enter left');
             newPosition.xIndex = newPosition.xIndex - 1;
         }
