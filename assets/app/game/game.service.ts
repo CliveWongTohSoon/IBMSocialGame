@@ -548,7 +548,10 @@ export class GameService {
             console.log("ship " + i +" 's relative position from this ship is: " + deg +" degree, distance is "+ distance );
         }
         function adjustByDir(dir:Direction,deg:number){
-            return this.mod(dir*90 + deg,360 );
+            return mod(dir*90 + deg,360 );
+        }
+        function mod(n, m) {
+            return ((n % m) + m) % m;
         }
     }
 
