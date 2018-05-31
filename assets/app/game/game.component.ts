@@ -124,6 +124,7 @@ export class GameComponent implements OnInit {
         else return 'DoNothing';
     }
 
+
     fullTurns(ship: ShipModel){
         // Test
         this.gameService.test(ship.shipId, this.intentArray);

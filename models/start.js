@@ -11,10 +11,10 @@ const schema = new Schema({
     leHealth: {type: Number, required: true},
     lwHealth: {type: Number, required: true},
     rwHealth: {type: Number, required: true},
-    // reAlive: {type: Boolean, required:true},
-    // leAlive: {type: Boolean, required:true},
-    // lwAlive: {type: Boolean, required:true},
-    // rwAlive: {type: Boolean, required:true},
+    reAlive: {type: Boolean, required:true},
+    leAlive: {type: Boolean, required:true},
+    lwAlive: {type: Boolean, required:true},
+    rwAlive: {type: Boolean, required:true},
 });
 
 module.exports = mongoose.model('Start', schema);

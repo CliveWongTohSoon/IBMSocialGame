@@ -19,5 +19,6 @@ import {Component} from "@angular/core";
 })
 
 export class AuthComponent {
-
+    isLoggedIn: boolean;
+    constructor() {}
 }

@@ -34,7 +34,7 @@ export class SigninComponent {
     }
 
     loginToTwitter() {
-        this.authService.loginToTwitter().subscribe(console.log);
+        this.authService.loginToTwitter().subscribe();
     }
 
     ngOnInit() {
