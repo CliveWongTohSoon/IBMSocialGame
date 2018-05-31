@@ -1626,7 +1626,7 @@ export class GameService {
         let minHP = 700, maxHP = 1300;
         let minAtt = 400, maxAtt = 800;
         let minDef = 0.5, maxDef = 0.9;
-        const wordCount = json['word_count']; //This will give 15128
+        // const wordCount = json['word_count']; //This will give 15128
         const personality = json['personality']; // This is an array
         const values = json['values'];
         var shipStat = new ShipStats(minHP, minAtt, minAttRange, minDef, minRange, false, 0);
@@ -1646,7 +1646,7 @@ export class GameService {
         let minAtt = 400, maxAtt = 800;
         let minDef = 0.5, maxDef = 0.9;
         let newShipStat = shipStat;
-        const value_fraction = 0.4;
+        const value_fraction = 1/3;
         if(traitID == 'value_conservation'){
             newShipStat.defence += (maxDef - minDef) * value_fraction * percentile;
         }
@@ -1676,7 +1676,7 @@ export class GameService {
         let minDef = 0.5, maxDef = 0.9;
 
         let newShipStat = shipStat;
-        const personality_fraction = 0.3;
+        const personality_fraction = 1/3;
         if(traitID == 'big5_openness'){
             if (percentile <= 0.5){
                 newShipStat.attack += (maxAtt - minAtt) * personality_fraction;
