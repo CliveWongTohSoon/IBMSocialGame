@@ -119,6 +119,11 @@ export class GameService {
                        leAlive = data[key]['leAlive'],
                        lwAlive = data[key]['lwAlive'],
                        rwAlive = data[key]['rwAlive'],
+                       attack  = data[key]['attack'],
+                       range  = data[key]['range'],
+                       attackRange  = data[key]['attackRange'],
+                       defence  = data[key]['defence'],
+
 
                        phase = this.getPhase(data[key]['phase']); // Should give Start initially
                    // console.log(data);
@@ -133,7 +138,7 @@ export class GameService {
                    // TODO:- Change initShipStat to dynamically change according to emotion
 
                    // TODO:- Update the health points of department
-                   const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
+                   const initShipStat = new ShipStats(1234, attack, attackRange, defence, range, false, 0);
 
                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, phase, randomColorFront, randomColorBack);
                    newShip.shipDepartment = ShipDepartment.updateDepartmentHealth(
@@ -253,13 +258,9 @@ export class GameService {
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
         let newPosition: ShipPosition = position;
-        newPosition.xIndex = this.mod(position.xIndex, fieldSize);
-        newPosition.yIndex = this.mod(position.yIndex, fieldSize);
+        newPosition.xIndex = mod(position.xIndex, fieldSize);
+        newPosition.yIndex = mod(position.yIndex, fieldSize);
         return newPosition;
-    }
-
-    mod(n, m) {
-        return ((n % m) + m) % m;
     }
 
     move(ship: ShipModel) {
@@ -288,15 +289,14 @@ export class GameService {
 
     performCollision(fieldSize: number, turn: number) {
         var validCheck = false;
-        var i = 0;
 
-        for (i = 0; i < this.allBattleShips.length; i++) {
+        for (let i = 0; i < this.allBattleShips.length; i++) {
             if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
                 validCheck = true;
             }
         }
-        while (validCheck == true) {
-            for (i = 0; i < this.allBattleShips.length; i++) {
+        while (validCheck) {
+            for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
                     this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
                     this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
@@ -308,17 +308,63 @@ export class GameService {
 
             this.checkCollision(fieldSize, turn);
             validCheck = false;
-            for (i = 0; i<this.allBattleShips.length; i++){
+            for (let i = 0; i<this.allBattleShips.length; i++){
                 if(this.allBattleShips[i].collisionInfo.moveCount > 0){
                     validCheck = true;
                 }
             }
         }
-        for (i = 0; i < this.allBattleShips.length; i++) {
+        for (let i = 0; i < this.allBattleShips.length; i++) {
             this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
             this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
         }
     }
+    //
+    // checkCollision(fieldSize :number, turn:number){
+    //     var resultant : ShipPosition = new ShipPosition(0,0);
+    //
+    //     for (let i = 0; i < this.allBattleShips.length; i++) {
+    //         for (let j = 0; j < this.allBattleShips.length; j++) {
+    //             let ix = this.allBattleShips[i].shipPosition.xIndex;
+    //             let jx = this.allBattleShips[j].shipPosition.xIndex;
+    //             let iy = this.allBattleShips[i].shipPosition.yIndex;
+    //             let jy = this.allBattleShips[j].shipPosition.yIndex;
+    //             let xOverlap = (Math.abs( ix - jx) <= 1) || (Math.abs(ix - jx ) == fieldSize-1);
+    //             let yOverlap = (Math.abs( ix - jx) <= 1) || (Math.abs(ix - jx ) == fieldSize-1);
+    //             let overlap = xOverlap && yOverlap;
+    //             let notSameShip = this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId;
+    //
+    //             if ( overlap && notSameShip) {
+    //                 checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
+    //                 if(ix - jx == 0 && iy - jy == 0){
+    //                     assignResultant(this.allBattleShips[i]);
+    //                 }
+    //                 resultant.xIndex = ix - jx;
+    //                 resultant.yIndex = iy - jy;
+    //
+    //                 if(Math.abs(resultant.xIndex) == fieldSize - 1){
+    //                     resultant.xIndex = -1 * adjustOverflow(resultant.xIndex);
+    //                 }
+    //                 if(Math.abs(resultant.yIndex) == fieldSize - 1){
+    //                     resultant.yIndex = -1 * adjustOverflow(resultant.yIndex);
+    //                 }
+    //
+    //                 this.allBattleShips[i].collisionInfo.resultantMove.xIndex += resultant.xIndex;
+    //                 this.allBattleShips[i].collisionInfo.resultantMove.yIndex += resultant.yIndex;
+    //
+    //                 if(Math.abs(this.allBattleShips[i].collisionInfo.resultantMove.xIndex) > 1){
+    //                     this.allBattleShips[i].collisionInfo.resultantMove.xIndex = adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.xIndex);
+    //                 }
+    //                 if(Math.abs(this.allBattleShips[i].collisionInfo.resultantMove.yIndex) > 1){
+    //                     this.allBattleShips[i].collisionInfo.resultantMove.yIndex = adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.yIndex);
+    //                 }
+    //
+    //                 this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+    //
+    //             }
+    //         }
+    //     }
+
 
     checkCollision(fieldSize :number, turn:number){
         var resultant : ShipPosition = new ShipPosition(0,0);
@@ -355,6 +401,8 @@ export class GameService {
                 }
             }
         }
+
+
 
         function checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel, turn: number){
             for(let i = 0; i < 4; i++){
@@ -413,8 +461,8 @@ export class GameService {
     rotate(ship: ShipModel, clockwise: boolean) {
         let dir = ship.shipDirection.dir;
         let newDirection;
-        if (clockwise){ newDirection = this.mod(dir - 1, 4 ); }
-        else{ newDirection = this.mod(dir + 1, 4 ); }
+        if (clockwise){ newDirection = mod(dir - 1, 4 ); }
+        else{ newDirection = mod(dir + 1, 4 ); }
         this.updateShip(ship, ship.shipPosition, new ShipDirection(newDirection));
     }
 
@@ -550,9 +598,7 @@ export class GameService {
         function adjustByDir(dir:Direction,deg:number){
             return mod(dir*90 + deg,360 );
         }
-        function mod(n, m) {
-            return ((n % m) + m) % m;
-        }
+
     }
 
     randomCoor(max: number, start: number){ //}, prevPos : number, range : number){
@@ -1718,6 +1764,10 @@ export class GameService {
         return newShipStat
     }
 
+}
+
+function mod(n, m) {
+    return ((n % m) + m) % m;
 }
 // else if (referShip.shipAction.act[turn-1] == Action.RightTurn || referShip.shipAction.act[turn-1] == Action.LeftTurn){
 //     if (xDiff > 0){
