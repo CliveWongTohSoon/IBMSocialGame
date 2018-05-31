@@ -7,9 +7,6 @@ const schema = new Schema({
     x: {type: Number, required: true},
     y: {type: Number, required: true},
     dir: {type: Number, required: true},
-
-<<<<<<< HEAD
-=======
     reHealth: {type: Number, required: true},
     leHealth: {type: Number, required: true},
     lwHealth: {type: Number, required: true},
@@ -18,7 +15,6 @@ const schema = new Schema({
     // leAlive: {type: Boolean, required:true},
     // lwAlive: {type: Boolean, required:true},
     // rwAlive: {type: Boolean, required:true},
->>>>>>> 79fe43a4b45148f7242792e2de2041ab81082ecd
 });
 
 module.exports = mongoose.model('Start', schema);

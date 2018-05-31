@@ -16,14 +16,21 @@ import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import * as io from 'socket.io-client';
 import {Instruction, InstructionModel} from "./instruction-model";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import "rxjs/add/operator/take";
 
 @Injectable()
 export class GameService {
     private socket: SocketIOClient.Socket;
 
-    constructor() {
+    constructor(private http: HttpClient) {
         this.socket = io();
     }
+
+    /***********************************************
+     * Test For IBM Personality Analysis
+     * *********************************************/
+
 
     /**********************************************
      * Test for Raspberry Pi
@@ -55,49 +62,6 @@ export class GameService {
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
         return Observable.of(this.battleField);
-    }
-
-    // createShipFromDatabase(): Observable<ShipModel[]> {
-    //     // TODO:- Dynamically change the numberOfShips
-    //     // TODO:- Store position and direction on database
-    //     // TODO:- Randomise initial position and direction on pi
-    //     return this.http.get('http://localhost:3000/start')
-    //         .map((response: Response, i) => { // For each ship
-    //             const data = response['obj'];
-    //             console.log('Fired!');
-    //             return Object.keys(data).map(key => {
-    //                 const shipId = data[key]['shipId'], randomX = data[key]['x'], randomY = data[key]['y'], randomDir = data[key]['dir'];
-    //
-    //                 const start = data[key]['phase'] === 'start'; // Check what I can do with this
-    //                 const randomColorBack = this.genRandomColor();
-    //                 const randomColorFront = this.shadeColor(randomColorBack, 20);
-    //                 const initShipPosition = new ShipPosition(randomX, randomY);
-    //                 const initShipDirection = new ShipDirection(randomDir);
-    //
-    //                 // TODO:- Change initShipStat to dynamically change according to emotion
-    //                 const initShipStat = new ShipStats(1000,500,5,0,5,false,0);
-    //
-    //                 const newShip = new ShipModel(shipId, initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
-    //                 newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
-    //                 const newShipPosition = new ShipPosition(0,0);
-    //                 newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-    //                 newShip.shipAction = new ShipAction(Array.apply(null, {length: 3})
-    //                     .map(_ => Action.DoNothing)
-    //                 );
-    //                 return start ? newShip : null;
-    //             });
-    //         })
-    //         .map(allShip => allShip.filter(ship => ship !== null))
-    //         .map(allShip => {
-    //             this.allBattleShips = allShip;
-    //             this.updateGridWithAllShip();
-    //             return allShip;
-    //         });
-    // }
-
-    updateShipToDatabase() {
-        console.log('Emitting...');
-        // this.socket.emit('update', this.allBattleShips);
     }
 
     createShipFromSocket(): Observable<ShipModel[]> {
