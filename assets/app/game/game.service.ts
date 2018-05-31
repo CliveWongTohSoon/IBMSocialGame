@@ -115,11 +115,10 @@ export class GameService {
                        leHealth = data[key]['leHealth'],
                        lwHealth = data[key]['lwHealth'],
                        rwHealth = data[key]['rwHealth'],
-
-                       // reAlive = data[key]['reHealth'],
-                       // leAlive = data[key]['leHealth'],
-                       // lwAlive = data[key]['lwHealth'],
-                       // rwAlive = data[key]['rwHealth'],
+                       reAlive = data[key]['reAlive'],
+                       leAlive = data[key]['leAlive'],
+                       lwAlive = data[key]['lwAlive'],
+                       rwAlive = data[key]['rwAlive'],
 
                        phase = this.getPhase(data[key]['phase']); // Should give Start initially
                    // console.log(data);
@@ -137,7 +136,10 @@ export class GameService {
                    const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
 
                    const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, phase, randomColorFront, randomColorBack);
-                   newShip.shipDepartment = ShipDepartment.updateDepartmentHealth(initShipPosition, initShipDirection, this.battleField.rowGrid.length, reHealth, leHealth,lwHealth,rwHealth);
+                   newShip.shipDepartment = ShipDepartment.updateDepartmentHealth(
+                       initShipPosition, initShipDirection, this.battleField.rowGrid.length,
+                       reHealth, leHealth, lwHealth, rwHealth, reAlive, leAlive, lwAlive, rwAlive
+                   );
                    const newShipPosition = new ShipPosition(0, 0);
                    newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
                    newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
@@ -250,38 +252,31 @@ export class GameService {
     }
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
-
         let newPosition: ShipPosition = position;
-
-        if (position.xIndex >= fieldSize) {
-            newPosition.xIndex = position.xIndex - fieldSize;
-        } else if (position.xIndex < 0) {
-            newPosition.xIndex = position.xIndex + fieldSize;
-        }
-
-        if (position.yIndex >= fieldSize) {
-            newPosition.yIndex = position.yIndex - fieldSize;
-        } else if (position.yIndex < 0) {
-            newPosition.yIndex = position.yIndex + fieldSize;
-        }
-
+        newPosition.xIndex = this.mod(position.xIndex, fieldSize);
+        newPosition.yIndex = this.mod(position.yIndex, fieldSize);
         return newPosition;
+    }
+
+    mod(n, m) {
+        return ((n % m) + m) % m;
     }
 
     move(ship: ShipModel) {
         const fieldSize = this.battleField.rowGrid.length;
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
+        let dir = ship.shipDirection.dir;
 
-        if (ship.shipDirection.dir == Direction.Up) {
+        if ( dir == Direction.Up) {
             console.log('Enter up');
             newPosition.yIndex = newPosition.yIndex - 1;
-        } else if (ship.shipDirection.dir == Direction.Down) {
+        } else if ( dir == Direction.Down) {
             console.log('Enter down');
             newPosition.yIndex = newPosition.yIndex + 1;
-        } else if (ship.shipDirection.dir == Direction.Right) {
+        } else if ( dir == Direction.Right) {
             console.log('Enter right');
             newPosition.xIndex = newPosition.xIndex + 1;
-        } else if (ship.shipDirection.dir == Direction.Left) {
+        } else if ( dir == Direction.Left) {
             console.log('Enter left');
             newPosition.xIndex = newPosition.xIndex - 1;
         }
@@ -326,35 +321,33 @@ export class GameService {
     }
 
     checkCollision(fieldSize :number, turn:number){
-
-        var i = 0, j = 0 ;
         var resultant : ShipPosition = new ShipPosition(0,0);
 
-        for (i = 0; i < this.allBattleShips.length; i++) {
-            for (var j = 0; j < this.allBattleShips.length; j++) {
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            for (let j = 0; j < this.allBattleShips.length; j++) {
                 if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == fieldSize-1)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == fieldSize-1)))&& this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
-                    this.checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
+                    checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
                     if(this.allBattleShips[i].shipPosition.xIndex-this.allBattleShips[j].shipPosition.xIndex == 0 && this.allBattleShips[i].shipPosition.yIndex- this.allBattleShips[j].shipPosition.yIndex == 0){
-                        this.assignResultant(this.allBattleShips[i]);
+                        assignResultant(this.allBattleShips[i]);
                     }
                     resultant.xIndex = this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
                     resultant.yIndex = this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
 
                     if(Math.abs(resultant.xIndex) == fieldSize - 1){
-                        resultant.xIndex = -1 * this.adjustOverflow(resultant.xIndex);
+                        resultant.xIndex = -1 * adjustOverflow(resultant.xIndex);
                     }
                     if(Math.abs(resultant.yIndex) == fieldSize - 1){
-                        resultant.yIndex = -1 * this.adjustOverflow(resultant.yIndex);
+                        resultant.yIndex = -1 * adjustOverflow(resultant.yIndex);
                     }
 
                     this.allBattleShips[i].collisionInfo.resultantMove.xIndex += resultant.xIndex;
                     this.allBattleShips[i].collisionInfo.resultantMove.yIndex += resultant.yIndex;
 
                     if(Math.abs(this.allBattleShips[i].collisionInfo.resultantMove.xIndex) > 1){
-                        this.allBattleShips[i].collisionInfo.resultantMove.xIndex = this.adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.xIndex);
+                        this.allBattleShips[i].collisionInfo.resultantMove.xIndex = adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.xIndex);
                     }
                     if(Math.abs(this.allBattleShips[i].collisionInfo.resultantMove.yIndex) > 1){
-                        this.allBattleShips[i].collisionInfo.resultantMove.yIndex = this.adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.yIndex);
+                        this.allBattleShips[i].collisionInfo.resultantMove.yIndex = adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.yIndex);
                     }
 
                     this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
@@ -362,62 +355,67 @@ export class GameService {
                 }
             }
         }
-    }
 
-    assignResultant(ship: ShipModel) {
-        if(ship.collisionInfo.moveCount == 0) {
-            if (ship.shipDirection.dir == Direction.Up) {
-                ship.collisionInfo.resultantMove.yIndex = 1;
+        function checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel, turn: number){
+            for(let i = 0; i < 4; i++){
+                for(let j = 0; j < 4; j++){
+                    if (rammerShip.shipDepartment.departmentArray[i].xIndex == victimShip.shipDepartment.departmentArray[j].xIndex && rammerShip.shipDepartment.departmentArray[i].yIndex == victimShip.shipDepartment.departmentArray[j].yIndex){
+                        updateCollisionHealth(rammerShip, i, victimShip, j, turn);
+                    }
+                }
+            }
+            function updateCollisionHealth(rammerShip: ShipModel, affectedRammerDep: number, victimShip: ShipModel, affectedVictimDep: number, turn :number) {
+                let damage: number;
+                damage = 300;
+                if(rammerShip.shipDepartment.departmentArray[affectedRammerDep].alive == false){
+                    damage = 50/100 * damage;
+                }
 
-            } else if (ship.shipDirection.dir == Direction.Down) {
-                ship.collisionInfo.resultantMove.yIndex = -1;
+                if(victimShip.shipStats.shieldActive == true) {
+                    damage = this.collisionShieldCheck(victimShip, rammerShip, damage, turn);
+                }
 
-            } else if (ship.shipDirection.dir == Direction.Right) {
-                ship.collisionInfo.resultantMove.xIndex = -1;
-
-            } else if (ship.shipDirection.dir == Direction.Left) {
-                ship.collisionInfo.resultantMove.xIndex = 1;
+                console.log("DAMAGE" + damage);
+                if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
+                    victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
+                }
+                else{
+                    victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
+                }
             }
         }
-        else{
-            console.log("ELSE");
-            ship.collisionInfo.resultantMove.xIndex *= -1;
-            ship.collisionInfo.resultantMove.yIndex *= -1;
+
+        function assignResultant(ship: ShipModel) {
+            let dir = ship.shipDirection.dir;
+            if(ship.collisionInfo.moveCount == 0) {
+                if ( dir == Direction.Up) {
+                    ship.collisionInfo.resultantMove.yIndex = 1;
+                } else if ( dir == Direction.Down) {
+                    ship.collisionInfo.resultantMove.yIndex = -1;
+                } else if ( dir == Direction.Right) {
+                    ship.collisionInfo.resultantMove.xIndex = -1;
+                } else if ( dir == Direction.Left) {
+                    ship.collisionInfo.resultantMove.xIndex = 1;
+                }
+            }
+            else{
+                console.log("ELSE");
+                ship.collisionInfo.resultantMove.xIndex *= -1;
+                ship.collisionInfo.resultantMove.yIndex *= -1;
+            }
         }
-    }
 
-    checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel, turn: number){
-       for(let i = 0; i < 4; i++){
-           for(let j = 0; j < 4; j++){
-               if (rammerShip.shipDepartment.departmentArray[i].xIndex == victimShip.shipDepartment.departmentArray[j].xIndex && rammerShip.shipDepartment.departmentArray[i].yIndex == victimShip.shipDepartment.departmentArray[j].yIndex){
-                   this.updateCollisionHealth(rammerShip, i, victimShip, j, turn);
-               }
-           }
-       }
-    }
-
-    adjustOverflow(overflow : number):number{
-        return Math.abs(overflow)/overflow;
+        function adjustOverflow(overflow : number):number{
+            return Math.abs(overflow)/overflow;
+        }
     }
 
     rotate(ship: ShipModel, clockwise: boolean) {
-        let newDirection: ShipDirection = new ShipDirection(ship.shipDirection.dir);
-        if (clockwise) {
-            if (newDirection.dir == 0) {
-                newDirection.dir = 3;
-            }
-            else {
-                newDirection.dir = ship.shipDirection.dir - 1;
-            }
-        } else {
-            if (newDirection.dir == 3) {
-                newDirection.dir = 0;
-            }
-            else {
-                newDirection.dir = ship.shipDirection.dir + 1;
-            }
-        }
-        this.updateShip(ship, ship.shipPosition,newDirection);
+        let dir = ship.shipDirection.dir;
+        let newDirection;
+        if (clockwise){ newDirection = this.mod(dir - 1, 4 ); }
+        else{ newDirection = this.mod(dir + 1, 4 ); }
+        this.updateShip(ship, ship.shipPosition, new ShipDirection(newDirection));
     }
 
     shield(ship: ShipModel, shieldDirection: Direction) {
@@ -555,7 +553,6 @@ export class GameService {
         function mod(n, m) {
             return ((n % m) + m) % m;
         }
-
     }
 
     randomCoor(max: number, start: number){ //}, prevPos : number, range : number){
@@ -577,26 +574,6 @@ export class GameService {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         };
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-    }
-
-    updateCollisionHealth(rammerShip: ShipModel, affectedRammerDep: number, victimShip: ShipModel, affectedVictimDep: number, turn :number) {
-        let damage: number;
-        damage = 300;
-        if(rammerShip.shipDepartment.departmentArray[affectedRammerDep].alive == false){
-            damage = 50/100 * damage;
-        }
-
-        if(victimShip.shipStats.shieldActive == true) {
-            damage = this.collisionShieldCheck(victimShip, rammerShip, damage, turn);
-        }
-
-        console.log("DAMAGE" + damage);
-        if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
-            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
-        }
-        else{
-            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
-        }
     }
 
     updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
@@ -829,7 +806,13 @@ export class GameService {
                 reHealth: depart[0].health,
                 leHealth: depart[1].health,
                 lwHealth: depart[2].health,
-                rwHealth: depart[3].health    });
+                rwHealth: depart[3].health,
+                reAlive: depart[0].alive,
+                leAlive: depart[1].alive,
+                lwAlive: depart[2].alive,
+                rwAlive: depart[3].alive
+
+            });
         });
 
         // reset all action

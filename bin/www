@@ -97,6 +97,10 @@ io.on('connection', (socket) => {
             ship.leHealth =  battleShipData.leHealth;
             ship.lwHealth = battleShipData.lwHealth;
             ship.rwHealth = battleShipData.rwHealth;
+            ship.reAlive = battleShipData.reAlive;
+            ship.leAlive = battleShipData.leAlive;
+            ship.lwAlive = battleShipData.lwAlive;
+            ship.rwAlive = battleShipData.rwAlive;
 
             ship.phase = 'report';
             // console.log('After: ', ship);
