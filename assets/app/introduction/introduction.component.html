@@ -1,0 +1,41 @@
+<div class="col-md-8 col-md-offset-2">
+    <h1> Introduction </h1>
+    Some Rules...
+    <hr>
+    <h2> Select a ship </h2>
+    <h3> Available Ship </h3>
+    <div *ngIf="shipModel == null" style="color: red">No ship available yet, please come back later!</div>
+    <div *ngFor="let ship of shipModel; let i = index" [attr.data-index]="i">
+        <!-- Can put an image -->
+        <h4> ShipId: {{ship.shipId}}</h4>
+        <div *ngIf="myShipStats == null" style="color: darkred"> Analysing your personality...</div>
+        <div *ngIf="myShipStats != null">
+            <label>Your Personality gives the ship: </label>
+            <table>
+                <tr>
+                    <td>Department's total health: </td>
+                    <td>{{myShipStats.totalHp}}</td>
+                </tr>
+                <tr>
+                    <td>Attack: </td>
+                    <td>{{myShipStats.attack}}</td>
+                </tr>
+                <tr>
+                    <td>Attack Range: </td>
+                    <td>{{myShipStats.attackRange}}</td>
+                </tr>
+                <tr>
+                    <td>Defence: </td>
+                    <td>{{myShipStats.defence}}</td>
+                </tr>
+                <tr>
+                    <td>Range: </td>
+                    <td>{{myShipStats.range}}</td>
+                </tr>
+            </table>
+
+            <button class="btn btn-primary" (click)="startGame(ship, i)">Start Game</button>
+        </div>
+    </div>
+
+</div>

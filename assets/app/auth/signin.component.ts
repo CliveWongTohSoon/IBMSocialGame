@@ -33,6 +33,10 @@ export class SigninComponent {
         this.myForm.reset();
     }
 
+    loginToTwitter() {
+        this.authService.loginToTwitter().subscribe();
+    }
+
     ngOnInit() {
         this.myForm = new FormGroup({
             email: new FormControl(null, [

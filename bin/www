@@ -86,6 +86,27 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('init', battleShipdata => {
+        console.log('Entered init', battleShipdata);
+        Start.findOne({shipId: battleShipdata.shipId}, (err, ship) => {
+            ship.x = battleShipdata.x;
+            ship.y = battleShipdata.y;
+            ship.dir = battleShipdata.dir;
+            ship.reHealth = battleShipdata.totalHp;
+            ship.leHealth = battleShipdata.totalHp;
+            ship.rwHealth = battleShipdata.totalHp;
+            ship.lwHealth = battleShipdata.totalHp;
+            ship.reAlive = true;
+            ship.leAlive = true;
+            ship.lwAlive = true;
+            ship.rwAlive = true;
+            ship.phase = 'start';
+            ship.save(err, _ => {
+
+            });
+       });
+    });
+
     socket.on('update', battleShipData => {
         // console.log(newBattleShipArray);
         Start.findOne({shipId: battleShipData.shipId}, (err, ship) => {

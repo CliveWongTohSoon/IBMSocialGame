@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 // import * as io from 'socket.io-client';
 import {MessageService} from "./messages/message.service";
 
@@ -9,10 +9,5 @@ import {MessageService} from "./messages/message.service";
     providers: [MessageService]
 })
 export class AppComponent {
-    // private socket: SocketIOClient.Socket;
-
-    constructor() {
-        // this.socket = io();
-        // this.socket.on('hello', data => console.log(data));
-    }
+    constructor() {}
 }

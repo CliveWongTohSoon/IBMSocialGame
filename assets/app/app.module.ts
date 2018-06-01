@@ -15,6 +15,7 @@ import {SigninComponent} from "./auth/signin.component";
 import {LogoutComponent} from "./auth/logout.component";
 import {HttpClientModule} from "@angular/common/http";
 import {GameComponent} from "./game/game.component";
+import {IntroductionComponent} from "./introduction/introduction.component";
 import {AuthService} from "./auth/auth.service";
 
 @NgModule({
@@ -29,7 +30,8 @@ import {AuthService} from "./auth/auth.service";
         SignupComponent,
         SigninComponent,
         LogoutComponent,
-        GameComponent
+        GameComponent,
+        IntroductionComponent
     ],
     imports: [
         BrowserModule,

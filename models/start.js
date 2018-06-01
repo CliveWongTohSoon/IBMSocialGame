@@ -7,8 +7,6 @@ const schema = new Schema({
     x: {type: Number, required: true},
     y: {type: Number, required: true},
     dir: {type: Number, required: true},
-
-
     reHealth: {type: Number, required: true},
     leHealth: {type: Number, required: true},
     lwHealth: {type: Number, required: true},
