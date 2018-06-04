@@ -227,12 +227,7 @@ export class GameService {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
         ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length, ship);
-<<<<<<< HEAD
-        console.log(this.allBattleShips;
-        this.socket.emit('update', {shipId: ship.shipId, x: ship.shipPosition.xIndex, y: ship.shipPosition.yIndex, dir: ship.shipDirection.dir});
 
-=======
->>>>>>> aae45111decf5fc992f875da499436665528421b
         this.updateGridWithAllShip();
     }
 
@@ -668,80 +663,6 @@ export class GameService {
 
     inputAction(ship: ShipModel, act: Action): boolean {
 
-<<<<<<< HEAD
-        damage = shooterShip.shipStats.attack;
-        if (victimShip.shipStats.shieldActive == true) {
-            damage = this.shootShieldCheck(shooterShip, victimShip, damage);
-        }
-        if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
-            victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
-        } else{
-            victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
-        }
-    }
-
-
-    shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
-        let shieldGridDirection: Direction;
-        // let enemyDirection: Direction = 4;
-        let reducedDamage = damage;
-        shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
-        if (shieldGridDirection > 3) {
-            shieldGridDirection = shieldGridDirection - 4;
-        }
-        if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2){
-            reducedDamage = damage * (1 - victimShip.shipStats.defence)
-        }
-        return reducedDamage;
-    }
-
-    collisionShieldCheck(updatingShip: ShipModel, referShip: ShipModel, damage: number, turn: number){
-        let shieldGridDirection: Direction;
-        let reducedDamage = damage;
-
-        shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
-        if (shieldGridDirection > 3) {
-            shieldGridDirection = shieldGridDirection - 4;
-        }
-        if (updatingShip.collisionInfo.moveCount == 0 && referShip.collisionInfo.moveCount == 0) {
-            if (referShip.shipAction.act[turn - 1] == Action.MoveFront) {
-                if (Math.abs(shieldGridDirection - referShip.shipDirection.dir) == 2) {
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-            else if (updatingShip.shipAction.act[turn - 1] == Action.MoveFront) {
-                if (updatingShip.shipDirection.dir == shieldGridDirection) {
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-        }
-        else if (referShip.collisionInfo.moveCount != 0){
-            if (referShip.collisionInfo.resultantMove.yIndex > 0 && shieldGridDirection == Direction.Up) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (referShip.collisionInfo.resultantMove.yIndex < 0 && shieldGridDirection == Direction.Down){
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (referShip.collisionInfo.resultantMove.xIndex > 0 && shieldGridDirection == Direction.Left){
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (referShip.collisionInfo.resultantMove.xIndex < 0 && shieldGridDirection == Direction.Right){
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-        }
-        else if (updatingShip.collisionInfo.moveCount != 0){
-            if (updatingShip.shipStats.shieldDirection == Direction.Up){
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-        }
-        return reducedDamage;
-    }
-
-
-
-    inputAction(ship: ShipModel, act: Action):boolean{
-=======
->>>>>>> aae45111decf5fc992f875da499436665528421b
         let maxActions = 3;
         if (ship.shipAction.act.length >= maxActions) {
             console.log("Length" + ship.shipAction.act.length);
