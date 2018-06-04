@@ -1,16 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {
-    ShipDepartment,
-    ShipDirection,
-    ShipModel,
-    ShipPosition,
-    ShipStats,
-    CollisionInfo,
-    ShipAction,
-    Action,
-    ShipPhase
-} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo, ShipAction, Action, ShipPhase} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -83,8 +73,6 @@ export class GameService {
                         leAlive = data[key]['leAlive'],
                         lwAlive = data[key]['lwAlive'],
                         rwAlive = data[key]['rwAlive'],
-
-
                         phase = this.getPhase(data[key]['phase']); // Should give Start initially
                     // console.log(data);
 
@@ -806,7 +794,6 @@ export class GameService {
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
                 rwAlive: depart[3].alive
-
             });
         });
 
