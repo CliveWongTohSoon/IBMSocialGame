@@ -801,6 +801,7 @@ export class GameService {
 
             this.asteroidMove();
             this.checkCollision(this.battleField.rowGrid.length, turn);
+            this.checkAsteroidCollision(this.battleField.rowGrid.length);
             this.performCollision(this.battleField.rowGrid.length, turn);
             //fb: collision with enemy / successful move
             for (let i = 0; i < this.allBattleShips.length; i++) {
@@ -882,13 +883,13 @@ export class GameService {
     genAstDamage(){
         let chance = Math.floor(Math.random()*3);
         if (chance == 0){
-            return 100;
+            return 200;
         }
         else if (chance == 1){
-            return 150;
+            return 250;
         }
         else if (chance == 2){
-            return 200;
+            return 300;
         }
     }
 
@@ -901,6 +902,45 @@ export class GameService {
         }
     }
 
+    updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
+        let damage: number;
+        damage = asteroid.damage;
+        if (victimShip.shipStats.shieldActive == true) {
+            damage = asteroidShieldCheck(victimShip, asteroid, damage);
+        }
+        console.log("DAMAGE" + damage);
+        if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
+            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
+        }
+        else {
+            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
+        }
+
+        function asteroidShieldCheck(updatingShip: ShipModel, asteroid: AsteroidModel, damage: number) {
+            let shieldGridDirection: Direction;
+            let reducedDamage = damage;
+            // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
+            // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+            shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
+            if (shieldGridDirection > 3) {
+                shieldGridDirection = shieldGridDirection - 4;
+            }
+            if (asteroid.asteroidMotion.yMotion > 0 && shieldGridDirection == Direction.Up) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.yMotion < 0 && shieldGridDirection == Direction.Down) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.xMotion > 0 && shieldGridDirection == Direction.Left) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.xMotion < 0 && shieldGridDirection == Direction.Right) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+
+            return reducedDamage;
+        }
+    }
 }
 
 function mod(n, m) {

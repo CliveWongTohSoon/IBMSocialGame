@@ -22,7 +22,10 @@ export class GameComponent implements OnInit {
     intentArray = [];
 
     constructor(private gameService: GameService) {
-        gameService.init(25).subscribe(battleField => this.battleField = battleField);
+        gameService.init(25).subscribe(battleField => {
+            this.battleField = battleField;
+            gameService.createAstArray();
+        });
     }
 
     renderBackgroundColor(col: TableContent) {
