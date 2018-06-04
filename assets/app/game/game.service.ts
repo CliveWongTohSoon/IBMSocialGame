@@ -18,6 +18,7 @@ import * as io from 'socket.io-client';
 import {Instruction, InstructionModel} from "./instruction-model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import "rxjs/add/operator/take";
+import {AsteroidModel, AsteroidMotion, AsteroidPosition} from "./asteroid-model";
 
 @Injectable()
 export class GameService {
@@ -47,6 +48,7 @@ export class GameService {
     // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
+    allAsteroids: AsteroidModel[];
 
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
@@ -665,7 +667,6 @@ export class GameService {
         return reducedDamage;
     }
 
-
     inputAction(ship: ShipModel, act: Action): boolean {
         let maxActions = 3;
         if (ship.shipAction.act.length >= maxActions) {
@@ -711,34 +712,62 @@ export class GameService {
 
     inputShoot(ship: ShipModel) {
         let valid: boolean;
-        valid = this.inputAction(ship, Action.ShootFront);
-        if (valid == false) {
-            console.log('Too many actions')
+        if(ship.shipDepartment[2].alive == false && ship.shipDepartment[3].alive == false){
+            console.log('Weapon systems failed');
+            this.inputDoNothing(ship);
         }
+        else{
+            valid = this.inputAction(ship, Action.ShootFront);
+            if (valid == false) {
+                console.log('Too many actions')
+            }
+        }
+
     }
 
     inputMove(ship: ShipModel) {
         let valid: boolean;
-        valid = this.inputAction(ship, Action.MoveFront);
-        if (valid == false) {
-            console.log('Too many actions')
+        if (ship.shipDepartment[0].alive == false && ship.shipDepartment[1].alive == false){
+            console.log('Engines failed');
+            this.inputDoNothing(ship);
         }
+        else{
+            valid = this.inputAction(ship, Action.MoveFront);
+            if (valid == false) {
+                console.log('Too many actions');
+            }
+        }
+
     }
 
     inputRotateRight(ship: ShipModel) {
         let valid: boolean;
-        valid = this.inputAction(ship, Action.RightTurn);
-        if (valid == false) {
-            console.log('Too many actions')
+        if (ship.shipDepartment[0].alive == false && ship.shipDepartment[1].alive == false){
+            console.log('Engines failed');
+            this.inputDoNothing(ship);
         }
+        else{
+            valid = this.inputAction(ship, Action.RightTurn);
+            if (valid == false) {
+                console.log('Too many actions')
+            }
+        }
+
     }
 
     inputRotateLeft(ship: ShipModel) {
         let valid: boolean;
-        valid = this.inputAction(ship, Action.LeftTurn);
-        if (valid == false) {
-            console.log('Too many actions')
+        if (ship.shipDepartment[0].alive == false && ship.shipDepartment[1].alive == false){
+            console.log('Engines failed');
+            this.inputDoNothing(ship);
         }
+        else{
+            valid = this.inputAction(ship, Action.LeftTurn);
+            if (valid == false) {
+                console.log('Too many actions')
+            }
+        }
+
     }
 
     inputDoNothing(ship: ShipModel) {
@@ -814,5 +843,66 @@ export class GameService {
         this.allBattleShips.map(ship => {
             ship.shipAction = new ShipAction([]);
         });
+    }
+
+    createAstArray(){
+        let i;
+        for(i=0; i <= this.allBattleShips.length; i++){
+            this.allAsteroids.push(this.generateAsteroid(i))
+        }
+    }
+
+    generateAsteroid(i:number){
+        let newPosition = this.genAstPosition(i);
+        let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
+        let newDamage = this.genAstDamage();
+        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
+        return newAsteroid;
+    }
+
+    genAstPosition(i:number){
+        const maxX = 25 / (this.allBattleShips.length * 2);
+        let xTmp = this.astCoord(maxX, 2*i*maxX);
+        let yTmp = Math.floor(Math.random()*25);
+        let tmpPosition = new AsteroidPosition(xTmp, yTmp);
+        return tmpPosition;
+    }
+
+    astCoord(max: number, start: number) {
+        return Math.floor((Math.random() * max) + start);
+    }
+
+    genAstMotion(){
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return -1;
+        }
+        else if (chance == 1){
+            return 0;
+        }
+        else if (chance == 2){
+            return 1;
+        }
+    }
+
+    genAstDamage(){
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return 100;
+        }
+        else if (chance == 1){
+            return 150;
+        }
+        else if (chance == 2){
+            return 200;
+        }
+    }
+
+    asteroidMove(){
+        let i;
+        for (i = 0; i < this.allAsteroids.length; i++){
+            this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
+            this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
+        }
     }
 }
