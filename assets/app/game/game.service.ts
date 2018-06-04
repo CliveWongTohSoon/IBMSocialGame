@@ -1,16 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {
-    ShipDepartment,
-    ShipDirection,
-    ShipModel,
-    ShipPosition,
-    ShipStats,
-    CollisionInfo,
-    ShipAction,
-    Action,
-    ShipPhase
-} from "./ship-model";
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo, ShipAction, Action, ShipPhase} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -90,8 +80,6 @@ export class GameService {
                         range = data[key]['range'],
                         attackRange = data[key]['attackRange'],
                         defence = data[key]['defence'],
-
-
                         phase = this.getPhase(data[key]['phase']); // Should give Start initially
                     // console.log(data);
 
@@ -140,33 +128,6 @@ export class GameService {
         else if (phase === 'action') return ShipPhase.Action;
         else if (phase === 'report') return ShipPhase.Report;
     }
-
-    // // TODO:- OLD
-    // createShip(numberOfShips: number): Observable<ShipModel[]> {
-    //     const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
-    //     const maxY = this.battleField.rowGrid.length;
-    //
-    //     this.allBattleShips = Array.apply(null, {length: numberOfShips})
-    //         .map((_, i) => {
-    //             const randomColorBack = this.genRandomColor();
-    //             const randomColorFront = this.shadeColor(randomColorBack, 20);
-    //             const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
-    //             const initShipPosition = new ShipPosition(randomX, randomY);
-    //             const randomDir = this.randomDir(4);
-    //             const initShipDirection = new ShipDirection(randomDir);
-    //
-    //             const initShipStat = new ShipStats(1000,500,5,0.5,5,false,0);
-    //             const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
-    //             newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
-    //             const newShipPosition = new ShipPosition(0,0);
-    //             newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-    //             newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
-    //                 .map(_ => null));
-    //             return newShip;
-    //         });
-    //     this.updateGridWithAllShip();
-    //     return Observable.of(this.allBattleShips);
-    // }
 
     listenToInstruction(): Observable<InstructionModel> {
         let observable = new Observable<ShipModel[]>(observer => {
@@ -295,7 +256,7 @@ export class GameService {
     }
 
     checkCollision(fieldSize: number, turn: number) {
-        var resultant: ShipPosition = new ShipPosition(0, 0);
+        let resultant: ShipPosition = new ShipPosition(0, 0);
 
         for (let i = 0; i < this.allBattleShips.length; i++) {
             for (let j = 0; j < this.allBattleShips.length; j++) {
@@ -462,18 +423,7 @@ export class GameService {
 
         console.log("shieldActive: " + ship.shipStats.shieldActive);
         console.log("shieldDirection " + ship.shipStats.shieldDirection);
-
     }
-
-
-    // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
-
-    //   NewShieldDirection = ship.ShipStats.shieldDirection + ship.shipDirection.dir;
-
-    //   if (NewShieldDirection >=4){
-    //       NewShieldDirection = NewShieldDirection%4;
-    //   }
-
 
     randomDir(range: number): number {
         return Math.floor(Math.random() * range);
@@ -560,7 +510,7 @@ export class GameService {
                     return reducedDamage;
                 }
             }
-        } // end shoot
+    } // end shoot
 
     relativePosition(ship: ShipModel, l: number) {
         let dir = ship.shipDirection.dir;
@@ -581,7 +531,8 @@ export class GameService {
                 console.log("current ship is " + i)
             }
         }
-        console.log("\n")
+
+        console.log("\n");
 
         function wrapDistance(xd: number) {
             if (Math.abs(xd) < l / 2) {
@@ -633,7 +584,6 @@ export class GameService {
         function adjustByDir(dir: Direction, deg: number) {
             return mod(dir * 90 + deg, 360);
         }
-
     }
 
     randomCoor(max: number, start: number) {
@@ -717,6 +667,7 @@ export class GameService {
         }
     }
 
+
     inputRotateRight(ship: ShipModel) {
         let valid: boolean;
         valid = this.inputAction(ship, Action.RightTurn);
@@ -742,7 +693,6 @@ export class GameService {
     }
 
     fullTurns() {
-
         for (let turn = 1; turn <= 3; turn++) {
             for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
@@ -830,7 +780,10 @@ export class GameService {
                 reAlive: depart[0].alive,
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
-                rwAlive: depart[3].alive
+                rwAlive: depart[3].alive,
+                report0: 0,
+                report1: 1,
+                report2: 2
             });
         });
 
@@ -840,9 +793,9 @@ export class GameService {
         });
     }
 
-    createAstArray(){
+    createAstArray() {
         let i;
-        for(i=0; i <= this.allBattleShips.length; i++){
+        for(i=0; i <= this.allBattleShips.length; i++) {
             this.allAsteroids.push(this.generateAsteroid(i))
         }
     }
@@ -867,7 +820,7 @@ export class GameService {
         return Math.floor((Math.random() * max) + start);
     }
 
-    genAstMotion(){
+    genAstMotion() {
         let chance = Math.floor(Math.random()*3);
         if (chance == 0){
             return -1;
@@ -880,7 +833,7 @@ export class GameService {
         }
     }
 
-    genAstDamage(){
+    genAstDamage() {
         let chance = Math.floor(Math.random()*3);
         if (chance == 0){
             return 200;
@@ -893,8 +846,7 @@ export class GameService {
         }
     }
 
-
-    asteroidMove(){
+    asteroidMove() {
         let i;
         for (i = 0; i < this.allAsteroids.length; i++){
             this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
