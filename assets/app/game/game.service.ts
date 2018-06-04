@@ -299,6 +299,83 @@ export class GameService {
         }
     }
 
+    performAsteroidCollision(fieldSize: number) {
+        var validCheck = false;
+
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+                validCheck = true;
+            }
+        }
+        while (validCheck) {
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+                    this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
+                    this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
+                    this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
+                    this.allBattleShips[i].collisionInfo.moveCount--;
+                    this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
+                }
+            }
+
+            this.checkAsteroidCollision(fieldSize, turn);
+            validCheck = false;
+
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+
+                    validCheck = true;
+                }
+            }
+        }
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
+            this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
+        }
+    }
+
+    checkAsteroidCollision(fieldSize: number) {
+        var resultant: ShipPosition = new ShipPosition(0, 0);
+
+        for (let i = 0; i < this.allAsteroids.length; i++) {
+            for (let j = 0; j < this.allBattleShips.length; j++) {
+                for(let k = 0; k < 4; k++){
+                    let shipX = this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex;
+                    let shipY = this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex;
+                    let asterX = this.allAsteroids[i].asteroidPosition.xIndex;
+                    let asterY = this.allAsteroids[i].asteroidPosition.yIndex;
+                    let shipPosX = this.allBattleShips[j].shipPosition.xIndex;
+                    let shipPosY = this.allBattleShips[j].shipPosition.yIndex;
+
+
+                    if(shipX == asterX && shipY == asterY){
+                        resultant.xIndex = asterX - shipPosX;
+                        resultant.yIndex = asterY - shipPosY;
+
+                        resultant.xIndex = -1 * resetToOne(resultant.xIndex);
+                        resultant.yIndex = -1 * resetToOne(resultant.yIndex);
+
+                        this.allAsteroids[i].asteroidMotion.xIndex += resultant.xIndex;
+                        this.allAsteroids[j].asteroidMotion.yIndex += resultant.yIndex;
+                        this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1*resultant.xIndex;
+                        this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1*resultant.yIndex;
+
+                        this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+                    }
+                }
+            }
+            if(Math.abs(this.allAsteroids[i].asteroidMotion.xIndex) >= 1){
+                this.allAsteroids[i].asteroidPosition.xIndex += -1* resetToOne(this.allAsteroids[i].asteroidMotion.xIndex);
+            }
+            if(Math.abs(this.allAsteroids[i].asteroidMotion.yIndex) >= 1){
+                this.allAsteroids[i].asteroidPosition.yIndex += -1* resetToOne(this.allAsteroids[i].asteroidMotion.yIndex);
+            }
+
+        function resetToOne(overflow: number): number {
+            return Math.abs(overflow) / overflow;
+        }
+    }
+
     checkCollision(fieldSize: number, turn: number) {
         var resultant: ShipPosition = new ShipPosition(0, 0);
 
@@ -311,15 +388,14 @@ export class GameService {
                 let jy = this.allBattleShips[j].shipPosition.yIndex;
                 let xd = ix - jx;
                 let yd = iy - jy;
-                let xOverlap = (Math.abs(ix - jx) <= 1) || (Math.abs(ix - jx) == fieldSize - 1);
-                let yOverlap = (Math.abs(iy - jy) <= 1) || (Math.abs(iy - jy) == fieldSize - 1);
+                let xOverlap = (Math.abs(xd) <= 1) || (Math.abs(xd) == fieldSize - 1);
+                let yOverlap = (Math.abs(yd) <= 1) || (Math.abs(yd) == fieldSize - 1);
                 let overlap = xOverlap && yOverlap;
                 let notSameShip = this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId;
 
                 if (overlap && notSameShip) {
                     checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
                     if (xd == 0 && yd == 0) {
-
                         assignResultant(this.allBattleShips[i]);
                     }
                     resultant.xIndex = xd;
