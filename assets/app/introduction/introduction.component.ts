@@ -206,10 +206,12 @@ export class IntroductionComponent {
         // console.log(i);
         console.log('Selected ship: ', ship.shipId, ' at index: ', i);
         // Update to database
+
+        const maxX = 25 / (this.shipModel.length * 2);
         const data = {
             shipId: ship.shipId,
             totalHp: this.myShipStats.totalHp,
-            x: this.gameService.randomCoor(25, 2*i*25),
+            x: this.gameService.randomCoor(maxX, 2*i*maxX),
             y: ship.shipPosition.yIndex,
             dir: this.gameService.randomDir(4)
         };

@@ -8,7 +8,7 @@ import * as io from 'socket.io-client';
 import {Instruction, InstructionModel} from "./instruction-model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import "rxjs/add/operator/take";
-import {tick} from "@angular/core/testing";
+import {AsteroidModel, AsteroidMotion, AsteroidPosition} from "./asteroid-model";
 
 @Injectable()
 export class GameService {
@@ -38,6 +38,7 @@ export class GameService {
     // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
+    allAsteroids: AsteroidModel[];
 
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
@@ -190,8 +191,8 @@ export class GameService {
 
     worldRound(position: ShipPosition, fieldSize: number): ShipPosition {
         let newPosition: ShipPosition = position;
-        newPosition.xIndex = this.mod(position.xIndex, fieldSize);
-        newPosition.yIndex = this.mod(position.yIndex, fieldSize);
+        newPosition.xIndex = mod(position.xIndex, fieldSize);
+        newPosition.yIndex = mod(position.yIndex, fieldSize);
         return newPosition;
     }
 
@@ -314,12 +315,11 @@ export class GameService {
                 let damage: number;
                 damage = 300;
                 if (rammerShip.shipDepartment.departmentArray[affectedRammerDep].alive == false) {
-                    damage = 50 / 100 * damage;
+                    damage = (50 / 100) * damage;
                 }
 
                 if (victimShip.shipStats.shieldActive == true) {
                     damage = collisionShieldCheck(victimShip, rammerShip, damage, turn);
-
                 }
 
                 console.log("DAMAGE" + damage);
@@ -405,10 +405,10 @@ export class GameService {
         let newDirection;
 
         if (clockwise) {
-            newDirection = this.mod(dir - 1, 4);
+            newDirection = mod(dir - 1, 4);
         }
         else {
-            newDirection = this.mod(dir + 1, 4);
+            newDirection = mod(dir + 1, 4);
         }
 
         this.updateShip(ship, ship.shipPosition, new ShipDirection(newDirection));
@@ -531,6 +531,7 @@ export class GameService {
                 console.log("current ship is " + i)
             }
         }
+
         console.log("\n");
 
         function wrapDistance(xd: number) {
@@ -581,12 +582,8 @@ export class GameService {
         }
 
         function adjustByDir(dir: Direction, deg: number) {
-            return this.mod(dir * 90 + deg, 360);
+            return mod(dir * 90 + deg, 360);
         }
-    }
-
-    mod(n, m) {
-        return ((n % m) + m) % m;
     }
 
     randomCoor(max: number, start: number) {
@@ -609,7 +606,6 @@ export class GameService {
         };
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
-
 
     inputAction(ship: ShipModel, act: Action): boolean {
 
@@ -671,6 +667,7 @@ export class GameService {
         }
     }
 
+
     inputRotateRight(ship: ShipModel) {
         let valid: boolean;
         valid = this.inputAction(ship, Action.RightTurn);
@@ -696,34 +693,65 @@ export class GameService {
     }
 
     fullTurns() {
-        for (let turn = 0; turn < 3; turn++) {
+        for (let turn = 1; turn <= 3; turn++) {
             for (let i = 0; i < this.allBattleShips.length; i++) {
-                let act = this.allBattleShips[i].shipAction.act[turn];
-                if (act == Action.FrontShield) {//fb: shield successful : front side
-                    this.shield(this.allBattleShips[i], 0);
-                } else if (act == Action.LeftShield) {//fb: shield successful: left side
-                    this.shield(this.allBattleShips[i], 1);
-                } else if (act == Action.BackShield) {//fb: shield successful: back side
-                    this.shield(this.allBattleShips[i], 2);
-                } else if (act == Action.RightShield) {//fb: shield successful: right side
-                    this.shield(this.allBattleShips[i], 3);
-                } else if (act == Action.ShootFront) {//fb: hit OR miss
-                    this.shoot(this.allBattleShips[i]);
-                } else if (act == Action.MoveFront) { //fb? enemies in radar OR no enemies detected
-                    this.move(this.allBattleShips[i]);
-                } else if (act == Action.RightTurn) {
-                    this.rotate(this.allBattleShips[i], true);
-                } else if (act == Action.LeftTurn) {
-                    this.rotate(this.allBattleShips[i], false);
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
+                    this.shield(this.allBattleShips[i],0);
                 }
-                for (let k = 0; k < 4; k++) {//fb: *department* destroyed
+                //fb: shield successful : front side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftShield) {
+                    this.shield(this.allBattleShips[i],1);
+                }
+                //fb: shield successful: left side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.BackShield) {
+                    this.shield(this.allBattleShips[i], 2);
+                }
+                //fb: shield successful: back side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightShield) {
+                    this.shield(this.allBattleShips[i], 3);
+                }
+                //fb: shield successful: right side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.ShootFront) {
+                    this.shoot(this.allBattleShips[i]);
+                }
+                //fb: hit OR miss
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                for (let k = 0; k < 4; k++) {
                     if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
                         this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
                     }
                 }
+                //fb: *department* destroyed
             }
-            this.checkCollision(this.battleField.rowGrid.length, turn + 1);
-            this.performCollision(this.battleField.rowGrid.length, turn + 1);
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.MoveFront) {
+                    this.move(this.allBattleShips[i]);
+                }
+                //fb? enemies in radar OR no enemies detected
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightTurn) {
+                    this.rotate(this.allBattleShips[i], true);
+                }
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftTurn) {
+                    this.rotate(this.allBattleShips[i], false);
+                }
+            }
+
+            this.asteroidMove();
+            this.checkCollision(this.battleField.rowGrid.length, turn);
+            this.performCollision(this.battleField.rowGrid.length, turn);
             //fb: collision with enemy / successful move
             for (let i = 0; i < this.allBattleShips.length; i++) {
                 for (let k = 0; k < 4; k++) {
@@ -751,10 +779,7 @@ export class GameService {
                 reAlive: depart[0].alive,
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
-                rwAlive: depart[3].alive,
-                report0: 0, // TODO:- Update this report
-                report1: 1,
-                report2: 2,
+                rwAlive: depart[3].alive
             });
         });
 
@@ -763,7 +788,69 @@ export class GameService {
             ship.shipAction = new ShipAction([]);
         });
     }
+
+    createAstArray() {
+        let i;
+        for(i=0; i <= this.allBattleShips.length; i++) {
+            this.allAsteroids.push(this.generateAsteroid(i))
+        }
+    }
+
+    generateAsteroid(i:number){
+        let newPosition = this.genAstPosition(i);
+        let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
+        let newDamage = this.genAstDamage();
+        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
+        return newAsteroid;
+    }
+
+    genAstPosition(i:number){
+        const maxX = 25 / (this.allBattleShips.length * 2);
+        let xTmp = this.astCoord(maxX, 2*i*maxX);
+        let yTmp = Math.floor(Math.random()*25);
+        let tmpPosition = new AsteroidPosition(xTmp, yTmp);
+        return tmpPosition;
+    }
+
+    astCoord(max: number, start: number) {
+        return Math.floor((Math.random() * max) + start);
+    }
+
+    genAstMotion() {
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return -1;
+        }
+        else if (chance == 1){
+            return 0;
+        }
+        else if (chance == 2){
+            return 1;
+        }
+    }
+
+    genAstDamage() {
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return 100;
+        }
+        else if (chance == 1){
+            return 150;
+        }
+        else if (chance == 2){
+            return 200;
+        }
+    }
+
+    asteroidMove() {
+        let i;
+        for (i = 0; i < this.allAsteroids.length; i++){
+            this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
+            this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
+        }
+    }
 }
 
-
-
+function mod(n, m) {
+    return ((n % m) + m) % m;
+}
