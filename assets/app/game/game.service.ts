@@ -8,6 +8,7 @@ import * as io from 'socket.io-client';
 import {Instruction, InstructionModel} from "./instruction-model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import "rxjs/add/operator/take";
+import {tick} from "@angular/core/testing";
 
 @Injectable()
 export class GameService {
@@ -57,6 +58,7 @@ export class GameService {
     createShipFromSocket(): Observable<ShipModel[]> {
         // this.socket.on('start', data => console.log(data));
         let observable = new Observable<ShipModel[]>(observer => {
+
             this.socket.on('start', data => {
                 console.log('Entered Start');
                 const allShips: ShipModel[] = Object.keys(data).map(key => {
@@ -73,6 +75,10 @@ export class GameService {
                         leAlive = data[key]['leAlive'],
                         lwAlive = data[key]['lwAlive'],
                         rwAlive = data[key]['rwAlive'],
+                        attack = data[key]['attack'],
+                        range = data[key]['range'],
+                        attackRange = data[key]['attackRange'],
+                        defence = data[key]['defence'],
                         phase = this.getPhase(data[key]['phase']); // Should give Start initially
                     // console.log(data);
 
@@ -86,7 +92,7 @@ export class GameService {
                     // TODO:- Change initShipStat to dynamically change according to emotion
 
                     // TODO:- Update the health points of department
-                    const initShipStat = new ShipStats(1234, 500, 5, 0, 5, false, 0);
+                    const initShipStat = new ShipStats(1234, attack, attackRange, defence, range, false, 0);
 
                     const newShip = new ShipModel(shipId, initShipPosition, initShipDirection, initShipStat, phase, randomColorFront, randomColorBack);
                     newShip.shipDepartment = ShipDepartment.updateDepartmentHealth(
@@ -110,6 +116,7 @@ export class GameService {
             return () => {
                 this.socket.disconnect()
             };
+
         });
         return observable;
     }
@@ -120,33 +127,6 @@ export class GameService {
         else if (phase === 'action') return ShipPhase.Action;
         else if (phase === 'report') return ShipPhase.Report;
     }
-
-    // // TODO:- OLD
-    // createShip(numberOfShips: number): Observable<ShipModel[]> {
-    //     const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
-    //     const maxY = this.battleField.rowGrid.length;
-    //
-    //     this.allBattleShips = Array.apply(null, {length: numberOfShips})
-    //         .map((_, i) => {
-    //             const randomColorBack = this.genRandomColor();
-    //             const randomColorFront = this.shadeColor(randomColorBack, 20);
-    //             const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
-    //             const initShipPosition = new ShipPosition(randomX, randomY);
-    //             const randomDir = this.randomDir(4);
-    //             const initShipDirection = new ShipDirection(randomDir);
-    //
-    //             const initShipStat = new ShipStats(1000,500,5,0.5,5,false,0);
-    //             const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
-    //             newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
-    //             const newShipPosition = new ShipPosition(0,0);
-    //             newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-    //             newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
-    //                 .map(_ => null));
-    //             return newShip;
-    //         });
-    //     this.updateGridWithAllShip();
-    //     return Observable.of(this.allBattleShips);
-    // }
 
     listenToInstruction(): Observable<InstructionModel> {
         let observable = new Observable<ShipModel[]>(observer => {
@@ -215,10 +195,6 @@ export class GameService {
         return newPosition;
     }
 
-    mod(n, m) {
-        return ((n % m) + m) % m;
-    }
-
     move(ship: ShipModel) {
         const fieldSize = this.battleField.rowGrid.length;
         let newPosition: ShipPosition = new ShipPosition(ship.shipPosition.xIndex, ship.shipPosition.yIndex);
@@ -245,15 +221,14 @@ export class GameService {
 
     performCollision(fieldSize: number, turn: number) {
         var validCheck = false;
-        var i = 0;
 
-        for (i = 0; i < this.allBattleShips.length; i++) {
+        for (let i = 0; i < this.allBattleShips.length; i++) {
             if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
                 validCheck = true;
             }
         }
-        while (validCheck == true) {
-            for (i = 0; i < this.allBattleShips.length; i++) {
+        while (validCheck) {
+            for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
                     this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
                     this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
@@ -265,30 +240,45 @@ export class GameService {
 
             this.checkCollision(fieldSize, turn);
             validCheck = false;
-            for (i = 0; i < this.allBattleShips.length; i++) {
+
+            for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+
                     validCheck = true;
                 }
             }
         }
-        for (i = 0; i < this.allBattleShips.length; i++) {
+        for (let i = 0; i < this.allBattleShips.length; i++) {
             this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
             this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
         }
     }
 
     checkCollision(fieldSize: number, turn: number) {
-        var resultant: ShipPosition = new ShipPosition(0, 0);
+        let resultant: ShipPosition = new ShipPosition(0, 0);
 
         for (let i = 0; i < this.allBattleShips.length; i++) {
             for (let j = 0; j < this.allBattleShips.length; j++) {
-                if ((((Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex) == fieldSize - 1)) && ((Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) <= 1) || (Math.abs(this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex) == fieldSize - 1))) && this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId) {
+
+                let ix = this.allBattleShips[i].shipPosition.xIndex;
+                let jx = this.allBattleShips[j].shipPosition.xIndex;
+                let iy = this.allBattleShips[i].shipPosition.yIndex;
+                let jy = this.allBattleShips[j].shipPosition.yIndex;
+                let xd = ix - jx;
+                let yd = iy - jy;
+                let xOverlap = (Math.abs(ix - jx) <= 1) || (Math.abs(ix - jx) == fieldSize - 1);
+                let yOverlap = (Math.abs(iy - jy) <= 1) || (Math.abs(iy - jy) == fieldSize - 1);
+                let overlap = xOverlap && yOverlap;
+                let notSameShip = this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId;
+
+                if (overlap && notSameShip) {
                     checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
-                    if (this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex == 0 && this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex == 0) {
+                    if (xd == 0 && yd == 0) {
+
                         assignResultant(this.allBattleShips[i]);
                     }
-                    resultant.xIndex = this.allBattleShips[i].shipPosition.xIndex - this.allBattleShips[j].shipPosition.xIndex;
-                    resultant.yIndex = this.allBattleShips[i].shipPosition.yIndex - this.allBattleShips[j].shipPosition.yIndex;
+                    resultant.xIndex = xd;
+                    resultant.yIndex = yd;
 
                     if (Math.abs(resultant.xIndex) == fieldSize - 1) {
                         resultant.xIndex = -1 * adjustOverflow(resultant.xIndex);
@@ -306,9 +296,7 @@ export class GameService {
                     if (Math.abs(this.allBattleShips[i].collisionInfo.resultantMove.yIndex) > 1) {
                         this.allBattleShips[i].collisionInfo.resultantMove.yIndex = adjustOverflow(this.allBattleShips[i].collisionInfo.resultantMove.yIndex);
                     }
-
                     this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
-
                 }
             }
         }
@@ -330,7 +318,8 @@ export class GameService {
                 }
 
                 if (victimShip.shipStats.shieldActive == true) {
-                    damage = this.collisionShieldCheck(victimShip, rammerShip, damage, turn);
+                    damage = collisionShieldCheck(victimShip, rammerShip, damage, turn);
+
                 }
 
                 console.log("DAMAGE" + damage);
@@ -339,6 +328,49 @@ export class GameService {
                 }
                 else {
                     victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
+                }
+
+                function collisionShieldCheck(updatingShip: ShipModel, referShip: ShipModel, damage: number, turn: number) {
+                    let shieldGridDirection: Direction;
+                    let reducedDamage = damage;
+                    // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
+                    // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+                    shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
+                    if (shieldGridDirection > 3) {
+                        shieldGridDirection = shieldGridDirection - 4;
+                    }
+                    if (updatingShip.collisionInfo.moveCount == 0 && referShip.collisionInfo.moveCount == 0) {
+                        if (referShip.shipAction.act[turn - 1] == Action.MoveFront) {
+                            if (Math.abs(shieldGridDirection - referShip.shipDirection.dir) == 2) {
+                                reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+                            }
+                        }
+                        else if (updatingShip.shipAction.act[turn - 1] == Action.MoveFront) {
+                            if (updatingShip.shipDirection.dir == shieldGridDirection) {
+                                reducedDamage = damage * (1 - updatingShip.shipStats.defence);
+                            }
+                        }
+                    }
+                    else if (referShip.collisionInfo.moveCount != 0) {
+                        if (referShip.collisionInfo.resultantMove.yIndex > 0 && shieldGridDirection == Direction.Up) {
+                            reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                        }
+                        if (referShip.collisionInfo.resultantMove.yIndex < 0 && shieldGridDirection == Direction.Down) {
+                            reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                        }
+                        if (referShip.collisionInfo.resultantMove.xIndex > 0 && shieldGridDirection == Direction.Left) {
+                            reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                        }
+                        if (referShip.collisionInfo.resultantMove.xIndex < 0 && shieldGridDirection == Direction.Right) {
+                            reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                        }
+                    }
+                    else if (updatingShip.collisionInfo.moveCount != 0) {
+                        if (updatingShip.shipStats.shieldDirection == Direction.Up) {
+                            reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+                        }
+                    }
+                    return reducedDamage;
                 }
             }
         }
@@ -371,12 +403,14 @@ export class GameService {
     rotate(ship: ShipModel, clockwise: boolean) {
         let dir = ship.shipDirection.dir;
         let newDirection;
+
         if (clockwise) {
             newDirection = this.mod(dir - 1, 4);
         }
         else {
             newDirection = this.mod(dir + 1, 4);
         }
+
         this.updateShip(ship, ship.shipPosition, new ShipDirection(newDirection));
     }
 
@@ -389,18 +423,7 @@ export class GameService {
 
         console.log("shieldActive: " + ship.shipStats.shieldActive);
         console.log("shieldDirection " + ship.shipStats.shieldDirection);
-
     }
-
-
-    // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
-
-    //   NewShieldDirection = ship.ShipStats.shieldDirection + ship.shipDirection.dir;
-
-    //   if (NewShieldDirection >=4){
-    //       NewShieldDirection = NewShieldDirection%4;
-    //   }
-
 
     randomDir(range: number): number {
         return Math.floor(Math.random() * range);
@@ -428,40 +451,68 @@ export class GameService {
                             switch (ship.shipDirection.dir) { //check four attacking ship direction
                                 case Direction.Up:
                                     if (positionCorrectUp && bothDepartExist) {
-                                        this.updateShootHealth(ship, defendShip, k);
+                                        updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                         break loopAttackRange;
                                     }
                                     break;
                                 case Direction.Down:
                                     if (positionCorrectDown && bothDepartExist) {
-                                        this.updateShootHealth(ship, defendShip, k);
+                                        updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                         break loopAttackRange;
                                     }
                                     break;
                                 case Direction.Left:
                                     if (positionCorrectLeft && bothDepartExist) {
-                                        this.updateShootHealth(ship, defendShip, k);
+                                        updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                         break loopAttackRange;
                                     }
                                     break;
                                 case Direction.Right:
                                     if (positionCorrectRight && bothDepartExist) {
-                                        this.updateShootHealth(ship, defendShip, k);
+                                        updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
                                         break loopAttackRange;
                                     }
+
                             }
                         }
                     }
                 }
-        }
+            }
+
+            function updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
+                let damage: number;
+
+                damage = shooterShip.shipStats.attack;
+                if (victimShip.shipStats.shieldActive == true) {
+                    damage = shootShieldCheck(shooterShip, victimShip, damage);
+                }
+                if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
+                    victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
+                } else {
+                    victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
+                }
+
+                function shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
+                    let shieldGridDirection: Direction;
+                    // let enemyDirection: Direction = 4;
+                    let reducedDamage = damage;
+                    shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
+                    if (shieldGridDirection > 3) {
+                        shieldGridDirection = shieldGridDirection - 4;
+                    }
+                    if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2) {
+                        reducedDamage = damage * (1 - victimShip.shipStats.defence)
+                    }
+                    return reducedDamage;
+                }
+            }
     } // end shoot
 
     relativePosition(ship: ShipModel, l: number) {
-
         let dir = ship.shipDirection.dir;
         for (let i = 0; i < this.allBattleShips.length; i++) {
             let x0 = ship.shipPosition.xIndex;
@@ -480,7 +531,7 @@ export class GameService {
                 console.log("current ship is " + i)
             }
         }
-        console.log("\n")
+        console.log("\n");
 
         function wrapDistance(xd: number) {
             if (Math.abs(xd) < l / 2) {
@@ -530,12 +581,12 @@ export class GameService {
         }
 
         function adjustByDir(dir: Direction, deg: number) {
-            return mod(dir * 90 + deg, 360);
+            return this.mod(dir * 90 + deg, 360);
         }
+    }
 
-        function mod(n, m) {
-            return ((n % m) + m) % m;
-        }
+    mod(n, m) {
+        return ((n % m) + m) % m;
     }
 
     randomCoor(max: number, start: number) {
@@ -559,102 +610,9 @@ export class GameService {
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
 
-    updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
-        let damage: number;
-
-        damage = shooterShip.shipStats.attack;
-        if (victimShip.shipStats.shieldActive == true) {
-            damage = this.shootShieldCheck(shooterShip, victimShip, damage);
-        }
-        if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
-            victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
-        } else {
-            victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
-        }
-    }
-
-
-    shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
-        let shieldGridDirection: Direction;
-        // let enemyDirection: Direction = 4;
-        let reducedDamage = damage;
-        shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
-        if (shieldGridDirection > 3) {
-            shieldGridDirection = shieldGridDirection - 4;
-        }
-        if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2) {
-            reducedDamage = damage * (1 - victimShip.shipStats.defence)
-        }
-        // let xDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.xIndex;
-        // let yDiff = victimShip.shipPosition.xIndex - shooterShip.shipPosition.yIndex;
-        // if (Math.abs(xDiff) < 1) {
-        //     if (yDiff > 0) {
-        //         enemyDirection = Direction.Up;
-        //     }
-        //     else {
-        //         enemyDirection = Direction.Down;
-        //     }
-        // }
-        // else if (Math.abs(yDiff) < 1) {
-        //     if (xDiff > 0) {
-        //         enemyDirection = Direction.Left;
-        //     }
-        //     else {
-        //         enemyDirection = Direction.Right;
-        //     }
-        // }
-        //
-        // if (shieldGridDirection == enemyDirection) {
-        //     reducedDamage = damage * (1 - victimShip.shipStats.defence);
-        // }
-        return reducedDamage;
-    }
-
-    collisionShieldCheck(updatingShip: ShipModel, referShip: ShipModel, damage: number, turn: number) {
-        let shieldGridDirection: Direction;
-        let reducedDamage = damage;
-        // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
-        // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
-        shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
-        if (shieldGridDirection > 3) {
-            shieldGridDirection = shieldGridDirection - 4;
-        }
-        if (updatingShip.collisionInfo.moveCount == 0 && referShip.collisionInfo.moveCount == 0) {
-            if (referShip.shipAction.act[turn - 1] == Action.MoveFront) {
-                if (Math.abs(shieldGridDirection - referShip.shipDirection.dir) == 2) {
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-            else if (updatingShip.shipAction.act[turn - 1] == Action.MoveFront) {
-                if (updatingShip.shipDirection.dir == shieldGridDirection) {
-                    reducedDamage = damage * (1 - updatingShip.shipStats.defence);
-                }
-            }
-        }
-        else if (referShip.collisionInfo.moveCount != 0) {
-            if (referShip.collisionInfo.resultantMove.yIndex > 0 && shieldGridDirection == Direction.Up) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (referShip.collisionInfo.resultantMove.yIndex < 0 && shieldGridDirection == Direction.Down) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (referShip.collisionInfo.resultantMove.xIndex > 0 && shieldGridDirection == Direction.Left) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (referShip.collisionInfo.resultantMove.xIndex < 0 && shieldGridDirection == Direction.Right) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-        }
-        else if (updatingShip.collisionInfo.moveCount != 0) {
-            if (updatingShip.shipStats.shieldDirection == Direction.Up) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-        }
-        return reducedDamage;
-    }
-
 
     inputAction(ship: ShipModel, act: Action): boolean {
+
         let maxActions = 3;
         if (ship.shipAction.act.length >= maxActions) {
             console.log("Length" + ship.shipAction.act.length);
@@ -793,7 +751,10 @@ export class GameService {
                 reAlive: depart[0].alive,
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
-                rwAlive: depart[3].alive
+                rwAlive: depart[3].alive,
+                report0: 0, // TODO:- Update this report
+                report1: 1,
+                report2: 2,
             });
         });
 
@@ -803,3 +764,6 @@ export class GameService {
         });
     }
 }
+
+
+
