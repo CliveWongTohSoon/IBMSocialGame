@@ -9,9 +9,17 @@ export class ShipModel {
                 public shipPosition: ShipPosition,
                 public shipDirection: ShipDirection,
                 public shipStats: ShipStats,
+                public phase: ShipPhase,
                 public colorFront: string,
                 public colorBack: string) {}
 
+}
+
+export enum ShipPhase {
+    Action,
+    Report,
+    Start,
+    End
 }
 
 export class ShipPosition {
@@ -163,6 +171,56 @@ export class ShipDepartment {
             return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
         }
     }
+
+    static updateDepartmentHealth(shipPosition: ShipPosition, shipDirection: ShipDirection, fieldSize: number,reHealth:number,leHealth:number,lwHealth:number,rwHealth:number,reAlive:boolean,leAlive:boolean,lwAlive:boolean,rwAlive:boolean): ShipDepartment {
+        // top left quadrant
+        let cordAX = shipPosition.xIndex - 0.5;
+        let cordAY = shipPosition.yIndex - 0.5;
+
+        // top right quadrant
+        let cordBX = shipPosition.xIndex + 0.5;
+        if (cordBX == fieldSize){cordBX = cordBX - fieldSize};
+        let cordBY = shipPosition.yIndex - 0.5;
+
+        // bottom left quadrant
+        let cordCX = shipPosition.xIndex - 0.5;
+        let cordCY = shipPosition.yIndex + 0.5;
+        if (cordCY == fieldSize){cordCY = cordCY - fieldSize};
+
+        // bottom right quadrant
+        let cordDX = shipPosition.xIndex + 0.5;
+        if (cordDX == fieldSize){cordDX = cordDX - fieldSize};
+        let cordDY = shipPosition.yIndex + 0.5;
+        if (cordDY == fieldSize){cordDY = cordDY - fieldSize};
+
+        if (shipDirection.dir == Direction.Left) {
+            const rightEngine = new Department(cordBX, cordBY, reHealth, null,reAlive);
+            const leftEngine = new Department(cordDX, cordDY, leHealth, null,leAlive);
+            const rightWeapon = new Department(cordAX, cordAY,rwHealth, null,rwAlive);
+            const leftWeapon = new Department(cordCX, cordCY, lwHealth,null,lwAlive);
+            return new ShipDepartment(  [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
+        } else if (shipDirection.dir == Direction.Right) {
+            const leftWeapon = new Department(cordBX, cordBY, lwHealth, null,lwAlive);
+            const rightWeapon = new Department(cordDX, cordDY, rwHealth, null,rwAlive);
+            const leftEngine = new Department(cordAX, cordAY,  leHealth, null,leAlive);
+            const rightEngine = new Department(cordCX, cordCY, reHealth,null,reAlive);
+            return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
+        } else if (shipDirection.dir == Direction.Up) {
+            const leftEngine = new Department(cordCX, cordCY,  leHealth, null,leAlive);
+            const leftWeapon = new Department(cordAX, cordAY,  lwHealth, null,lwAlive);
+            const rightEngine = new Department(cordDX, cordDY, reHealth, null,reAlive);
+            const rightWeapon = new Department(cordBX, cordBY, rwHealth, null,rwAlive);
+            return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
+        }
+        else if (shipDirection.dir == Direction.Down) {
+            const rightWeapon = new Department(cordCX, cordCY, rwHealth,null,rwAlive);
+            const rightEngine = new Department(cordAX, cordAY,reHealth, null,reAlive);
+            const leftWeapon = new Department(cordDX, cordDY,  lwHealth,null,lwAlive);
+            const leftEngine = new Department(cordBX, cordBY, leHealth, null,leAlive);
+            return new ShipDepartment( [rightEngine, leftEngine, leftWeapon, rightWeapon]  );
+        }
+    }
+
 }
 
 export class Department {

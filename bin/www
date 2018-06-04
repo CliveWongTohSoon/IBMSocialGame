@@ -8,6 +8,7 @@ const debug = require('debug')('node-rest:server');
 const http = require('http');
 const socketIO = require('socket.io');
 const Start = require('../models/start');
+const Instruction = require('../models/instruction');
 /**
  * Get port from environment and store in Express.
  */
@@ -19,6 +20,7 @@ app.set('port', port);
  */
 const server = http.createServer(app);
 const io = socketIO(server);
+
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -28,7 +30,7 @@ const io = socketIO(server);
  */
 io.on('connection', (socket) => {
     console.log('Socket connected');
-
+    socket.emit('hello', {message: 'Can you hear me?'});
     // First time it runs
     Start.find() // Find all ships initially
         .exec((err, start) => {
@@ -37,7 +39,74 @@ io.on('connection', (socket) => {
             socket.emit('start', start);
         });
 
-    // if someone call start => emit new ship
+    Instruction.find()
+        .exec((err, instruction) => {
+           if (err) throw err;
+           socket.emit('instruction', {phase: 'action'});
+        });
+
+    socket.on('test', data => {
+        Instruction.findOne({shipId: data.shipId}, (err, instruction) => {
+           if (err) throw err;
+           instruction.instruction0 = data.instruction0;
+           instruction.instruction1 = data.instruction1;
+           instruction.instruction2 = data.instruction2;
+           instruction.save(err, _ => {
+               // console.log(instruction);
+               if (!err) io.sockets.emit('instruction_server', {shipId: data.shipId});
+           });
+        });
+    });
+
+    // Listening to instruction given by pi
+    // Note: Cannot use -
+    socket.on('instruction_server', data => {
+        // Update the ship to action phase
+        console.log('instruction_server reached!', data);
+        Start.findOne({shipId: data.shipId}, (err, ship) => {
+            ship.phase = 'action';
+            ship.save(err, _ => {
+                if (!err) {
+                    // update the instruction to action phase
+                    Instruction.findOne({shipId: data.shipId}, (err, instruction) => {
+                        instruction.phase = 'action';
+                        instruction.save(err, _ => {
+                            if (!err) {
+                                Start.find()
+                                    .exec((err, start) => {
+                                       if (err) throw err;
+                                       // io.sockets.emit('start', start);
+                                       io.sockets.emit('instruction_client', instruction);
+                                    });
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    });
+
+    socket.on('init', battleShipdata => {
+        console.log('Entered init', battleShipdata);
+        Start.findOne({shipId: battleShipdata.shipId}, (err, ship) => {
+            ship.x = battleShipdata.x;
+            ship.y = battleShipdata.y;
+            ship.dir = battleShipdata.dir;
+            ship.reHealth = battleShipdata.totalHp;
+            ship.leHealth = battleShipdata.totalHp;
+            ship.rwHealth = battleShipdata.totalHp;
+            ship.lwHealth = battleShipdata.totalHp;
+            ship.reAlive = true;
+            ship.leAlive = true;
+            ship.lwAlive = true;
+            ship.rwAlive = true;
+            ship.phase = 'start';
+            ship.save(err, _ => {
+
+            });
+       });
+    });
+
     socket.on('update', battleShipData => {
         // console.log(newBattleShipArray);
         Start.findOne({shipId: battleShipData.shipId}, (err, ship) => {
@@ -45,6 +114,16 @@ io.on('connection', (socket) => {
             ship.x = battleShipData.x;
             ship.y = battleShipData.y;
             ship.dir = battleShipData.dir;
+            ship.reHealth = battleShipData.reHealth;
+            ship.leHealth =  battleShipData.leHealth;
+            ship.lwHealth = battleShipData.lwHealth;
+            ship.rwHealth = battleShipData.rwHealth;
+            ship.reAlive = battleShipData.reAlive;
+            ship.leAlive = battleShipData.leAlive;
+            ship.lwAlive = battleShipData.lwAlive;
+            ship.rwAlive = battleShipData.rwAlive;
+
+            ship.phase = 'report';
             // console.log('After: ', ship);
             // console.log(ship);
             ship.save(err, _ => {
@@ -52,26 +131,15 @@ io.on('connection', (socket) => {
                     Start.find()
                         .exec((err, start) => {
                            if (err) throw err;
+                           // Send to front end to update the ship to sync with database
                            io.sockets.emit('start', start);
+
+                           // Send to pi to report the status of the ship
+                           io.sockets.emit('instruction', {phase: 'report', shipData: start});
                         });
                 }
             });
         });
-
-
-        // message.content = req.body.content;
-        // message.save(err, result => {
-        //     if (err) {
-        //         return res.status(500).json({
-        //             title: 'An error occurred',
-        //             error: err
-        //         });
-        //     }
-        //     res.status(201).json({
-        //         message: 'Updated message',
-        //         obj: result
-        //     });
-        // });
     });
 
     socket.on('disconnect', () => {

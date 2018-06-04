@@ -1,5 +1,5 @@
 import {Component, OnInit} from "@angular/core";
-import {ShipModel, Action, ShipAction} from "./ship-model";
+import {ShipModel, Action, ShipAction, ShipPhase} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
 
@@ -18,6 +18,9 @@ export class GameComponent implements OnInit {
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
 
+    // Mock raspberry pi
+    intentArray = [];
+
     constructor(private gameService: GameService) {
         gameService.init(25).subscribe(battleField => this.battleField = battleField);
     }
@@ -28,130 +31,151 @@ export class GameComponent implements OnInit {
 
     start(numberOfPlayers: string) {
         // randomDir();
-        console.log(numberOfPlayers);
 
-        console.log("Working");
-        //
-        // if (Number(numberOfPlayers) == 1) {
-        //     this.gameService.init(25)
-        //         .subscribe(battleField => {
-        //             this.battleField = battleField;
-        //             this.gameService.createShip(Number(numberOfPlayers+1))
-        //                 .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
-        //         });
-        // }
-
-        if (Number(numberOfPlayers) <= 2) {
-            this.gameService.init(25)
-                .subscribe(battleField => {
-                    this.battleField = battleField;
-                    this.gameService.createShip(Number(numberOfPlayers))
-                        .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
-                });
-        }
-
-        else if (Number(numberOfPlayers) == 3) {
-            this.gameService.init(30)
-                .subscribe(battleField => {
-                    this.battleField = battleField;
-                    this.gameService.createShip(Number(numberOfPlayers))
-                        .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
-                });
-        }
-
-       else if (Number(numberOfPlayers) >= 4) {
-            this.gameService.init(36)
-                .subscribe(battleField => {
-                    this.battleField = battleField;
-                    this.gameService.createShip(Number(numberOfPlayers))
-                        .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
-                });
-        }
-
-        this.fullTurns();
-
+       //  console.log(numberOfPlayers);
+       //
+       //  console.log("Working");
+       //
+       //  if (Number(numberOfPlayers) <= 2) {
+       //      this.gameService.init(25)
+       //          .subscribe(battleField => {
+       //              this.battleField = battleField;
+       //              this.gameService.createShip(Number(numberOfPlayers))
+       //                  .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+       //          });
+       //  }
+       //
+       //  else if (Number(numberOfPlayers) == 3) {
+       //      this.gameService.init(30)
+       //          .subscribe(battleField => {
+       //              this.battleField = battleField;
+       //              this.gameService.createShip(Number(numberOfPlayers))
+       //                  .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+       //          });
+       //  }
+       //
+       // else if (Number(numberOfPlayers) >= 4) {
+       //      this.gameService.init(36)
+       //          .subscribe(battleField => {
+       //              this.battleField = battleField;
+       //              this.gameService.createShip(Number(numberOfPlayers))
+       //                  .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
+       //          });
+       //  }
+       //
+       //  this.fullTurns();
     }
-
-    // rotateRight(ship: ShipModel) {
-    //     console.log('Rotating...');
-    //     this.gameService.rotate(ship, true);
-    // }
-    //
-    // rotateLeft(ship: ShipModel) {
-    //     console.log('Rotating...');
-    //     this.gameService.rotate(ship, false);
-    // }
-    //
-    // move(ship: ShipModel) {
-    //     this.gameService.move(ship);
-    //     //this.gameService.checkCollision(ship, this.battleField.rowGrid.length);
-    // }
-    //
-    // shieldUp(ship: ShipModel) {
-    //     this.gameService.shield(ship, 0);
-    // }
-    //
-    // shieldLeft(ship: ShipModel) {
-    //     this.gameService.shield(ship, 1);
-    // }
-    //
-    // shieldDown(ship: ShipModel) {
-    //     this.gameService.shield(ship,2)
-    // }
-    //
-    // shieldRight(ship: ShipModel) {
-    //     this.gameService.shield(ship,3)
-    // }
-    //
-    // shoot(ship:ShipModel){
-    //     this.gameService.shoot(ship);
-    // }
 
     relativePosition(ship:ShipModel){
         this.gameService.relativePosition(ship,this.battleField.rowGrid.length);
     }
 
     inputMove(ship:ShipModel){
-        this.gameService.inputMove(ship);
+        this.intentArray.push('MoveFront');
+        // this.gameService.inputMove(ship);
     }
 
     inputRotateLeft(ship:ShipModel){
-        this.gameService.inputRotateLeft(ship);
+        this.intentArray.push('LeftTurn');
+        // this.gameService.inputRotateLeft(ship);
     }
 
     inputRotateRight(ship:ShipModel){
-        this.gameService.inputRotateRight(ship);
+        this.intentArray.push('RightTurn');
+        // this.gameService.inputRotateRight(ship);
     }
 
     inputShoot(ship:ShipModel){
-        this.gameService.inputShoot(ship);
+        this.intentArray.push('ShootFront');
+        // this.gameService.inputShoot(ship);
     }
 
     inputShieldUp(ship:ShipModel){
-        this.gameService.inputShieldUp(ship);
+        this.intentArray.push('FrontShield');
+        // this.gameService.inputShieldUp(ship);
     }
 
     inputShieldDown(ship:ShipModel){
-        this.gameService.inputShieldDown(ship);
+        this.intentArray.push('BackShield');
+        // this.gameService.inputShieldDown(ship);
     }
 
     inputShieldLeft(ship:ShipModel){
-        this.gameService.inputShieldLeft(ship);
+        this.intentArray.push('LeftShield');
+        // this.gameService.inputShieldLeft(ship);
     }
 
     inputShieldRight(ship:ShipModel){
-        this.gameService.inputShieldRight(ship);
+        this.intentArray.push('RightShield');
+        // this.gameService.inputShieldRight(ship);
     }
 
-    fullTurns(){
-        this.gameService.fullTurns();
+    /*************************************************
+     * Mock raspberry pi
+     * ***********************************************/
+    getInstruction(intent, entity) {
+        if (intent === 'goforward') return 'MoveFront';
+        else if (intent === 'rotate' && entity === 'left') return 'LeftTurn';
+        else if (intent === 'rotate' && entity === 'right') return 'RightTurn';
+        else if (intent === 'attack') return 'ShootFront';
+        else if (intent === 'defence' && entity === 'front') return 'FrontShield';
+        else if (intent === 'defence' && entity === 'rear') return 'BackShield';
+        else if (intent === 'defence' && entity === 'right') return 'RightShield';
+        else if (intent === 'defence' && entity === 'left') return 'LeftShield';
+        else return 'DoNothing';
     }
 
 
+    fullTurns(ship: ShipModel){
+        // Test
+        this.gameService.test(ship.shipId, this.intentArray);
+        this.intentArray = [];
+    }
+
+    instructionToAction(ship: ShipModel, instruction: String) {
+        if (instruction === 'MoveFront') this.gameService.inputMove(ship);
+        else if (instruction === 'LeftTurn') this.gameService.inputRotateLeft(ship);
+        else if (instruction === 'RightTurn') this.gameService.inputRotateRight(ship);
+        else if (instruction === 'ShootFront') this.gameService.inputShoot(ship);
+        else if (instruction === 'FrontShield') this.gameService.inputShieldUp(ship);
+        else if (instruction === 'BackShield') this.gameService.inputShieldDown(ship);
+        else if (instruction === 'RightShield') this.gameService.inputShieldRight(ship);
+        else if (instruction === 'LeftShield') this.gameService.inputShieldLeft(ship);
+    }
 
     ngOnInit() {
         // this.gameService.createShipFromSocket().subscribe(console.log);
+        this.gameService.listenToInstruction().subscribe(instructionData => {
+            // Match instruction data to different action
+            console.log('Entered listenToInstruction', instructionData);
+            const currentShip = this.allBattleShip.filter(ship => ship.shipId === instructionData['shipId'])[0];
+
+            // Update the ship phase to phase given in instruction
+            console.log(this.allBattleShip, instructionData['shipId']);
+            currentShip.phase = this.gameService.getPhase(instructionData['phase']);
+            const instruction0 = instructionData['instruction0'];
+            const instruction1 = instructionData['instruction1'];
+            const instruction2 = instructionData['instruction2'];
+
+            // Update by calling fullTurns
+            this.instructionToAction(currentShip, instruction0);
+            this.instructionToAction(currentShip, instruction1);
+            this.instructionToAction(currentShip, instruction2);
+
+            // Check All BattleShip is Ready
+            const allBattleShipReady = this.allBattleShip.reduce((prev, curr) => {
+                return curr.phase === ShipPhase.Action && prev;
+            }, this.allBattleShip);
+
+
+            if (allBattleShipReady) {
+                console.log('Entering full turn...');
+                this.gameService.fullTurns();
+            }
+        });
+
         this.gameService.createShipFromSocket().subscribe(shipModel => {
+            console.log('Ship:', shipModel);
             const numberOfPlayers = shipModel.length;
             // if (numberOfPlayers <= 2) {
             //     this.gameService.init(25)
@@ -170,8 +194,6 @@ export class GameComponent implements OnInit {
             // }
 
             this.allBattleShip = shipModel;
-
-            // this.fullTurns();
 
         });
     }

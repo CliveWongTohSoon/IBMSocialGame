@@ -10,6 +10,10 @@ export class AuthService {
 
     }
 
+    loginToTwitter() {
+        return this.http.get('http://localhost:3000/auth/twitter');
+    }
+
     signup(user: UserModel) {
         const body = JSON.stringify(user);
         const headers = new HttpHeaders({'Content-Type': 'application/json'});
