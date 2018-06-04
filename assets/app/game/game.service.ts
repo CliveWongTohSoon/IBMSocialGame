@@ -806,74 +806,102 @@ export class GameService {
             }
         }
 
-        fullTurns()
-        {
-            for (let turn = 0; turn < 3; turn++) {
-                for (let i = 0; i < this.allBattleShips.length; i++) {
-                    let act = this.allBattleShips[i].shipAction.act[turn];
-                    if (act == Action.FrontShield) {//fb: shield successful : front side
-                        this.shield(this.allBattleShips[i], 0);
-                    } else if (act == Action.LeftShield) {//fb: shield successful: left side
-                        this.shield(this.allBattleShips[i], 1);
-                    } else if (act == Action.BackShield) {//fb: shield successful: back side
-                        this.shield(this.allBattleShips[i], 2);
-                    } else if (act == Action.RightShield) {//fb: shield successful: right side
-                        this.shield(this.allBattleShips[i], 3);
-                    } else if (act == Action.ShootFront) {//fb: hit OR miss
-                        this.shoot(this.allBattleShips[i]);
-                    } else if (act == Action.MoveFront) { //fb? enemies in radar OR no enemies detected
-                        this.move(this.allBattleShips[i]);
-                    } else if (act == Action.RightTurn) {
-                        this.rotate(this.allBattleShips[i], true);
-                    } else if (act == Action.LeftTurn) {
-                        this.rotate(this.allBattleShips[i], false);
-                    }
-                    for (let k = 0; k < 4; k++) {//fb: *department* destroyed
-                        if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
-                            this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
-                        }
+
+    fullTurns() {
+
+        for (let turn = 1; turn <= 3; turn++) {
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
+                    this.shield(this.allBattleShips[i],0);
+                }
+                //fb: shield successful : front side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftShield) {
+                    this.shield(this.allBattleShips[i],1);
+                }
+                //fb: shield successful: left side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.BackShield) {
+                    this.shield(this.allBattleShips[i], 2);
+                }
+                //fb: shield successful: back side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightShield) {
+                    this.shield(this.allBattleShips[i], 3);
+                }
+                //fb: shield successful: right side
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.ShootFront) {
+                    this.shoot(this.allBattleShips[i]);
+                }
+                //fb: hit OR miss
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                for (let k = 0; k < 4; k++) {
+                    if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
+                        this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
                     }
                 }
-                this.checkCollision(this.battleField.rowGrid.length, turn + 1);
-                this.performCollision(this.battleField.rowGrid.length, turn + 1);
-                //fb: collision with enemy / successful move
-                for (let i = 0; i < this.allBattleShips.length; i++) {
-                    for (let k = 0; k < 4; k++) {
-                        if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
-                            this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
-                        }
-                    }
-                    // fb: *department* destroyed
-                    this.allBattleShips[i].shipStats.shieldActive = false;
+                //fb: *department* destroyed
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.MoveFront) {
+                    this.move(this.allBattleShips[i]);
+                }
+                //fb? enemies in radar OR no enemies detected
+            }
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.RightTurn) {
+                    this.rotate(this.allBattleShips[i], true);
                 }
             }
-
-            this.allBattleShips.map(ship => {
-                // Update the phase
-                let depart = ship.shipDepartment.departmentArray;
-                this.socket.emit('update', {
-                    shipId: ship.shipId,
-                    x: ship.shipPosition.xIndex,
-                    y: ship.shipPosition.yIndex,
-                    dir: ship.shipDirection.dir,
-                    reHealth: depart[0].health,
-                    leHealth: depart[1].health,
-                    lwHealth: depart[2].health,
-                    rwHealth: depart[3].health,
-                    reAlive: depart[0].alive,
-                    leAlive: depart[1].alive,
-                    lwAlive: depart[2].alive,
-                    rwAlive: depart[3].alive
-
-                });
-            });
-
-            // reset all action
-            this.allBattleShips.map(ship => {
-                ship.shipAction = new ShipAction([]);
-            });
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftTurn) {
+                    this.rotate(this.allBattleShips[i], false);
+                }
+            }
+            this.checkCollision(this.battleField.rowGrid.length, turn);
+            this.performCollision(this.battleField.rowGrid.length, turn);
+            //fb: collision with enemy / successful move
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                for (let k = 0; k < 4; k++) {
+                    if (this.allBattleShips[i].shipDepartment.departmentArray[k].health <= 0) {
+                        this.allBattleShips[i].shipDepartment.departmentArray[k].alive = false;
+                    }
+                }
+                // fb: *department* destroyed
+                this.allBattleShips[i].shipStats.shieldActive = false;
+            }
         }
 
+        this.allBattleShips.map(ship => {
+            // Update the phase
+            let depart = ship.shipDepartment.departmentArray;
+            this.socket.emit('update', {
+                shipId: ship.shipId,
+                x: ship.shipPosition.xIndex,
+                y: ship.shipPosition.yIndex,
+                dir: ship.shipDirection.dir,
+                reHealth: depart[0].health,
+                leHealth: depart[1].health,
+                lwHealth: depart[2].health,
+                rwHealth: depart[3].health,
+                reAlive: depart[0].alive,
+                leAlive: depart[1].alive,
+                lwAlive: depart[2].alive,
+                rwAlive: depart[3].alive
+            });
+        });
+
+        // reset all action
+        this.allBattleShips.map(ship => {
+            ship.shipAction = new ShipAction([]);
+        });
+    }
 
         getPersonality()
         {
