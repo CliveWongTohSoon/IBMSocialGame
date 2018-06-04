@@ -561,250 +561,184 @@ export class GameService {
             }
         } // end shoot
 
-        relativePosition(ship
-    :
-        ShipModel, l
-    :
-        number
-    )
-        {
+    relativePosition(ship: ShipModel, l: number) {
+        let dir = ship.shipDirection.dir;
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            let x0 = ship.shipPosition.xIndex;
+            let y0 = ship.shipPosition.yIndex;
 
-            let dir = ship.shipDirection.dir;
-            for (let i = 0; i < this.allBattleShips.length; i++) {
-                let x0 = ship.shipPosition.xIndex;
-                let y0 = ship.shipPosition.yIndex;
+            let x = this.allBattleShips[i].shipPosition.xIndex;
+            let y = this.allBattleShips[i].shipPosition.yIndex;
+            let xd = x - x0;
+            let yd = y - y0;
 
-                let x = this.allBattleShips[i].shipPosition.xIndex;
-                let y = this.allBattleShips[i].shipPosition.yIndex;
-                let xd = x - x0;
-                let yd = y - y0;
-
-                if (!(xd == 0 && yd == 0)) {
-                    {
-                        calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd));
-                    }
-                } else {
-                    console.log("current ship is " + i)
+            if (!(xd == 0 && yd == 0)) {
+                {
+                    calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd));
                 }
+            } else {
+                console.log("current ship is " + i)
             }
-            console.log("\n")
+        }
+        console.log("\n")
 
-            function wrapDistance(xd: number) {
-                if (Math.abs(xd) < l / 2) {
-                    return xd;
+        function wrapDistance(xd: number) {
+            if (Math.abs(xd) < l / 2) {
+                return xd;
+            }
+            else {
+                if (xd < 0) {
+                    return l + xd;
                 }
                 else {
-                    if (xd < 0) {
-                        return l + xd;
-                    }
-                    else {
-                        return -(l - xd);
-                    }
+                    return -(l - xd);
                 }
             }
+        }
 
-            function wrapSub(yd: number) {
-                if (Math.abs(yd) < l / 2) {
-                    if (yd < 0) {
-                        return 0;
-                    }
-                    else {
-                        return 180;
-                    }
-                } else {
-                    if (yd < 0) {
-                        return 180;
-                    }
-                    else {
-                        return 0;
-                    }
+        function wrapSub(yd: number) {
+            if (Math.abs(yd) < l / 2) {
+                if (yd < 0) {
+                    return 0;
                 }
-            }
-
-            function calPolar(i: number, xd: number, yd: number, sub: number) {
-                let rad = Math.atan(xd / yd);
-                let deg = rad * 180 / Math.PI;
-                let d = distance(xd, yd);
-                logPolar(i, adjustByDir(dir, sub - deg), d);
-            }
-
-            function distance(a: number, b: number) {
-                return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-            }
-
-            function logPolar(i: number, deg: number, distance: number) {
-                console.log("ship " + i + " 's relative position from this ship is: " + deg + " degree, distance is " + distance);
-            }
-
-            function adjustByDir(dir: Direction, deg: number) {
-                return mod(dir * 90 + deg, 360);
-            }
-
-        }
-
-        randomCoor(max
-    :
-        number, start
-    :
-        number
-    )
-        {
-            return Math.floor((Math.random() * max) + start) + 0.5; // + (prevPos + range)) (9 + adjustment)) + prevX + 8) + 0.5;
-        }
-
-        genRandomColor()
-    :
-        string
-        {
-            return '#' + (Math.random() * 0xFFFFFF << 0).toString(16) === '#FFFFFF' ? '#990000' : '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
-        }
-
-        shadeColor(color, percent)
-    :
-        string
-        {
-            return '#000000';
-            // const f = parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-            // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
-        }
-
-        uidGenerator()
-    :
-        string
-        {
-            const S4 = function () {
-                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-            };
-            return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-        }
-
-
-        inputAction(ship
-    :
-        ShipModel, act
-    :
-        Action
-    ):
-        boolean
-        {
-
-            let maxActions = 3;
-            if (ship.shipAction.act.length >= maxActions) {
-                console.log("Length" + ship.shipAction.act.length);
-                return false;
+                else {
+                    return 180;
+                }
             } else {
-                ship.shipAction.act.push(act);
-                return true;
+                if (yd < 0) {
+                    return 180;
+                }
+                else {
+                    return 0;
+                }
             }
         }
 
-        inputShieldUp(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.FrontShield);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
+        function calPolar(i: number, xd: number, yd: number, sub: number) {
+            let rad = Math.atan(xd / yd);
+            let deg = rad * 180 / Math.PI;
+            let d = distance(xd, yd);
+            logPolar(i, adjustByDir(dir, sub - deg), d);
         }
 
-        inputShieldLeft(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.LeftShield);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
+        function distance(a: number, b: number) {
+            return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
         }
 
-        inputShieldRight(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.RightShield);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
+        function logPolar(i: number, deg: number, distance: number) {
+            console.log("ship " + i + " 's relative position from this ship is: " + deg + " degree, distance is " + distance);
         }
 
-        inputShieldDown(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.BackShield);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
+        function adjustByDir(dir: Direction, deg: number) {
+            return mod(dir * 90 + deg, 360);
         }
 
-        inputShoot(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.ShootFront);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
-        }
+    }
 
-        inputMove(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.MoveFront);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
-        }
+    randomCoor(max: number, start: number) {
+        return Math.floor((Math.random() * max) + start) + 0.5; // + (prevPos + range)) (9 + adjustment)) + prevX + 8) + 0.5;
+    }
 
-        inputRotateRight(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.RightTurn);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
-        }
+    genRandomColor(): string {
+        return '#' + (Math.random() * 0xFFFFFF << 0).toString(16) === '#FFFFFF' ? '#990000' : '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+    }
 
-        inputRotateLeft(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.LeftTurn);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
-        }
+    shadeColor(color, percent): string {
+        return '#000000';
+        // const f = parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+        // return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+    }
 
-        inputDoNothing(ship
-    :
-        ShipModel
-    )
-        {
-            let valid: boolean;
-            valid = this.inputAction(ship, Action.DoNothing);
-            if (valid == false) {
-                console.log('Too many actions')
-            }
+    uidGenerator(): string {
+        const S4 = function () {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        };
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    }
+
+    inputAction(ship: ShipModel, act: Action): boolean {
+
+        let maxActions = 3;
+        if (ship.shipAction.act.length >= maxActions) {
+            console.log("Length" + ship.shipAction.act.length);
+            return false;
+        } else {
+            ship.shipAction.act.push(act);
+            return true;
         }
+    }
+
+    inputShieldUp(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.FrontShield);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldLeft(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.LeftShield);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldRight(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.RightShield);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputShieldDown(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.BackShield);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputShoot(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.ShootFront);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputMove(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.MoveFront);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateRight(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.RightTurn);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputRotateLeft(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.LeftTurn);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
+
+    inputDoNothing(ship: ShipModel) {
+        let valid: boolean;
+        valid = this.inputAction(ship, Action.DoNothing);
+        if (valid == false) {
+            console.log('Too many actions')
+        }
+    }
 
 
     fullTurns() {
@@ -903,8 +837,7 @@ export class GameService {
         });
     }
 
-    getPersonality()
-    {
+    getPersonality() {
         const json = {
             "word_count": 15128,
             "processed_language": "en",
