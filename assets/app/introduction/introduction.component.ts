@@ -107,7 +107,7 @@ export class IntroductionComponent {
         });
 
         shipStat.attack = Math.round(shipStat.attack);
-        shipStat.defence = Math.round(shipStat.defence);
+        shipStat.defence = Number(shipStat.defence.toFixed(3));
         shipStat.range = Math.round(shipStat.range);
         shipStat.attackRange = Math.round(shipStat.attackRange);
         shipStat.totalHp = Math.round(shipStat.totalHp);
