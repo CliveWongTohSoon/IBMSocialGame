@@ -15,6 +15,10 @@ const schema = new Schema({
     leAlive: {type: Boolean, required:true},
     lwAlive: {type: Boolean, required:true},
     rwAlive: {type: Boolean, required:true},
+    attack: {type: Number, required: true},
+    range: {type: Number, required: true},
+    attackRange: {type: Number, required: true},
+    defence: {type: Number, required: true},
 });
 
 module.exports = mongoose.model('Start', schema);
