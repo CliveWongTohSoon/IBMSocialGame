@@ -779,7 +779,10 @@ export class GameService {
                 reAlive: depart[0].alive,
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
-                rwAlive: depart[3].alive
+                rwAlive: depart[3].alive,
+                report0: 0,
+                report1: 1,
+                report2: 2
             });
         });
 
