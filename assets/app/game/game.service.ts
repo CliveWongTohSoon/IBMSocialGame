@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
+
 import {
     ShipDepartment,
     ShipDirection,
@@ -12,6 +13,7 @@ import {
     ShipPhase,
     RelativePosition,
 } from "./ship-model";
+
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -19,6 +21,7 @@ import * as io from 'socket.io-client';
 import {Instruction, InstructionModel} from "./instruction-model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import "rxjs/add/operator/take";
+import {AsteroidModel, AsteroidMotion, AsteroidPosition} from "./asteroid-model";
 
 @Injectable()
 export class GameService {
@@ -48,6 +51,7 @@ export class GameService {
     // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
+    allAsteroids: AsteroidModel[];
 
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
@@ -68,6 +72,7 @@ export class GameService {
     createShipFromSocket(): Observable<ShipModel[]> {
         // this.socket.on('start', data => console.log(data));
         let observable = new Observable<ShipModel[]>(observer => {
+
 
             this.socket.on('start', data => {
                 console.log('Entered Start');
@@ -132,39 +137,14 @@ export class GameService {
         return observable;
     }
 
+
     getPhase(phase: string): ShipPhase {
         if (phase === 'start') return ShipPhase.Start;
         else if (phase === 'end') return ShipPhase.End;
         else if (phase === 'action') return ShipPhase.Action;
         else if (phase === 'report') return ShipPhase.Report;
-    }
 
-    // // TODO:- OLD
-    // createShip(numberOfShips: number): Observable<ShipModel[]> {
-    //     const maxX = this.battleField.rowGrid[0].length/(numberOfShips * 2);
-    //     const maxY = this.battleField.rowGrid.length;
-    //
-    //     this.allBattleShips = Array.apply(null, {length: numberOfShips})
-    //         .map((_, i) => {
-    //             const randomColorBack = this.genRandomColor();
-    //             const randomColorFront = this.shadeColor(randomColorBack, 20);
-    //             const randomX = this.randomCoor(maxX, 2*i*maxX), randomY = this.randomCoor(maxY,0);
-    //             const initShipPosition = new ShipPosition(randomX, randomY);
-    //             const randomDir = this.randomDir(4);
-    //             const initShipDirection = new ShipDirection(randomDir);
-    //
-    //             const initShipStat = new ShipStats(1000,500,5,0.5,5,false,0);
-    //             const newShip = new ShipModel(this.uidGenerator(), initShipPosition, initShipDirection,  initShipStat, randomColorFront, randomColorBack);
-    //             newShip.shipDepartment = ShipDepartment.getDepartment(initShipPosition, initShipDirection, this.battleField.rowGrid.length);
-    //             const newShipPosition = new ShipPosition(0,0);
-    //             newShip.collisionInfo = new CollisionInfo(newShipPosition, 0);
-    //             newShip.shipAction = new ShipAction(Array.apply(null, {length: 0})
-    //                 .map(_ => null));
-    //             return newShip;
-    //         });
-    //     this.updateGridWithAllShip();
-    //     return Observable.of(this.allBattleShips);
-    // }
+    }
 
     listenToInstruction(): Observable<InstructionModel> {
         let observable = new Observable<ShipModel[]>(observer => {
@@ -204,6 +184,7 @@ export class GameService {
     }
 
     // --------------------------------------- Update Data ---------------------------------------------------------- //
+
     updateGridWithAllShip() {
         // Clear the map
         this.battleField.rowGrid.map(col => col.map(c => c.color = null));
@@ -223,6 +204,7 @@ export class GameService {
         ship.shipPosition = newPosition;
         ship.shipDirection = newDirection;
         ship.shipDepartment = ShipDepartment.updateDepartment(newPosition, newDirection, this.battleField.rowGrid.length, ship);
+
         this.updateGridWithAllShip();
     }
 
@@ -295,8 +277,85 @@ export class GameService {
         }
     }
 
-    checkCollision(fieldSize: number, turn: number) {
+    performAsteroidCollision(fieldSize: number) {
+        var validCheck = false;
+
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+                validCheck = true;
+            }
+        }
+        while (validCheck) {
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+                    this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
+                    this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
+                    this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
+                    this.allBattleShips[i].collisionInfo.moveCount--;
+                    this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
+                }
+            }
+
+            this.checkAsteroidCollision(fieldSize);
+            validCheck = false;
+
+            for (let i = 0; i < this.allBattleShips.length; i++) {
+                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+
+                    validCheck = true;
+                }
+            }
+        }
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
+            this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
+        }
+    }
+
+    checkAsteroidCollision(fieldSize: number) {
         var resultant: ShipPosition = new ShipPosition(0, 0);
+
+        for (let i = 0; i < this.allAsteroids.length; i++) {
+            for (let j = 0; j < this.allBattleShips.length; j++) {
+                for (let k = 0; k < 4; k++) {
+                    let shipX = this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex;
+                    let shipY = this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex;
+                    let asterX = this.allAsteroids[i].asteroidPosition.xIndex;
+                    let asterY = this.allAsteroids[i].asteroidPosition.yIndex;
+                    let shipPosX = this.allBattleShips[j].shipPosition.xIndex;
+                    let shipPosY = this.allBattleShips[j].shipPosition.yIndex;
+
+
+                    if (shipX == asterX && shipY == asterY) {
+                        resultant.xIndex = asterX - shipPosX;
+                        resultant.yIndex = asterY - shipPosY;
+
+                        resultant.xIndex = -1 * resetToOne(resultant.xIndex);
+                        resultant.yIndex = -1 * resetToOne(resultant.yIndex);
+
+                        this.allAsteroids[i].asteroidMotion.xMotion += resultant.xIndex;
+                        this.allAsteroids[j].asteroidMotion.yMotion += resultant.yIndex;
+                        this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1 * resultant.xIndex;
+                        this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1 * resultant.yIndex;
+
+                        this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+                    }
+                }
+            }
+            if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
+                this.allAsteroids[i].asteroidPosition.xIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.xMotion);
+            }
+            if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
+                this.allAsteroids[i].asteroidPosition.yIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.yMotion);
+            }
+        }
+        function resetToOne(overflow: number): number {
+            return Math.abs(overflow) / overflow;
+        }
+    }
+
+    checkCollision(fieldSize: number, turn: number) {
+        let resultant: ShipPosition = new ShipPosition(0, 0);
 
         for (let i = 0; i < this.allBattleShips.length; i++) {
             for (let j = 0; j < this.allBattleShips.length; j++) {
@@ -307,15 +366,14 @@ export class GameService {
                 let jy = this.allBattleShips[j].shipPosition.yIndex;
                 let xd = ix - jx;
                 let yd = iy - jy;
-                let xOverlap = (Math.abs(ix - jx) <= 1) || (Math.abs(ix - jx) == fieldSize - 1);
-                let yOverlap = (Math.abs(iy - jy) <= 1) || (Math.abs(iy - jy) == fieldSize - 1);
+                let xOverlap = (Math.abs(xd) <= 1) || (Math.abs(xd) == fieldSize - 1);
+                let yOverlap = (Math.abs(yd) <= 1) || (Math.abs(yd) == fieldSize - 1);
                 let overlap = xOverlap && yOverlap;
                 let notSameShip = this.allBattleShips[i].shipId !== this.allBattleShips[j].shipId;
 
                 if (overlap && notSameShip) {
                     checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
                     if (xd == 0 && yd == 0) {
-
                         assignResultant(this.allBattleShips[i]);
                     }
                     resultant.xIndex = xd;
@@ -355,12 +413,11 @@ export class GameService {
                 let damage: number;
                 damage = 300;
                 if (rammerShip.shipDepartment.departmentArray[affectedRammerDep].alive == false) {
-                    damage = 50 / 100 * damage;
+                    damage = (50 / 100) * damage;
                 }
 
                 if (victimShip.shipStats.shieldActive == true) {
                     damage = collisionShieldCheck(victimShip, rammerShip, damage, turn);
-
                 }
 
                 console.log("DAMAGE" + damage);
@@ -464,18 +521,7 @@ export class GameService {
 
         console.log("shieldActive: " + ship.shipStats.shieldActive);
         console.log("shieldDirection " + ship.shipStats.shieldDirection);
-
     }
-
-
-    // if(ship.ShipStats.shieldActive == 1 && ship.ShipStats.defence !=0) {
-
-    //   NewShieldDirection = ship.ShipStats.shieldDirection + ship.shipDirection.dir;
-
-    //   if (NewShieldDirection >=4){
-    //       NewShieldDirection = NewShieldDirection%4;
-    //   }
-
 
     randomDir(range: number): number {
         return Math.floor(Math.random() * range);
@@ -562,7 +608,7 @@ export class GameService {
                     return reducedDamage;
                 }
             }
-        } // end shoot
+    } // end shoot
 
     relativePosition(ship: ShipModel, l: number) {
         let dir = ship.shipDirection.dir;
@@ -579,7 +625,8 @@ export class GameService {
                 { calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd)); }
             }else{ console.log("current ship is " + i) }
         }
-        console.log("\n")
+
+        console.log("\n");
 
         function wrapDistance(xd: number) {
             if (Math.abs(xd) < l / 2) {
@@ -632,7 +679,6 @@ export class GameService {
         function adjustByDir(dir: Direction, deg: number) {
             return mod(dir * 90 + deg, 360);
         }
-
     }
 
     randomCoor(max: number, start: number) {
@@ -716,6 +762,7 @@ export class GameService {
         }
     }
 
+
     inputRotateRight(ship: ShipModel) {
         let valid: boolean;
         valid = this.inputAction(ship, Action.RightTurn);
@@ -740,9 +787,7 @@ export class GameService {
         }
     }
 
-
     fullTurns() {
-
         for (let turn = 1; turn <= 3; turn++) {
             for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
@@ -798,7 +843,10 @@ export class GameService {
                     this.rotate(this.allBattleShips[i], false);
                 }
             }
+
+            this.asteroidMove();
             this.checkCollision(this.battleField.rowGrid.length, turn);
+            this.checkAsteroidCollision(this.battleField.rowGrid.length);
             this.performCollision(this.battleField.rowGrid.length, turn);
             //fb: collision with enemy / successful move
             for (let i = 0; i < this.allBattleShips.length; i++) {
@@ -828,8 +876,10 @@ export class GameService {
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
                 rwAlive: depart[3].alive,
-                // opponentDistance: ship.opponentDistance,
-                // opponentAngle: ship.opponentAngle
+
+                report0: 0,
+                report1: 1,
+                report2: 2
             });
         });
 
@@ -839,910 +889,108 @@ export class GameService {
         });
     }
 
-    getPersonality() {
-        const json = {
-            "word_count": 15128,
-            "processed_language": "en",
-            "personality": [
-                {
-                    "trait_id": "big5_openness",
-                    "name": "Openness",
-                    "category": "personality",
-                    "percentile": 0.8048087217136444,
-                    "children": [
-                        {
-                            "trait_id": "facet_adventurousness",
-                            "name": "Adventurousness",
-                            "category": "personality",
-                            "percentile": 0.9045974768772609
-                        },
-                        {
-                            "trait_id": "facet_artistic_interests",
-                            "name": "Artistic interests",
-                            "category": "personality",
-                            "percentile": 0.9790201511572232
-                        },
-                        {
-                            "trait_id": "facet_emotionality",
-                            "name": "Emotionality",
-                            "category": "personality",
-                            "percentile": 0.994913153896493
-                        },
-                        {
-                            "trait_id": "facet_imagination",
-                            "name": "Imagination",
-                            "category": "personality",
-                            "percentile": 0.8714517724206957
-                        },
-                        {
-                            "trait_id": "facet_intellect",
-                            "name": "Intellect",
-                            "category": "personality",
-                            "percentile": 0.8835958016905736
-                        },
-                        {
-                            "trait_id": "facet_liberalism",
-                            "name": "Authority-challenging",
-                            "category": "personality",
-                            "percentile": 0.6486344859769552
-                        }
-                    ]
-                },
-                {
-                    "trait_id": "big5_conscientiousness",
-                    "name": "Conscientiousness",
-                    "category": "personality",
-                    "percentile": 0.8102947333861581,
-                    "children": [
-                        {
-                            "trait_id": "facet_achievement_striving",
-                            "name": "Achievement striving",
-                            "category": "personality",
-                            "percentile": 0.8447942535266852
-                        },
-                        {
-                            "trait_id": "facet_cautiousness",
-                            "name": "Cautiousness",
-                            "category": "personality",
-                            "percentile": 0.7225672485998348
-                        },
-                        {
-                            "trait_id": "facet_dutifulness",
-                            "name": "Dutifulness",
-                            "category": "personality",
-                            "percentile": 0.8414459590561425
-                        },
-                        {
-                            "trait_id": "facet_orderliness",
-                            "name": "Orderliness",
-                            "category": "personality",
-                            "percentile": 0.6154468578992103
-                        },
-                        {
-                            "trait_id": "facet_self_discipline",
-                            "name": "Self-discipline",
-                            "category": "personality",
-                            "percentile": 0.8344273426362091
-                        },
-                        {
-                            "trait_id": "facet_self_efficacy",
-                            "name": "Self-efficacy",
-                            "category": "personality",
-                            "percentile": 0.7041262378443771
-                        }
-                    ]
-                },
-                {
-                    "trait_id": "big5_extraversion",
-                    "name": "Extraversion",
-                    "category": "personality",
-                    "percentile": 0.6425580321109656,
-                    "children": [
-                        {
-                            "trait_id": "facet_activity_level",
-                            "name": "Activity level",
-                            "category": "personality",
-                            "percentile": 0.8860397181738027
-                        },
-                        {
-                            "trait_id": "facet_assertiveness",
-                            "name": "Assertiveness",
-                            "category": "personality",
-                            "percentile": 0.6742837190539857
-                        },
-                        {
-                            "trait_id": "facet_cheerfulness",
-                            "name": "Cheerfulness",
-                            "category": "personality",
-                            "percentile": 0.9430030813836863
-                        },
-                        {
-                            "trait_id": "facet_excitement_seeking",
-                            "name": "Excitement-seeking",
-                            "category": "personality",
-                            "percentile": 0.5936685312560733
-                        },
-                        {
-                            "trait_id": "facet_friendliness",
-                            "name": "Outgoing",
-                            "category": "personality",
-                            "percentile": 0.9603396711358603
-                        },
-                        {
-                            "trait_id": "facet_gregariousness",
-                            "name": "Gregariousness",
-                            "category": "personality",
-                            "percentile": 0.6570127643040263
-                        }
-                    ]
-                },
-                {
-                    "trait_id": "big5_agreeableness",
-                    "name": "Agreeableness",
-                    "category": "personality",
-                    "percentile": 0.9441476521819426,
-                    "children": [
-                        {
-                            "trait_id": "facet_altruism",
-                            "name": "Altruism",
-                            "category": "personality",
-                            "percentile": 0.9925983032671803
-                        },
-                        {
-                            "trait_id": "facet_cooperation",
-                            "name": "Cooperation",
-                            "category": "personality",
-                            "percentile": 0.8640865926209997
-                        },
-                        {
-                            "trait_id": "facet_modesty",
-                            "name": "Modesty",
-                            "category": "personality",
-                            "percentile": 0.7777409427743319
-                        },
-                        {
-                            "trait_id": "facet_morality",
-                            "name": "Uncompromising",
-                            "category": "personality",
-                            "percentile": 0.8952857419791442
-                        },
-                        {
-                            "trait_id": "facet_sympathy",
-                            "name": "Sympathy",
-                            "category": "personality",
-                            "percentile": 0.994659354665798
-                        },
-                        {
-                            "trait_id": "facet_trust",
-                            "name": "Trust",
-                            "category": "personality",
-                            "percentile": 0.9031062247867112
-                        }
-                    ]
-                },
-                {
-                    "trait_id": "big5_neuroticism",
-                    "name": "Emotional range",
-                    "category": "personality",
-                    "percentile": 0.5011424258038871,
-                    "children": [
-                        {
-                            "trait_id": "facet_anger",
-                            "name": "Fiery",
-                            "category": "personality",
-                            "percentile": 0.16919226490209138
-                        },
-                        {
-                            "trait_id": "facet_anxiety",
-                            "name": "Prone to worry",
-                            "category": "personality",
-                            "percentile": 0.42130232455149075
-                        },
-                        {
-                            "trait_id": "facet_depression",
-                            "name": "Melancholy",
-                            "category": "personality",
-                            "percentile": 0.1490766395109473
-                        },
-                        {
-                            "trait_id": "facet_immoderation",
-                            "name": "Immoderation",
-                            "category": "personality",
-                            "percentile": 0.2702704377158157
-                        },
-                        {
-                            "trait_id": "facet_self_consciousness",
-                            "name": "Self-consciousness",
-                            "category": "personality",
-                            "percentile": 0.29325681738170095
-                        },
-                        {
-                            "trait_id": "facet_vulnerability",
-                            "name": "Susceptible to stress",
-                            "category": "personality",
-                            "percentile": 0.3862483573834635
-                        }
-                    ]
-                }
-            ],
-            "needs": [
-                {
-                    "trait_id": "need_challenge",
-                    "name": "Challenge",
-                    "category": "needs",
-                    "percentile": 0.6699981453953766
-                },
-                {
-                    "trait_id": "need_closeness",
-                    "name": "Closeness",
-                    "category": "needs",
-                    "percentile": 0.8366389466400257
-                },
-                {
-                    "trait_id": "need_curiosity",
-                    "name": "Curiosity",
-                    "category": "needs",
-                    "percentile": 0.9338147737801363
-                },
-                {
-                    "trait_id": "need_excitement",
-                    "name": "Excitement",
-                    "category": "needs",
-                    "percentile": 0.7368905165835753
-                },
-                {
-                    "trait_id": "need_harmony",
-                    "name": "Harmony",
-                    "category": "needs",
-                    "percentile": 0.9681096581919244
-                },
-                {
-                    "trait_id": "need_ideal",
-                    "name": "Ideal",
-                    "category": "needs",
-                    "percentile": 0.6846651401448991
-                },
-                {
-                    "trait_id": "need_liberty",
-                    "name": "Liberty",
-                    "category": "needs",
-                    "percentile": 0.7944143551559293
-                },
-                {
-                    "trait_id": "need_love",
-                    "name": "Love",
-                    "category": "needs",
-                    "percentile": 0.8187640742747349
-                },
-                {
-                    "trait_id": "need_practicality",
-                    "name": "Practicality",
-                    "category": "needs",
-                    "percentile": 0.34469863540722323
-                },
-                {
-                    "trait_id": "need_self_expression",
-                    "name": "Self-expression",
-                    "category": "needs",
-                    "percentile": 0.8698181973941164
-                },
-                {
-                    "trait_id": "need_stability",
-                    "name": "Stability",
-                    "category": "needs",
-                    "percentile": 0.8705205013979334
-                },
-                {
-                    "trait_id": "need_structure",
-                    "name": "Structure",
-                    "category": "needs",
-                    "percentile": 0.7464328575415977
-                }
-            ],
-            "values": [
-                {
-                    "trait_id": "value_conservation",
-                    "name": "Conservation",
-                    "category": "values",
-                    "percentile": 0.886672268738759
-                },
-                {
-                    "trait_id": "value_openness_to_change",
-                    "name": "Openness to change",
-                    "category": "values",
-                    "percentile": 0.8696769334020679
-                },
-                {
-                    "trait_id": "value_hedonism",
-                    "name": "Hedonism",
-                    "category": "values",
-                    "percentile": 0.4401896345423549
-                },
-                {
-                    "trait_id": "value_self_enhancement",
-                    "name": "Self-enhancement",
-                    "category": "values",
-                    "percentile": 0.6488575994223418
-                },
-                {
-                    "trait_id": "value_self_transcendence",
-                    "name": "Self-transcendence",
-                    "category": "values",
-                    "percentile": 0.8280778884301451
-                }
-            ],
-            "behavior": [
-                {
-                    "trait_id": "behavior_sunday",
-                    "name": "Sunday",
-                    "category": "behavior",
-                    "percentage": 0.2217782217782218
-                },
-                {
-                    "trait_id": "behavior_monday",
-                    "name": "Monday",
-                    "category": "behavior",
-                    "percentage": 0.42157842157842157
-                },
-                {
-                    "trait_id": "behavior_tuesday",
-                    "name": "Tuesday",
-                    "category": "behavior",
-                    "percentage": 0.07092907092907093
-                },
-                {
-                    "trait_id": "behavior_wednesday",
-                    "name": "Wednesday",
-                    "category": "behavior",
-                    "percentage": 0.01098901098901099
-                },
-                {
-                    "trait_id": "behavior_thursday",
-                    "name": "Thursday",
-                    "category": "behavior",
-                    "percentage": 0.12087912087912088
-                },
-                {
-                    "trait_id": "behavior_friday",
-                    "name": "Friday",
-                    "category": "behavior",
-                    "percentage": 0.07692307692307693
-                },
-                {
-                    "trait_id": "behavior_saturday",
-                    "name": "Saturday",
-                    "category": "behavior",
-                    "percentage": 0.07692307692307693
-                },
-                {
-                    "trait_id": "behavior_0000",
-                    "name": "0:00 am",
-                    "category": "behavior",
-                    "percentage": 0.4515484515484515
-                },
-                {
-                    "trait_id": "behavior_0100",
-                    "name": "1:00 am",
-                    "category": "behavior",
-                    "percentage": 0.12087912087912088
-                },
-                {
-                    "trait_id": "behavior_0200",
-                    "name": "2:00 am",
-                    "category": "behavior",
-                    "percentage": 0.02097902097902098
-                },
-                {
-                    "trait_id": "behavior_0300",
-                    "name": "3:00 am",
-                    "category": "behavior",
-                    "percentage": 0.0939060939060939
-                },
-                {
-                    "trait_id": "behavior_0400",
-                    "name": "4:00 am",
-                    "category": "behavior",
-                    "percentage": 0.01998001998001998
-                },
-                {
-                    "trait_id": "behavior_0500",
-                    "name": "5:00 am",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_0600",
-                    "name": "6:00 am",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_0700",
-                    "name": "7:00 am",
-                    "category": "behavior",
-                    "percentage": 0.01098901098901099
-                },
-                {
-                    "trait_id": "behavior_0800",
-                    "name": "8:00 am",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_0900",
-                    "name": "9:00 am",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_1000",
-                    "name": "10:00 am",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_1100",
-                    "name": "11:00 am",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_1200",
-                    "name": "12:00 pm",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_1300",
-                    "name": "1:00 pm",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_1400",
-                    "name": "2:00 pm",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_1500",
-                    "name": "3:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.02197802197802198
-                },
-                {
-                    "trait_id": "behavior_1600",
-                    "name": "4:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.02197802197802198
-                },
-                {
-                    "trait_id": "behavior_1700",
-                    "name": "5:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.03196803196803197
-                },
-                {
-                    "trait_id": "behavior_1800",
-                    "name": "6:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.00999000999000999
-                },
-                {
-                    "trait_id": "behavior_1900",
-                    "name": "7:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.01098901098901099
-                },
-                {
-                    "trait_id": "behavior_2000",
-                    "name": "8:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.02197802197802198
-                },
-                {
-                    "trait_id": "behavior_2100",
-                    "name": "9:00 pm",
-                    "category": "behavior",
-                    "percentage": 0
-                },
-                {
-                    "trait_id": "behavior_2200",
-                    "name": "10:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.04095904095904096
-                },
-                {
-                    "trait_id": "behavior_2300",
-                    "name": "11:00 pm",
-                    "category": "behavior",
-                    "percentage": 0.12187812187812187
-                }
-            ],
-            "consumption_preferences": [
-                {
-                    "consumption_preference_category_id": "consumption_preferences_shopping",
-                    "name": "Purchasing Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_automobile_ownership_cost",
-                            "name": "Likely to be sensitive to ownership cost when buying automobiles",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_automobile_safety",
-                            "name": "Likely to prefer safety when buying automobiles",
-                            "score": 0.5
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_clothes_quality",
-                            "name": "Likely to prefer quality when buying clothes",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_clothes_style",
-                            "name": "Likely to prefer style when buying clothes",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_clothes_comfort",
-                            "name": "Likely to prefer comfort when buying clothes",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_influence_brand_name",
-                            "name": "Likely to be influenced by brand name when making product purchases",
-                            "score": 0.5
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_influence_utility",
-                            "name": "Likely to be influenced by product utility when making product purchases",
-                            "score": 0.5
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_influence_online_ads",
-                            "name": "Likely to be influenced by online ads when making product purchases",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_influence_social_media",
-                            "name": "Likely to be influenced by social media when making product purchases",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_influence_family_members",
-                            "name": "Likely to be influenced by family when making product purchases",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_spur_of_moment",
-                            "name": "Likely to indulge in spur of the moment purchases",
-                            "score": 0.5
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_credit_card_payment",
-                            "name": "Likely to prefer using credit cards for shopping",
-                            "score": 0
-                        }
-                    ]
-                },
-                {
-                    "consumption_preference_category_id": "consumption_preferences_health_and_activity",
-                    "name": "Health & Activity Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_eat_out",
-                            "name": "Likely to eat out frequently",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_gym_membership",
-                            "name": "Likely to have a gym membership",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_outdoor",
-                            "name": "Likely to like outdoor activities",
-                            "score": 0
-                        }
-                    ]
-                },
-                {
-                    "consumption_preference_category_id": "consumption_preferences_environmental_concern",
-                    "name": "Environmental Concern Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_concerned_environment",
-                            "name": "Likely to be concerned about the environment",
-                            "score": 0
-                        }
-                    ]
-                },
-                {
-                    "consumption_preference_category_id": "consumption_preferences_entrepreneurship",
-                    "name": "Entrepreneurship Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_start_business",
-                            "name": "Likely to consider starting a business in next few years",
-                            "score": 1
-                        }
-                    ]
-                },
-                {
-                    "consumption_preference_category_id": "consumption_preferences_movie",
-                    "name": "Movie Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_romance",
-                            "name": "Likely to like romance movies",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_adventure",
-                            "name": "Likely to like adventure movies",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_horror",
-                            "name": "Likely to like horror movies",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_musical",
-                            "name": "Likely to like musical movies",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_historical",
-                            "name": "Likely to like historical movies",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_science_fiction",
-                            "name": "Likely to like science-fiction movies",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_war",
-                            "name": "Likely to like war movies",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_drama",
-                            "name": "Likely to like drama movies",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_action",
-                            "name": "Likely to like action movies",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_movie_documentary",
-                            "name": "Likely to like documentary movies",
-                            "score": 0
-                        }
-                    ]
-                },
-                {
-                    "consumption_preference_category_id": "consumption_preferences_music",
-                    "name": "Music Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_rap",
-                            "name": "Likely to like rap music",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_country",
-                            "name": "Likely to like country music",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_r_b",
-                            "name": "Likely to like R&B music",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_hip_hop",
-                            "name": "Likely to like hip hop music",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_live_event",
-                            "name": "Likely to attend live musical events",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_playing",
-                            "name": "Likely to have experience playing music",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_latin",
-                            "name": "Likely to like Latin music",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_rock",
-                            "name": "Likely to like rock music",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_music_classical",
-                            "name": "Likely to like classical music",
-                            "score": 0
-                        }
-                    ]
-                },
-                {
-                    "consumption_preference_category_id": "consumption_preferences_reading",
-                    "name": "Reading Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_read_frequency",
-                            "name": "Likely to read often",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_books_entertainment_magazines",
-                            "name": "Likely to read entertainment magazines",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_books_non_fiction",
-                            "name": "Likely to read non-fiction books",
-                            "score": 0
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_books_financial_investing",
-                            "name": "Likely to read financial investment books",
-                            "score": 1
-                        },
-                        {
-                            "consumption_preference_id": "consumption_preferences_books_autobiographies",
-                            "name": "Likely to read autobiographical books",
-                            "score": 0
-                        }
-                    ]
-                },
-                {
-                    "consumption_preference_category_id": "consumption_preferences_volunteering",
-                    "name": "Volunteering Preferences",
-                    "consumption_preferences": [
-                        {
-                            "consumption_preference_id": "consumption_preferences_volunteer",
-                            "name": "Likely to volunteer for social causes",
-                            "score": 0
-                        }
-                    ]
-                }
-            ],
-            "warnings": []
-        };
-
-        let minRange = 4, maxRange = 8;
-        let minAttRange = 4, maxAttRange = 8;
-        let minHP = 700, maxHP = 1300;
-        let minAtt = 400, maxAtt = 800;
-        let minDef = 0.5, maxDef = 0.9;
-        const wordCount = json['word_count']; //This will give 15128
-        const personality = json['personality']; // This is an array
-        const values = json['values'];
-        var shipStat = new ShipStats(minHP, minAtt, minAttRange, minDef, minRange, false, 0);
-        //const sampleJson = {hallo: [{personality: 'trait'}, {personality: 'second_trait'}]};
-        Object.keys(personality).map((key, index) => {
-            shipStat = this.personalitySort(shipStat, (personality[key]["trait_id"]), personality[key]["percentile"])
-        });
-        Object.keys(values).map((key, index) => {
-            shipStat = this.valueSort(shipStat, (values[key]["trait_id"]), values[key]["percentile"])
-        });
+    createAstArray() {
+        let i;
+        for(i=0; i <= this.allBattleShips.length; i++) {
+            this.allAsteroids.push(this.generateAsteroid(i))
+        }
     }
 
-    valueSort(shipStat: ShipStats, traitID: string, percentile: number): ShipStats {
-        let minRange = 4, maxRange = 8;
-        let minAttRange = 4, maxAttRange = 8;
-        let minHP = 700, maxHP = 1300;
-        let minAtt = 400, maxAtt = 800;
-        let minDef = 0.5, maxDef = 0.9;
-        let newShipStat = shipStat;
-        const value_fraction = 0.4;
-        if (traitID == 'value_conservation') {
-            newShipStat.defence += (maxDef - minDef) * value_fraction * percentile;
-        }
-        if (traitID == 'value_openness_to_change') {
-            newShipStat.attack += (maxAtt - minAtt) * value_fraction * percentile;
-        }
-        if (traitID == 'value_hedonism') {
-            newShipStat.totalHp += (maxHP - minHP) * value_fraction * percentile;
-        }
-        if (traitID == 'value_self_enhancement') {
-            newShipStat.range += (maxRange - minRange) * value_fraction * percentile;
-        }
-        if (traitID == 'value_self_transcendence') {
-            newShipStat.attackRange += (maxAttRange - minAttRange) * value_fraction * percentile;
-        }
-        console.log(newShipStat);
-        console.log(traitID);
-        console.log(percentile);
-        return newShipStat;
+    generateAsteroid(i:number){
+        let newPosition = this.genAstPosition(i);
+        let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
+        let newDamage = this.genAstDamage();
+        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
+        return newAsteroid;
     }
 
-    personalitySort(shipStat: ShipStats, traitID: string, percentile: number): ShipStats {
-        let minRange = 4, maxRange = 8;
-        let minAttRange = 4, maxAttRange = 8;
-        let minHP = 700, maxHP = 1300;
-        let minAtt = 400, maxAtt = 800;
-        let minDef = 0.5, maxDef = 0.9;
-
-        let newShipStat = shipStat;
-        const personality_fraction = 0.3;
-        if (traitID == 'big5_openness') {
-            if (percentile <= 0.5) {
-                newShipStat.attack += (maxAtt - minAtt) * personality_fraction;
-                newShipStat.range += (maxRange - minRange) * (percentile * personality_fraction / 0.5);
-            }
-            else if (percentile > 0.5) {
-                newShipStat.attack += (maxAtt - minAtt) * ((1 - percentile) * personality_fraction / 0.5);
-                newShipStat.range += (maxRange - minRange) * personality_fraction;
-            }
-        }
-        if (traitID == 'big5_conscientiousness') {
-            if (percentile <= 0.5) {
-                newShipStat.attackRange += (maxAttRange - minAttRange) * personality_fraction;
-                newShipStat.range += (maxRange - minRange) * (percentile * personality_fraction / 0.5);
-            }
-            else if (percentile > 0.5) {
-                newShipStat.attackRange += (maxAttRange - minAttRange) * ((1 - percentile) * personality_fraction / 0.5);
-                newShipStat.range += (maxRange - minRange) * personality_fraction;
-            }
-        }
-        if (traitID == 'big5_extraversion') {
-            if (percentile <= 0.5) {
-                newShipStat.defence += (maxDef - minDef) * personality_fraction;
-                newShipStat.attack += (maxAtt - minAtt) * (percentile * personality_fraction / 0.5);
-            }
-            else if (percentile > 0.5) {
-                newShipStat.defence += (maxDef - minDef) * ((1 - percentile) * personality_fraction / 0.5);
-                newShipStat.attack += (maxAtt - minAtt) * personality_fraction;
-            }
-        }
-        if (traitID == 'big5_agreeableness') {
-            if (percentile <= 0.5) {
-                newShipStat.defence += (maxDef - minDef) * personality_fraction;
-                newShipStat.totalHp += (maxHP - minHP) * (percentile * personality_fraction / 0.5);
-            }
-            else if (percentile > 0.5) {
-                newShipStat.defence += (maxDef - minDef) * ((1 - percentile) * personality_fraction / 0.5);
-                newShipStat.totalHp += (maxHP - minHP) * personality_fraction;
-            }
-        }
-        if (traitID == 'big5_neuroticism') {
-            if (percentile <= 0.5) {
-                newShipStat.totalHp += (maxHP - minHP) * personality_fraction;
-                newShipStat.attackRange += (maxAttRange - minAttRange) * (percentile * personality_fraction / 0.5);
-            }
-            else if (percentile > 0.5) {
-                newShipStat.totalHp += (maxHP - minHP) * ((1 - percentile) * personality_fraction / 0.5);
-                newShipStat.attackRange += (maxAttRange - minAttRange) * personality_fraction;
-            }
-        }
-
-        console.log(newShipStat);
-        console.log(traitID);
-        console.log(percentile);
-
-        return newShipStat
+    genAstPosition(i:number){
+        const maxX = 25 / (this.allBattleShips.length * 2);
+        let xTmp = this.astCoord(maxX, 2*i*maxX);
+        let yTmp = Math.floor(Math.random()*25);
+        let tmpPosition = new AsteroidPosition(xTmp, yTmp);
+        return tmpPosition;
     }
 
+    astCoord(max: number, start: number) {
+        return Math.floor((Math.random() * max) + start);
+    }
+
+    genAstMotion() {
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return -1;
+        }
+        else if (chance == 1){
+            return 0;
+        }
+        else if (chance == 2){
+            return 1;
+        }
+    }
+
+    genAstDamage() {
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return 200;
+        }
+        else if (chance == 1){
+            return 250;
+        }
+        else if (chance == 2){
+            return 300;
+        }
+    }
+
+    asteroidMove() {
+        let i;
+        for (i = 0; i < this.allAsteroids.length; i++){
+            this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
+            this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
+        }
+    }
+
+    updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
+        let damage: number;
+        damage = asteroid.damage;
+        if (victimShip.shipStats.shieldActive == true) {
+            damage = asteroidShieldCheck(victimShip, asteroid, damage);
+        }
+        console.log("DAMAGE" + damage);
+        if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
+            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
+        }
+        else {
+            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
+        }
+
+        function asteroidShieldCheck(updatingShip: ShipModel, asteroid: AsteroidModel, damage: number) {
+            let shieldGridDirection: Direction;
+            let reducedDamage = damage;
+            // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
+            // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+            shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
+            if (shieldGridDirection > 3) {
+                shieldGridDirection = shieldGridDirection - 4;
+            }
+            if (asteroid.asteroidMotion.yMotion > 0 && shieldGridDirection == Direction.Up) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.yMotion < 0 && shieldGridDirection == Direction.Down) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.xMotion > 0 && shieldGridDirection == Direction.Left) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.xMotion < 0 && shieldGridDirection == Direction.Right) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+
+            return reducedDamage;
+        }
+    }
 }
 
 function mod(n, m) {
     return ((n % m) + m) % m;
 }
-
-
-
-
-

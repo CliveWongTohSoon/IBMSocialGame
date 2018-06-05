@@ -14,6 +14,7 @@ export class ShipModel {
                 public phase: ShipPhase,
                 public colorFront: string,
                 public colorBack: string) {}
+
 }
 
 export enum ShipPhase {
