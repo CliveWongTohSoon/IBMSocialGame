@@ -26,6 +26,7 @@
     <div align = "center" class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
         <h4> PLAYER {{i+1}} </h4>
         <p class="demonstrateHealth"><small>Attack: {{ship.shipStats.attack}} Attack Range: {{ship.shipStats.attackRange}} Sonar Range: {{ship.shipStats.range}} Defence: {{ship.shipStats.defence}}</small></p>
+        <p class="demonstrateHealth"><small>Relative Position: {{ship.rp}}</small></p>
         <p class="demonstrateHealth"><small>Left Weapon: {{ship.shipDepartment.departmentArray[2].health}} {{ship.shipDepartment.departmentArray[2].alive}}<br>Right Weapon: {{ship.shipDepartment.departmentArray[3].health}} {{ship.shipDepartment.departmentArray[3].alive}}</small></p>
         <p class="demonstrateHealth"><small>Left Engine: {{ship.shipDepartment.departmentArray[1].health}} {{ship.shipDepartment.departmentArray[1].alive}}<br>&nbsp;Right Engine: {{ship.shipDepartment.departmentArray[0].health}} {{ship.shipDepartment.departmentArray[0].alive}}</small></p>
 

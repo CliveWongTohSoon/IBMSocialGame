@@ -4,6 +4,8 @@ export class ShipModel {
     //public collidedShipId: string[];
     public collisionInfo: CollisionInfo;
     public shipAction: ShipAction;
+    public rp: RelativePosition[];
+
 
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
@@ -232,4 +234,8 @@ export class Character {
 
 export class CollisionInfo {
     constructor(public resultantMove: ShipPosition, public moveCount: number) {}
+}
+
+export class RelativePosition {
+    constructor(public distance:number, public angle:number){}
 }

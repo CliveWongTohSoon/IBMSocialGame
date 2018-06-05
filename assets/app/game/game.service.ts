@@ -9,7 +9,8 @@ import {
     CollisionInfo,
     ShipAction,
     Action,
-    ShipPhase
+    ShipPhase,
+    RelativePosition,
 } from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
@@ -88,7 +89,6 @@ export class GameService {
                         range = data[key]['range'],
                         attackRange = data[key]['attackRange'],
                         defence = data[key]['defence'],
-
 
                         phase = this.getPhase(data[key]['phase']); // Should give Start initially
                     // console.log(data);
@@ -255,6 +255,9 @@ export class GameService {
         newPosition = this.worldRound(newPosition, fieldSize);
 
         this.updateShip(ship, newPosition, ship.shipDirection);
+
+        ship.rp.length = 0; //empty rp of the ship
+        this.relativePosition(ship,this.battleField.rowGrid.length); // filling it with new position
     }
 
     performCollision(fieldSize: number, turn: number) {
@@ -573,12 +576,8 @@ export class GameService {
             let yd = y - y0;
 
             if (!(xd == 0 && yd == 0)) {
-                {
-                    calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd));
-                }
-            } else {
-                console.log("current ship is " + i)
-            }
+                { calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd)); }
+            }else{ console.log("current ship is " + i) }
         }
         console.log("\n")
 
@@ -627,6 +626,7 @@ export class GameService {
 
         function logPolar(i: number, deg: number, distance: number) {
             console.log("ship " + i + " 's relative position from this ship is: " + deg + " degree, distance is " + distance);
+            ship.rp.push(new RelativePosition(distance,deg));
         }
 
         function adjustByDir(dir: Direction, deg: number) {
@@ -827,7 +827,9 @@ export class GameService {
                 reAlive: depart[0].alive,
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
-                rwAlive: depart[3].alive
+                rwAlive: depart[3].alive,
+                // opponentDistance: ship.opponentDistance,
+                // opponentAngle: ship.opponentAngle
             });
         });
 
