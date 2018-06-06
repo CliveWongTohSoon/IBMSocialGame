@@ -126,6 +126,8 @@ io.on('connection', (socket) => {
             ship.leAlive = battleShipData.leAlive;
             ship.lwAlive = battleShipData.lwAlive;
             ship.rwAlive = battleShipData.rwAlive;
+            ship.opponentDistance = battleShipData.opponentDistance;
+            ship.opponentAngle = battleShipData.opponentAngle;
 
             ship.phase = 'report';
             // console.log('After: ', ship);
