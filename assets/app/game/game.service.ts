@@ -1,6 +1,17 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo, ShipAction, Action, ShipPhase} from "./ship-model";
+import {
+    ShipDepartment,
+    ShipDirection,
+    ShipModel,
+    ShipPosition,
+    ShipStats,
+    CollisionInfo,
+    ShipAction,
+    Action,
+    ShipPhase,
+    ShipHostility
+} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -9,6 +20,7 @@ import {Instruction, InstructionModel} from "./instruction-model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import "rxjs/add/operator/take";
 import {AsteroidModel, AsteroidMotion, AsteroidPosition} from "./asteroid-model";
+import {Ast} from "@angular/animations/browser/src/dsl/animation_ast";
 
 @Injectable()
 export class GameService {
@@ -38,7 +50,7 @@ export class GameService {
     // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
-    allAsteroids: AsteroidModel[];
+    // allAsteroids: AsteroidModel[];
 
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
@@ -53,6 +65,7 @@ export class GameService {
         }
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
+        // this.allAsteroids = this.createAstArray();
         return Observable.of(this.battleField);
     }
 
@@ -260,82 +273,82 @@ export class GameService {
         }
     }
 
-    performAsteroidCollision(fieldSize: number) {
-        var validCheck = false;
+    // performAsteroidCollision(fieldSize: number) {
+    //     var validCheck = false;
+    //
+    //     for (let i = 0; i < this.allBattleShips.length; i++) {
+    //         if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+    //             validCheck = true;
+    //         }
+    //     }
+    //     while (validCheck) {
+    //         for (let i = 0; i < this.allBattleShips.length; i++) {
+    //             if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+    //                 this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
+    //                 this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
+    //                 this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
+    //                 this.allBattleShips[i].collisionInfo.moveCount--;
+    //                 this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
+    //             }
+    //         }
+    //
+    //         this.checkAsteroidCollision(fieldSize);
+    //         validCheck = false;
+    //
+    //         for (let i = 0; i < this.allBattleShips.length; i++) {
+    //             if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+    //
+    //                 validCheck = true;
+    //             }
+    //         }
+    //     }
+    //     for (let i = 0; i < this.allBattleShips.length; i++) {
+    //         this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
+    //         this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
+    //     }
+    // }
 
-        for (let i = 0; i < this.allBattleShips.length; i++) {
-            if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
-                validCheck = true;
-            }
-        }
-        while (validCheck) {
-            for (let i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
-                    this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
-                    this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
-                    this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
-                    this.allBattleShips[i].collisionInfo.moveCount--;
-                    this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
-                }
-            }
-
-            this.checkAsteroidCollision(fieldSize);
-            validCheck = false;
-
-            for (let i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
-
-                    validCheck = true;
-                }
-            }
-        }
-        for (let i = 0; i < this.allBattleShips.length; i++) {
-            this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
-            this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
-        }
-    }
-
-    checkAsteroidCollision(fieldSize: number) {
-        var resultant: ShipPosition = new ShipPosition(0, 0);
-
-        for (let i = 0; i < this.allAsteroids.length; i++) {
-            for (let j = 0; j < this.allBattleShips.length; j++) {
-                for (let k = 0; k < 4; k++) {
-                    let shipX = this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex;
-                    let shipY = this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex;
-                    let asterX = this.allAsteroids[i].asteroidPosition.xIndex;
-                    let asterY = this.allAsteroids[i].asteroidPosition.yIndex;
-                    let shipPosX = this.allBattleShips[j].shipPosition.xIndex;
-                    let shipPosY = this.allBattleShips[j].shipPosition.yIndex;
-
-
-                    if (shipX == asterX && shipY == asterY) {
-                        resultant.xIndex = asterX - shipPosX;
-                        resultant.yIndex = asterY - shipPosY;
-
-                        resultant.xIndex = -1 * resetToOne(resultant.xIndex);
-                        resultant.yIndex = -1 * resetToOne(resultant.yIndex);
-
-                        this.allAsteroids[i].asteroidMotion.xMotion += resultant.xIndex;
-                        this.allAsteroids[j].asteroidMotion.yMotion += resultant.yIndex;
-                        this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1 * resultant.xIndex;
-                        this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1 * resultant.yIndex;
-
-                        this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
-                    }
-                }
-            }
-            if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
-                this.allAsteroids[i].asteroidPosition.xIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.xMotion;
-            }
-            if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
-                this.allAsteroids[i].asteroidPosition.yIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.yMotion);
-            }
-        }
-        function resetToOne(overflow: number): number {
-            return Math.abs(overflow) / overflow;
-        }
-    }
+    // checkAsteroidCollision(fieldSize: number) {
+    //     var resultant: ShipPosition = new ShipPosition(0, 0);
+    //
+    //     for (let i = 0; i < this.allAsteroids.length; i++) {
+    //         for (let j = 0; j < this.allBattleShips.length; j++) {
+    //             for (let k = 0; k < 4; k++) {
+    //                 let shipX = this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex;
+    //                 let shipY = this.allBattleShips[j].shipDepartment.departmentArray[k].yIndex;
+    //                 let asterX = this.allAsteroids[i].asteroidPosition.xIndex;
+    //                 let asterY = this.allAsteroids[i].asteroidPosition.yIndex;
+    //                 let shipPosX = this.allBattleShips[j].shipPosition.xIndex;
+    //                 let shipPosY = this.allBattleShips[j].shipPosition.yIndex;
+    //
+    //
+    //                 if (shipX == asterX && shipY == asterY) {
+    //                     resultant.xIndex = 2*(asterX - shipPosX);
+    //                     resultant.yIndex = 2*(asterY - shipPosY);
+    //
+    //                     resultant.xIndex = -1 * resetToOne(resultant.xIndex);
+    //                     resultant.yIndex = -1 * resetToOne(resultant.yIndex);
+    //
+    //                     this.allAsteroids[i].asteroidMotion.xMotion += resultant.xIndex;
+    //                     this.allAsteroids[j].asteroidMotion.yMotion += resultant.yIndex;
+    //                     this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1 * resultant.xIndex;
+    //                     this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1 * resultant.yIndex;
+    //
+    //                     this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+    //                 }
+    //             }
+    //         }
+    //         if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
+    //             this.allAsteroids[i].asteroidPosition.xIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.xMotion;
+    //         }
+    //         if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
+    //             this.allAsteroids[i].asteroidPosition.yIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.yMotion);
+    //         }
+    //     }
+    //     function resetToOne(overflow: number): number {
+    //         return Math.abs(overflow) / overflow;
+    //     }
+    // }
 
     checkCollision(fieldSize: number, turn: number) {
         let resultant: ShipPosition = new ShipPosition(0, 0);
@@ -829,10 +842,11 @@ export class GameService {
                     this.rotate(this.allBattleShips[i], false);
                 }
             }
-
-            this.asteroidMove();
+            // for (let i = 0; i < this.allAsteroids.length; i++) {
+            //     this.asteroidMove(i);
+            // }
             this.checkCollision(this.battleField.rowGrid.length, turn);
-            this.checkAsteroidCollision(this.battleField.rowGrid.length);
+            // this.checkAsteroidCollision(this.battleField.rowGrid.length);
             this.performCollision(this.battleField.rowGrid.length, turn);
             //fb: collision with enemy / successful move
             for (let i = 0; i < this.allBattleShips.length; i++) {
@@ -843,6 +857,11 @@ export class GameService {
                 }
                 // fb: *department* destroyed
                 this.allBattleShips[i].shipStats.shieldActive = false;
+            }
+        }
+        for (let i = 0; i < this.allBattleShips.length; i++){
+            if (this.allBattleShips[i].fullReport.reportArray.length == 0){
+                this.inputReport(this.allBattleShips[i],0);
             }
         }
 
@@ -868,111 +887,129 @@ export class GameService {
             });
         });
 
-        // reset all action
+        // reset all action and report
         this.allBattleShips.map(ship => {
             ship.shipAction = new ShipAction([]);
+            ship.fullReport.reportArray.length = 0;
         });
     }
 
-    createAstArray() {
-        let i;
-        for(i=0; i <= this.allBattleShips.length; i++) {
-            this.allAsteroids.push(this.generateAsteroid(i))
-        }
-    }
 
-    generateAsteroid(i:number){
-        let newPosition = this.genAstPosition(i);
-        let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
-        let newDamage = this.genAstDamage();
-        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
-        return newAsteroid;
-    }
+    // createAstArray() {
+    //     let i;
+    //     let newAstArray:AsteroidModel[] = [];
+    //     //for(i=0; i <= this.allBattleShips.length; i++) {
+    //     for(i=0; i <= 2; i++) {
+    //         newAstArray.push(this.generateAsteroid(i))
+    //     }
+    //     return newAstArray;
+    // }
+    // generateAsteroid(i:number){
+    //     let newPosition = this.genAstPosition(i);
+    //     // newPosition = this.checkPosition( newPosition, i);
+    //     let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
+    //     let newDamage = this.genAstDamage();
+    //     let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
+    //     return newAsteroid;
+    // }
 
-    genAstPosition(i:number){
-        const maxX = 25 / (this.allBattleShips.length * 2);
-        let xTmp = this.astCoord(maxX, 2*i*maxX);
-        let yTmp = Math.floor(Math.random()*25);
-        let tmpPosition = new AsteroidPosition(xTmp, yTmp);
-        return tmpPosition;
-    }
+    // checkPosition(oldPosition: AsteroidPosition, i: number): AsteroidPosition{
+    //     let valid = true;
+    //     let newPosition = oldPosition;
+    //     // for (let i = 0; i < 2; i++){
+    //     for (let i = 0; i < this.allBattleShips.length; i++){
+    //         if (oldPosition == this.allBattleShips[i].shipPosition){
+    //             valid = false;
+    //         }
+    //     }
+    //     if(valid == false){
+    //         newPosition = this.genAstPosition(i);
+    //         newPosition = this.checkPosition(newPosition, i);
+    //     }
+    //     return newPosition;
+    // }
 
-    astCoord(max: number, start: number) {
-        return Math.floor((Math.random() * max) + start);
-    }
+   e   //     updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
+//         let damage: number;
+//         damage = asteroid.damage;
+//         if (victimShip.shipStats.shieldActive == true) {
+//             damage = asteroidShieldCheck(victimShip, asteroid, damage);
+//         }
+//         console.log("DAMAGE" + damage);
+//         if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
+//             victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
+//         }
+//         else {
+//             victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
+//         }
+//
+//         function asteroidShieldCheck(updatingShip: ShipModel, asteroid: AsteroidModel, damage: number) {
+//             let shieldGridDirection: Direction;
+//             let reducedDamage = damage;
+//             // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
+//             // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+//             shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
+//             if (shieldGridDirection > 3) {
+//                 shieldGridDirection = shieldGridDirection - 4;
+//             }
+//             if (asteroid.asteroidMotion.yMotion > 0 && shieldGridDirection == Direction.Up) {
+//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+//             }
+//             if (asteroid.asteroidMotion.yMotion < 0 && shieldGridDirection == Direction.Down) {
+//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+//             }
+//             if (asteroid.asteroidMotion.xMotion > 0 && shieldGridDirection == Direction.Left) {
+//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+//             }
+//             if (asteroid.asteroidMotion.xMotion < 0 && shieldGridDirection == Direction.Right) {
+//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+//             }
+//
+//             return reducedDamage;
+//         }
 
-    genAstMotion() {
-        let chance = Math.floor(Math.random()*3);
-        if (chance == 0){
-            return -1;
-        }
-        else if (chance == 1){
-            return 0;
-        }
-        else if (chance == 2){
-            return 1;
-        }
-    }
+    // getHostility(json, ship: ShipModel) {
+    //     const emotion = json['emotion_tone']; // This is an array
+    //     const language = json['language_tone'];
+    //     const social = json['social_tone'];
+    //     let hostility = new ShipHostility(ship.ShipHostility.hosti);
+    //     //const sampleJson = {hallo: [{personality: 'trait'}, {personality: 'second_trait'}]};
+    //     Object.keys(emotion).map((key) => {
+    //          hostility= this.emotionSort(hostility, (emotion[key]["trait_id"]), emotion[key]["percentile"])
+    //     });
+    //     Object.keys(language).map((key) => {
+    //         hostility = this.languageSort(hostility, (language[key]["trait_id"]), language[key]["percentile"])
+    //     });
+    //     Object.keys(social).map((key) => {
+    //         hostility = this.socialSort(hostility, (social[key]["trait_id"]), social[key]["percentile"])
+    //     });
+    //
+    //     ship.ShipHostility = hostility;
+    // }
 
-    genAstDamage() {
-        let chance = Math.floor(Math.random()*3);
-        if (chance == 0){
-            return 200;
-        }
-        else if (chance == 1){
-            return 250;
-        }
-        else if (chance == 2){
-            return 300;
-        }
-    }
+    // emotionSort(shipHostility: ShipHostility, traitID: string, percentile: number): ShipHostility {
+    //     let newHostility = shipHostility;
+    //     const hostile_increase = 0.2;
+    //     if (traitID == 'emotion_anger') {
+    //         newHostility.hosti += hostile_increase * percentile;
+    //     }
+    //     if (traitID == 'emotion_disgust') {
+    //         newHostility.hosti += hostile_increase * percentile;
+    //     }
+    //     if (traitID == 'emotion_fear') {
+    //         newHostility.hosti += hostile_increase * percentile;
+    //     }
+    //     if (traitID == 'emotion_joy') {
+    //         newHostility.hosti -= hostile_increase * percentile;
+    //     }
+    //     if (traitID == 'emotion_sadness') {
+    //         newHostility.hosti += hostile_increase * percentile;
+    //     }
+    //     return newHostility;
+    // }
 
-    asteroidMove() {
-        let i;
-        for (i = 0; i < this.allAsteroids.length; i++){
-            this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
-            this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
-        }
-    }
-
-    updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
-        let damage: number;
-        damage = asteroid.damage;
-        if (victimShip.shipStats.shieldActive == true) {
-            damage = asteroidShieldCheck(victimShip, asteroid, damage);
-        }
-        console.log("DAMAGE" + damage);
-        if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
-            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
-        }
-        else {
-            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
-        }
-
-        function asteroidShieldCheck(updatingShip: ShipModel, asteroid: AsteroidModel, damage: number) {
-            let shieldGridDirection: Direction;
-            let reducedDamage = damage;
-            // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
-            // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
-            shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
-            if (shieldGridDirection > 3) {
-                shieldGridDirection = shieldGridDirection - 4;
-            }
-            if (asteroid.asteroidMotion.yMotion > 0 && shieldGridDirection == Direction.Up) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (asteroid.asteroidMotion.yMotion < 0 && shieldGridDirection == Direction.Down) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (asteroid.asteroidMotion.xMotion > 0 && shieldGridDirection == Direction.Left) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-            if (asteroid.asteroidMotion.xMotion < 0 && shieldGridDirection == Direction.Right) {
-                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-            }
-
-            return reducedDamage;
-        }
+    inputReport(ship:ShipModel, reportNumber: number ){
+        ship.fullReport.reportArray.push(reportNumber);
     }
 }
 
