@@ -4,7 +4,7 @@ export class ShipModel {
     //public collidedShipId: string[];
     public collisionInfo: CollisionInfo;
     public shipAction: ShipAction;
-    public fullReport: number[];
+    public report: number[];
     public rp: RelativePosition[];
 
     constructor(public shipId: string,
@@ -242,15 +242,15 @@ export class ShipHostility {
 
 
 
-    // const report = [
-    //     "[] unknown entities detected within radar range",   // code 0
-    //     "Attacked the enemy successfully",                   // code 1
-    //     "Our weapons have missed",                           // code 2
-    //     "We're under attack from an enemy",                  // code 3
-    //     "Shields have been damaged by an enemy",             // code 4
-    //     "We have collided with an enemy ship"                // code 5
-    //      ""                                                  // code 6
-    // ];
+// const report = [
+//     "[] unknown entities detected within radar range",   // code 0
+//     "Attacked the enemy successfully",                   // code 1
+//     "Our weapons have missed",                           // code 2
+//     "We're under attack from an enemy",                  // code 3
+//     "Shields have been damaged by an enemy",             // code 4
+//     "We have collided with an enemy ship"                // code 5
+//      ""                                                  // code 6
+// ];
 
 
 export class RelativePosition {

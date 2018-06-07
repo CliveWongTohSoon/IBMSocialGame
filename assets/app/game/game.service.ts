@@ -77,7 +77,7 @@ export class GameService {
 
 
             this.socket.on('start', data => {
-                console.log('Entered Start');
+                // console.log('Entered Start');
                 const allShips: ShipModel[] = Object.keys(data).map(key => {
                     // console.log(key, data[key]);
                     const shipId = data[key]['shipId'],
@@ -529,8 +529,8 @@ export class GameService {
 
     shoot(ship: ShipModel) {
         for (let l = 2; l < 4; l++) {
-            loopAttackRange:
-                for (let i = 1; i < ship.shipStats.attackRange + 1; i++) { //check all attack range
+            loopAttackRange:{
+            for (let i = 1; i < ship.shipStats.attackRange + 1; i++) { //check all attack range
                     for (let j = 0; j < this.allBattleShips.length; j++) { // check all ships (for being attacked)
                         for (let k = 0; k < 4; k++) { //check all four department being hit, also 4 directions. directions are anti-clockwise, and four department are clockwise
                             let defendShip = this.allBattleShips[j];
@@ -551,6 +551,8 @@ export class GameService {
                                     if (positionCorrectUp && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -558,6 +560,8 @@ export class GameService {
                                     if (positionCorrectDown && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -565,6 +569,8 @@ export class GameService {
                                     if (positionCorrectLeft && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -572,6 +578,8 @@ export class GameService {
                                     if (positionCorrectRight && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
 
@@ -579,35 +587,37 @@ export class GameService {
                         }
                     }
                 }
+            ship.report.push(2);
+            }
+        }
+
+        function updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
+            let damage: number;
+
+            damage = shooterShip.shipStats.attack;
+            if (victimShip.shipStats.shieldActive == true) {
+                damage = shootShieldCheck(shooterShip, victimShip, damage);
+            }
+            if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
+                victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
+            } else {
+                victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
             }
 
-            function updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
-                let damage: number;
-
-                damage = shooterShip.shipStats.attack;
-                if (victimShip.shipStats.shieldActive == true) {
-                    damage = shootShieldCheck(shooterShip, victimShip, damage);
+            function shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
+                let shieldGridDirection: Direction;
+                // let enemyDirection: Direction = 4;
+                let reducedDamage = damage;
+                shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
+                if (shieldGridDirection > 3) {
+                    shieldGridDirection = shieldGridDirection - 4;
                 }
-                if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
-                    victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
-                } else {
-                    victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
+                if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2) {
+                    reducedDamage = damage * (1 - victimShip.shipStats.defence)
                 }
-
-                function shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
-                    let shieldGridDirection: Direction;
-                    // let enemyDirection: Direction = 4;
-                    let reducedDamage = damage;
-                    shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
-                    if (shieldGridDirection > 3) {
-                        shieldGridDirection = shieldGridDirection - 4;
-                    }
-                    if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2) {
-                        reducedDamage = damage * (1 - victimShip.shipStats.defence)
-                    }
-                    return reducedDamage;
-                }
+                return reducedDamage;
             }
+        }
     } // end shoot
 
     relativePosition(ship: ShipModel, l: number) {
@@ -785,6 +795,8 @@ export class GameService {
     }
 
     fullTurns() {
+        this.initializeReport();
+
         for (let turn = 1; turn <= 3; turn++) {
             for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
@@ -886,7 +898,7 @@ export class GameService {
                 opponentDistance: oppoDis,
                 opponentAngle: oppoAng,
 
-                reportArray: [] // Pass in array
+                report: ship.report // Pass in array
 
             });
         });
@@ -898,6 +910,16 @@ export class GameService {
         });
     }
 
+    initializeReport(){
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            let ship = this.allBattleShips[i];
+            if(ship.report==undefined){
+                ship.report = []; //initialize ship's relativeposition array
+            }
+            ship.report.length = 0; //empty rp of the ship
+        }
+    }
+
     storeRP(){
         for (let i = 0; i < this.allBattleShips.length; i++) {
             let ship = this.allBattleShips[i];
@@ -907,11 +929,11 @@ export class GameService {
             ship.rp.length = 0; //empty rp of the ship
             this.relativePosition(ship,this.battleField.rowGrid.length); // filling it with new position
 
-            console.log( i + "th ship's relative position:\n")
-            for (let j = 0; j < ship.rp.length; j++) {
-                console.log( j + "th opponent:\n distance: " + ship.rp[j].distance + " angle: " + ship.rp[j].angle + "\n")
-            }
-            console.log("\n")
+            // console.log( i + "th ship's relative position:\n")
+            // for (let j = 0; j < ship.rp.length; j++) {
+            //     console.log( j + "th opponent:\n distance: " + ship.rp[j].distance + " angle: " + ship.rp[j].angle + "\n")
+            // }
+            // console.log("\n")
         }
     }
 

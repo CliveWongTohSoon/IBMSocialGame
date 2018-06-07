@@ -20,7 +20,8 @@ const schema = new Schema({
     attackRange: {type: Number, required: true},
     defence: {type: Number, required: true},
     opponentDistance: {type: Array, required: true},
-    opponentAngle: {type: Array, required: true}
+    opponentAngle: {type: Array, required: true},
+    report: {type: Array, required: true}
 });
 
 module.exports = mongoose.model('Start', schema);

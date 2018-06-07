@@ -128,6 +128,8 @@ io.on('connection', (socket) => {
             ship.rwAlive = battleShipData.rwAlive;
             ship.opponentDistance = battleShipData.opponentDistance;
             ship.opponentAngle = battleShipData.opponentAngle;
+            ship.report = battleShipData.report
+
 
             ship.phase = 'report';
             // console.log('After: ', ship);
@@ -144,7 +146,7 @@ io.on('connection', (socket) => {
                             // TODO:- Send this to specific client only
                             io.to(battleShipData.shipId).emit('instruction', {
                                 phase: 'report',
-                                reportArray: battleShipData.reportArray,
+                                report: battleShipData.report,
 
                             });
                         });
