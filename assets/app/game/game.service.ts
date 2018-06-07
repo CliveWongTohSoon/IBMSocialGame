@@ -881,9 +881,8 @@ export class GameService {
                 opponentDistance: oppoDis,
                 opponentAngle: oppoAng,
 
-                report0: 0,
-                report1: 1,
-                report2: 2
+                reportArray: [] // Pass in array
+
             });
         });
 
