@@ -4,8 +4,8 @@ export class ShipModel {
     //public collidedShipId: string[];
     public collisionInfo: CollisionInfo;
     public shipAction: ShipAction;
+    public fullReport: ReportCode;
     public rp: RelativePosition[];
-
 
     constructor(public shipId: string,
                 public shipPosition: ShipPosition,
@@ -47,7 +47,6 @@ export class ShipStats {
                 public range: number,
                 public shieldActive: boolean,
                 public shieldDirection: Direction) {}
-
 }
 
 export enum Action {
@@ -235,6 +234,25 @@ export class Character {
 
 export class CollisionInfo {
     constructor(public resultantMove: ShipPosition, public moveCount: number) {}
+}
+
+export class ShipHostility {
+    constructor (public hosti: number){}
+}
+
+export class ReportCode {
+    constructor(public reportArray: number[]) {
+    }
+
+    // const report = [
+    //     "[] unknown entities detected within radar range",   // code 0
+    //     "Attacked the enemy successfully",                   // code 1
+    //     "Our weapons have missed",                           // code 2
+    //     "We're under attack from an enemy",                  // code 3
+    //     "Shields have been damaged by an enemy",             // code 4
+    //     "We have collided with an enemy ship"                // code 5
+    //      ""                                                  // code 6
+    // ];
 }
 
 export class RelativePosition {

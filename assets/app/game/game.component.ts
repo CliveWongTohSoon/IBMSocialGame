@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {ShipModel, Action, ShipAction, ShipPhase} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
+import {AsteroidModel} from "./asteroid-model";
 
 @Component({
     selector: 'app-game',
@@ -17,6 +18,7 @@ export class GameComponent implements OnInit {
 
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
+    // allAsteroid: AsteroidModel[];
 
     // Mock raspberry pi
     intentArray = [];
