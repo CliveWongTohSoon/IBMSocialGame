@@ -4,7 +4,7 @@ export class ShipModel {
     //public collidedShipId: string[];
     public collisionInfo: CollisionInfo;
     public shipAction: ShipAction;
-    public fullReport: ReportCode;
+    public fullReport: number[];
     public rp: RelativePosition[];
 
     constructor(public shipId: string,
@@ -240,9 +240,7 @@ export class ShipHostility {
     constructor (public hosti: number){}
 }
 
-export class ReportCode {
-    constructor(public reportArray: number[]) {
-    }
+
 
     // const report = [
     //     "[] unknown entities detected within radar range",   // code 0
@@ -253,7 +251,7 @@ export class ReportCode {
     //     "We have collided with an enemy ship"                // code 5
     //      ""                                                  // code 6
     // ];
-}
+
 
 export class RelativePosition {
     constructor(public distance:number, public angle:number){}

@@ -10,7 +10,8 @@ import {
     ShipAction,
     Action,
     ShipPhase,
-    ShipHostility
+    ShipHostility,
+    RelativePosition
 } from "./ship-model";
 
 import {Direction} from "./ship-model";
@@ -857,11 +858,7 @@ export class GameService {
                 this.allBattleShips[i].shipStats.shieldActive = false;
             }
         }
-        for (let i = 0; i < this.allBattleShips.length; i++){
-            if (this.allBattleShips[i].fullReport.reportArray.length == 0){
-                this.inputReport(this.allBattleShips[i],0);
-            }
-        }
+
 
         this.storeRP();
 
@@ -897,7 +894,7 @@ export class GameService {
         // reset all action and report
         this.allBattleShips.map(ship => {
             ship.shipAction = new ShipAction([]);
-            ship.fullReport.reportArray.length = 0;
+
         });
     }
 
@@ -1031,9 +1028,7 @@ export class GameService {
     //     return newHostility;
     // }
 
-    inputReport(ship:ShipModel, reportNumber: number ){
-        ship.fullReport.reportArray.push(reportNumber);
-    }
+
 }
 
 function mod(n, m) {
