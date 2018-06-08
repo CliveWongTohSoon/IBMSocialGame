@@ -1,6 +1,19 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo, ShipAction, Action, ShipPhase} from "./ship-model";
+
+import {
+    ShipDepartment,
+    ShipDirection,
+    ShipModel,
+    ShipPosition,
+    ShipStats,
+    CollisionInfo,
+    ShipAction,
+    Action,
+    ShipPhase,
+    RelativePosition,
+} from "./ship-model";
+
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -81,6 +94,7 @@ export class GameService {
                         range = data[key]['range'],
                         attackRange = data[key]['attackRange'],
                         defence = data[key]['defence'],
+
                         phase = this.getPhase(data[key]['phase']); // Should give Start initially
                     // console.log(data);
 
@@ -223,6 +237,7 @@ export class GameService {
         newPosition = this.worldRound(newPosition, fieldSize);
 
         this.updateShip(ship, newPosition, ship.shipDirection);
+
     }
 
     performCollision(fieldSize: number, turn: number) {
@@ -279,7 +294,7 @@ export class GameService {
                 }
             }
 
-            this.checkAsteroidCollision(fieldSize, turn);
+            this.checkAsteroidCollision(fieldSize);
             validCheck = false;
 
             for (let i = 0; i < this.allBattleShips.length; i++) {
@@ -316,8 +331,10 @@ export class GameService {
                         resultant.xIndex = -1 * resetToOne(resultant.xIndex);
                         resultant.yIndex = -1 * resetToOne(resultant.yIndex);
 
-                        this.allAsteroids[i].asteroidMotion.xIndex += resultant.xIndex;
-                        this.allAsteroids[j].asteroidMotion.yIndex += resultant.yIndex;
+
+                        this.allAsteroids[i].asteroidMotion.xMotion += resultant.xIndex;
+                        this.allAsteroids[j].asteroidMotion.yMotion += resultant.yIndex;
+
                         this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1 * resultant.xIndex;
                         this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1 * resultant.yIndex;
 
@@ -325,16 +342,17 @@ export class GameService {
                     }
                 }
             }
-            if (Math.abs(this.allAsteroids[i].asteroidMotion.xIndex) >= 1) {
-                this.allAsteroids[i].asteroidPosition.xIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.xIndex);
-            }
-            if (Math.abs(this.allAsteroids[i].asteroidMotion.yIndex) >= 1) {
-                this.allAsteroids[i].asteroidPosition.yIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.yIndex);
-            }
 
-            function resetToOne(overflow: number): number {
-                return Math.abs(overflow) / overflow;
+            if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
+                this.allAsteroids[i].asteroidPosition.xIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.xMotion);
             }
+            if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
+                this.allAsteroids[i].asteroidPosition.yIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.yMotion);
+            }
+        }
+        function resetToOne(overflow: number): number {
+            return Math.abs(overflow) / overflow;
+
         }
     }
     checkCollision(fieldSize: number, turn: number) {
@@ -605,15 +623,9 @@ export class GameService {
             let yd = y - y0;
 
             if (!(xd == 0 && yd == 0)) {
-                {
-                    calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd));
-                }
-            } else {
-                console.log("current ship is " + i)
+                 calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd));
             }
         }
-
-        console.log("\n");
 
         function wrapDistance(xd: number) {
             if (Math.abs(xd) < l / 2) {
@@ -651,15 +663,15 @@ export class GameService {
             let rad = Math.atan(xd / yd);
             let deg = rad * 180 / Math.PI;
             let d = distance(xd, yd);
-            logPolar(i, adjustByDir(dir, sub - deg), d);
+            pushPolar(i, adjustByDir(dir, sub - deg), d);
         }
 
         function distance(a: number, b: number) {
             return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
         }
 
-        function logPolar(i: number, deg: number, distance: number) {
-            console.log("ship " + i + " 's relative position from this ship is: " + deg + " degree, distance is " + distance);
+        function pushPolar(i: number, deg: number, distance: number) {
+            ship.rp.push(new RelativePosition(distance,deg));
         }
 
         function adjustByDir(dir: Direction, deg: number) {
@@ -830,9 +842,9 @@ export class GameService {
                 }
             }
 
-            this.asteroidMove();
+            // this.asteroidMove();
             this.checkCollision(this.battleField.rowGrid.length, turn);
-            this.checkAsteroidCollision(this.battleField.rowGrid.length);
+            // this.checkAsteroidCollision(this.battleField.rowGrid.length);
             this.performCollision(this.battleField.rowGrid.length, turn);
             //fb: collision with enemy / successful move
             for (let i = 0; i < this.allBattleShips.length; i++) {
@@ -846,9 +858,16 @@ export class GameService {
             }
         }
 
+        this.storeRP();
+
         this.allBattleShips.map(ship => {
             // Update the phase
             let depart = ship.shipDepartment.departmentArray;
+            let oppoDis = [], oppoAng = [];
+            for(let i=0;i<ship.rp.length;i++){
+                oppoDis.push(ship.rp[i].distance);
+                oppoAng.push(ship.rp[i].angle);
+            }
             this.socket.emit('update', {
                 shipId: ship.shipId,
                 x: ship.shipPosition.xIndex,
@@ -862,6 +881,9 @@ export class GameService {
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
                 rwAlive: depart[3].alive,
+                opponentDistance: oppoDis,
+                opponentAngle: oppoAng,
+
                 report0: 0,
                 report1: 1,
                 report2: 2
@@ -872,6 +894,23 @@ export class GameService {
         this.allBattleShips.map(ship => {
             ship.shipAction = new ShipAction([]);
         });
+    }
+
+    storeRP(){
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            let ship = this.allBattleShips[i];
+            if(ship.rp==undefined){
+                ship.rp = []; //initialize ship's relativeposition array
+            }
+            ship.rp.length = 0; //empty rp of the ship
+            this.relativePosition(ship,this.battleField.rowGrid.length); // filling it with new position
+
+            console.log( i + "th ship's relative position:\n")
+            for (let j = 0; j < ship.rp.length; j++) {
+                console.log( j + "th opponent:\n distance: " + ship.rp[j].distance + " angle: " + ship.rp[j].angle + "\n")
+            }
+            console.log("\n")
+        }
     }
 
     createAstArray() {

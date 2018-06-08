@@ -24,7 +24,7 @@ export class GameComponent implements OnInit {
     constructor(private gameService: GameService) {
         gameService.init(25).subscribe(battleField => {
             this.battleField = battleField;
-            gameService.createAstArray();
+            // gameService.createAstArray();
         });
     }
 
