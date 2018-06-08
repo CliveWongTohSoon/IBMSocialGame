@@ -10,7 +10,8 @@ import {
     ShipAction,
     Action,
     ShipPhase,
-    ShipHostility, RelativePosition
+    ShipHostility,
+    RelativePosition
 } from "./ship-model";
 
 import {Direction} from "./ship-model";
@@ -77,7 +78,7 @@ export class GameService {
 
 
             this.socket.on('start', data => {
-                console.log('Entered Start');
+                // console.log('Entered Start');
                 const allShips: ShipModel[] = Object.keys(data).map(key => {
                     // console.log(key, data[key]);
                     const shipId = data[key]['shipId'],
@@ -539,7 +540,7 @@ export class GameService {
 
     shoot(ship: ShipModel) {
         for (let l = 2; l < 4; l++) {
-            loopAttackRange:
+            loopAttackRange:{
                 for (let i = 1; i < ship.shipStats.attackRange + 1; i++) { //check all attack range
                     for (let j = 0; j < this.allBattleShips.length; j++) { // check all ships (for being attacked)
                         for (let k = 0; k < 4; k++) { //check all four department being hit, also 4 directions. directions are anti-clockwise, and four department are clockwise
@@ -561,6 +562,8 @@ export class GameService {
                                     if (positionCorrectUp && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -568,6 +571,8 @@ export class GameService {
                                     if (positionCorrectDown && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -575,6 +580,8 @@ export class GameService {
                                     if (positionCorrectLeft && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -582,6 +589,8 @@ export class GameService {
                                     if (positionCorrectRight && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
+                                        ship.report.push(1);
+                                        defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
 
@@ -589,35 +598,37 @@ export class GameService {
                         }
                     }
                 }
+                ship.report.push(2);
+            }
+        }
+
+        function updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
+            let damage: number;
+
+            damage = shooterShip.shipStats.attack;
+            if (victimShip.shipStats.shieldActive == true) {
+                damage = shootShieldCheck(shooterShip, victimShip, damage);
+            }
+            if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
+                victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
+            } else {
+                victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
             }
 
-            function updateShootHealth(shooterShip: ShipModel, victimShip: ShipModel, affectedDep: number) {
-                let damage: number;
-
-                damage = shooterShip.shipStats.attack;
-                if (victimShip.shipStats.shieldActive == true) {
-                    damage = shootShieldCheck(shooterShip, victimShip, damage);
+            function shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
+                let shieldGridDirection: Direction;
+                // let enemyDirection: Direction = 4;
+                let reducedDamage = damage;
+                shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
+                if (shieldGridDirection > 3) {
+                    shieldGridDirection = shieldGridDirection - 4;
                 }
-                if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
-                    victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
-                } else {
-                    victimShip.shipDepartment.departmentArray[affectedDep].health = victimShip.shipDepartment.departmentArray[affectedDep].health - damage;
+                if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2) {
+                    reducedDamage = damage * (1 - victimShip.shipStats.defence)
                 }
-
-                function shootShieldCheck(shooterShip: ShipModel, victimShip: ShipModel, damage: number) {
-                    let shieldGridDirection: Direction;
-                    // let enemyDirection: Direction = 4;
-                    let reducedDamage = damage;
-                    shieldGridDirection = victimShip.shipDirection.dir + victimShip.shipStats.shieldDirection;
-                    if (shieldGridDirection > 3) {
-                        shieldGridDirection = shieldGridDirection - 4;
-                    }
-                    if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2) {
-                        reducedDamage = damage * (1 - victimShip.shipStats.defence)
-                    }
-                    return reducedDamage;
-                }
+                return reducedDamage;
             }
+        }
     } // end shoot
 
     relativePosition(ship: ShipModel, l: number) {
@@ -632,7 +643,7 @@ export class GameService {
             let yd = y - y0;
 
             if (!(xd == 0 && yd == 0)) {
-                 calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd));
+                calPolar(i, wrapDistance(xd), wrapDistance(yd), wrapSub(yd));
             }
         }
 
@@ -680,7 +691,7 @@ export class GameService {
         }
 
         function pushPolar(i: number, deg: number, distance: number) {
-            ship.rp.push(new RelativePosition(distance,deg));
+            ship.rp.push(new RelativePosition(distance, deg));
         }
 
         function adjustByDir(dir: Direction, deg: number) {
@@ -795,16 +806,18 @@ export class GameService {
     }
 
     fullTurns() {
+        this.initializeReport();
+
         for (let turn = 1; turn <= 3; turn++) {
             for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.FrontShield) {
-                    this.shield(this.allBattleShips[i],0);
+                    this.shield(this.allBattleShips[i], 0);
                 }
                 //fb: shield successful : front side
             }
             for (let i = 0; i < this.allBattleShips.length; i++) {
                 if (this.allBattleShips[i].shipAction.act[(turn - 1)] == Action.LeftShield) {
-                    this.shield(this.allBattleShips[i],1);
+                    this.shield(this.allBattleShips[i], 1);
                 }
                 //fb: shield successful: left side
             }
@@ -868,11 +881,13 @@ export class GameService {
                 this.allBattleShips[i].shipStats.shieldActive = false;
             }
         }
+
         // for (let i = 0; i < this.allBattleShips.length; i++){
         //     if (this.allBattleShips[i].fullReport.reportArray.length == 0){
         //         this.inputReport(this.allBattleShips[i],0);
         //     }
         // }
+
 
         this.storeRP();
 
@@ -880,7 +895,7 @@ export class GameService {
             // Update the phase
             let depart = ship.shipDepartment.departmentArray;
             let oppoDis = [], oppoAng = [];
-            for(let i=0;i<ship.rp.length;i++){
+            for (let i = 0; i < ship.rp.length; i++) {
                 oppoDis.push(ship.rp[i].distance);
                 oppoAng.push(ship.rp[i].angle);
             }
@@ -900,9 +915,8 @@ export class GameService {
                 opponentDistance: oppoDis,
                 opponentAngle: oppoAng,
 
-                report0: 0,
-                report1: 1,
-                report2: 2
+                report: ship.report // Pass in array
+
             });
         });
 
@@ -913,45 +927,57 @@ export class GameService {
         });
     }
 
-    storeRP(){
+    initializeReport() {
         for (let i = 0; i < this.allBattleShips.length; i++) {
             let ship = this.allBattleShips[i];
-            if(ship.rp==undefined){
+            if (ship.report == undefined) {
+                ship.report = []; //initialize ship's relativeposition array
+            }
+            ship.report.length = 0; //empty rp of the ship
+        }
+    }
+
+    storeRP() {
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            let ship = this.allBattleShips[i];
+            if (ship.rp == undefined) {
                 ship.rp = []; //initialize ship's relativeposition array
             }
             ship.rp.length = 0; //empty rp of the ship
-            this.relativePosition(ship,this.battleField.rowGrid.length); // filling it with new position
+            this.relativePosition(ship, this.battleField.rowGrid.length); // filling it with new position
 
-            console.log( i + "th ship's relative position:\n")
-            for (let j = 0; j < ship.rp.length; j++) {
-                console.log( j + "th opponent:\n distance: " + ship.rp[j].distance + " angle: " + ship.rp[j].angle + "\n")
-            }
-            console.log("\n")
+            // console.log( i + "th ship's relative position:\n")
+            // for (let j = 0; j < ship.rp.length; j++) {
+            //     console.log( j + "th opponent:\n distance: " + ship.rp[j].distance + " angle: " + ship.rp[j].angle + "\n")
+            // }
+            // console.log("\n")
         }
     }
 
     createAstArray() {
         let i;
-        let newAstArray:AsteroidModel[] = [];
+        let newAstArray: AsteroidModel[] = [];
         //for(i=0; i <= this.allBattleShips.length; i++) {
-        for(i=0; i <= 2; i++) {
+        for (i = 0; i <= 2; i++) {
             newAstArray.push(this.generateAsteroid(i))
         }
         return newAstArray;
     }
-    generateAsteroid(i:number){
+
+    generateAsteroid(i: number) {
         let newPosition = this.genAstPosition(i);
         // newPosition = this.checkPosition( newPosition, i);
-        let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
+        let newMotion = new AsteroidMotion(this.genAstMotion(), this.genAstMotion());
         let newDamage = this.genAstDamage();
         let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
         return newAsteroid;
     }
-    genAstPosition(i:number){
-        const maxX = 25 / (3*2);
+
+    genAstPosition(i: number) {
+        const maxX = 25 / (3 * 2);
         // const maxX = 25 / (this.allBattleShips.length * 2);
-        let xTmp = this.astCoord(maxX, ((2*i)+1)*maxX);
-        let yTmp = Math.floor(Math.random()*25);
+        let xTmp = this.astCoord(maxX, ((2 * i) + 1) * maxX);
+        let yTmp = Math.floor(Math.random() * 25);
         let tmpPosition = new AsteroidPosition(xTmp, yTmp);
         return tmpPosition;
     }
@@ -961,34 +987,34 @@ export class GameService {
     }
 
     genAstMotion() {
-        let chance = Math.floor(Math.random()*3);
-        if (chance == 0){
+        let chance = Math.floor(Math.random() * 3);
+        if (chance == 0) {
             return -1;
         }
-        else if (chance == 1){
+        else if (chance == 1) {
             return 0;
         }
-        else if (chance == 2){
+        else if (chance == 2) {
             return 1;
         }
     }
 
     genAstDamage() {
-        let chance = Math.floor(Math.random()*3);
-        if (chance == 0){
+        let chance = Math.floor(Math.random() * 3);
+        if (chance == 0) {
             return 200;
         }
-        else if (chance == 1){
+        else if (chance == 1) {
             return 250;
         }
-        else if (chance == 2){
+        else if (chance == 2) {
             return 300;
         }
     }
 
     asteroidMove() {
         let i;
-        for (i = 0; i < this.allAsteroids.length; i++){
+        for (i = 0; i < this.allAsteroids.length; i++) {
             this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
             this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
         }
