@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {ShipModel, Action, ShipAction, ShipPhase} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
+import {AsteroidModel} from "./asteroid-model";
 
 @Component({
     selector: 'app-game',
@@ -17,6 +18,7 @@ export class GameComponent implements OnInit {
 
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
+    // allAsteroid: AsteroidModel[];
 
     // Mock raspberry pi
     intentArray = [];
@@ -150,11 +152,11 @@ export class GameComponent implements OnInit {
         // this.gameService.createShipFromSocket().subscribe(console.log);
         this.gameService.listenToInstruction().subscribe(instructionData => {
             // Match instruction data to different action
-            console.log('Entered listenToInstruction', instructionData);
+            // console.log('Entered listenToInstruction', instructionData);
             const currentShip = this.allBattleShip.filter(ship => ship.shipId === instructionData['shipId'])[0];
 
             // Update the ship phase to phase given in instruction
-            console.log(this.allBattleShip, instructionData['shipId']);
+            // console.log(this.allBattleShip, instructionData['shipId']);
             currentShip.phase = this.gameService.getPhase(instructionData['phase']);
             const instruction0 = instructionData['instruction0'];
             const instruction1 = instructionData['instruction1'];
@@ -172,13 +174,13 @@ export class GameComponent implements OnInit {
 
 
             if (allBattleShipReady) {
-                console.log('Entering full turn...');
+                // console.log('Entering full turn...');
                 this.gameService.fullTurns();
             }
         });
 
         this.gameService.createShipFromSocket().subscribe(shipModel => {
-            console.log('Ship:', shipModel);
+            // console.log('Ship:', shipModel);
             const numberOfPlayers = shipModel.length;
             // if (numberOfPlayers <= 2) {
             //     this.gameService.init(25)
