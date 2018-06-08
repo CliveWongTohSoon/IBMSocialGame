@@ -196,6 +196,15 @@ export class GameService {
             prev = this.updateGrid(curr);
             return prev;
         }, this.battleField);
+
+        this.battleField = this.allAsteroids.reduce((prev,curr) => {
+            prev = this.updateAstGrid(curr);
+            return prev;
+        }, this.battleField);
+    }
+
+    updateAstGrid(asteroid: AsteroidModel) : BattleFieldModel {
+        return BattleFieldModel.renderAsteroids(asteroid, this.battleField);
     }
 
     updateGrid(currentShip: ShipModel): BattleFieldModel {
@@ -374,7 +383,7 @@ export class GameService {
 
                 if (overlap && notSameShip) {
                     checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
-                    // collisionReport(this.allBattleShips[i]);
+                    this.allBattleShips[i].report.push(6);
                     if (xd == 0 && yd == 0) {
                         assignResultant(this.allBattleShips[i]);
                     }
@@ -403,12 +412,12 @@ export class GameService {
         }
 
         // function collisionReport(ship:ShipModel){
-        //     let lastElement = ship.fullReport.reportArray.pop();
-        //     if (lastElement == 5 || lastElement == 6){
-        //         ship.fullReport.reportArray.push(lastElement,6);
+        //     let lastElement = ship.report.pop();
+        //     if (lastElement == 6 || lastElement == 7){
+        //         ship.report.push(lastElement,7);
         //     }
         //     else {
-        //         ship.fullReport.reportArray.push(lastElement, 5);
+        //         ship.report.push(lastElement, 6);
         //     }
         // }
         function checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel, turn: number) {
@@ -562,8 +571,8 @@ export class GameService {
                                     if (positionCorrectUp && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
-                                        ship.report.push(1);
-                                        defendShip.report.push(3);
+                                        // ship.report.push(1);
+                                        // defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -571,8 +580,8 @@ export class GameService {
                                     if (positionCorrectDown && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
-                                        ship.report.push(1);
-                                        defendShip.report.push(3);
+                                        // ship.report.push(1);
+                                        // defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -580,8 +589,8 @@ export class GameService {
                                     if (positionCorrectLeft && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
-                                        ship.report.push(1);
-                                        defendShip.report.push(3);
+                                        // ship.report.push(1);
+                                        // defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
                                     break;
@@ -589,8 +598,8 @@ export class GameService {
                                     if (positionCorrectRight && bothDepartExist) {
                                         updateShootHealth(ship, defendShip, k);
                                         console.log('Department ' + k + ' of ship ' + j + ' is being hit');
-                                        ship.report.push(1);
-                                        defendShip.report.push(3);
+                                        // ship.report.push(1);
+                                        // defendShip.report.push(3);
                                         break loopAttackRange;
                                     }
 
@@ -625,6 +634,12 @@ export class GameService {
                 }
                 if (Math.abs(shieldGridDirection - shooterShip.shipDirection.dir) == 2) {
                     reducedDamage = damage * (1 - victimShip.shipStats.defence)
+                    shooterShip.report.push(3);
+                    victimShip.report.push(5);
+                }
+                else{
+                    shooterShip.report.push(1);
+                    victimShip.report.push(4);
                 }
                 return reducedDamage;
             }
@@ -882,11 +897,11 @@ export class GameService {
             }
         }
 
-        // for (let i = 0; i < this.allBattleShips.length; i++){
-        //     if (this.allBattleShips[i].fullReport.reportArray.length == 0){
-        //         this.inputReport(this.allBattleShips[i],0);
-        //     }
-        // }
+        for (let i = 0; i < this.allBattleShips.length; i++){
+            if (this.allBattleShips[i].report.length == 0){
+                this.allBattleShips[i].report.push(0);
+            }
+        }
 
 
         this.storeRP();
@@ -923,7 +938,6 @@ export class GameService {
         // reset all action and report
         this.allBattleShips.map(ship => {
             ship.shipAction = new ShipAction([]);
-            // ship.fullReport.reportArray.length = 0;
         });
     }
 
@@ -1113,10 +1127,6 @@ export class GameService {
     //         newHostility.hosti += hostile_increase * percentile;
     //     }
     //     return newHostility;
-    // }
-
-    // inputReport(ship:ShipModel, reportNumber: number ){
-    //     ship.fullReport.reportArray.push(reportNumber);
     // }
 }
 

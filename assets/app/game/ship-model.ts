@@ -245,10 +245,11 @@ export class ShipHostility {
 //     "[] unknown entities detected within radar range",   // code 0
 //     "Attacked the enemy successfully",                   // code 1
 //     "Our weapons have missed",                           // code 2
-//     "We're under attack from an enemy",                  // code 3
-//     "Shields have been damaged by an enemy",             // code 4
-//     "We have collided with an unknown entity"                // code 5
-//      "We have collided with another unknown entity"                                                  // code 6
+//     "Our weapons have hit enemy shields"                 // code 3
+//     "We're under attack from an enemy",                  // code 4
+//     "Shields have been damaged by an enemy",             // code 5
+//     "We have collided with an enemy ship"                // code 6
+//     "We've collided with an asteroid"                    // code 7
 // ];
 
 
