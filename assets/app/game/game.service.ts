@@ -10,7 +10,7 @@ import {
     ShipAction,
     Action,
     ShipPhase,
-    ShipHostility
+    ShipHostility, RelativePosition
 } from "./ship-model";
 
 import {Direction} from "./ship-model";
@@ -51,7 +51,7 @@ export class GameService {
     // ----------------------------- Data for all components -------------------------------------------------------- //
     battleField: BattleFieldModel;
     allBattleShips: ShipModel[];
-    // allAsteroids: AsteroidModel[];
+    allAsteroids: AsteroidModel[];
 
     // --------------------------------- CREATE OBSERVABLE ---------------------------------------------------------- //
     init(length: number): Observable<BattleFieldModel> {
@@ -66,7 +66,8 @@ export class GameService {
         }
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
-        // this.allAsteroids = this.createAstArray();
+        this.allAsteroids = this.createAstArray();
+        console.log(this.allAsteroids);
         return Observable.of(this.battleField);
     }
 
@@ -372,6 +373,7 @@ export class GameService {
 
                 if (overlap && notSameShip) {
                     checkCollisionHit(this.allBattleShips[i], this.allBattleShips[j], turn);
+                    // collisionReport(this.allBattleShips[i]);
                     if (xd == 0 && yd == 0) {
                         assignResultant(this.allBattleShips[i]);
                     }
@@ -399,6 +401,15 @@ export class GameService {
             }
         }
 
+        // function collisionReport(ship:ShipModel){
+        //     let lastElement = ship.fullReport.reportArray.pop();
+        //     if (lastElement == 5 || lastElement == 6){
+        //         ship.fullReport.reportArray.push(lastElement,6);
+        //     }
+        //     else {
+        //         ship.fullReport.reportArray.push(lastElement, 5);
+        //     }
+        // }
         function checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel, turn: number) {
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
@@ -839,9 +850,9 @@ export class GameService {
                     this.rotate(this.allBattleShips[i], false);
                 }
             }
-            // for (let i = 0; i < this.allAsteroids.length; i++) {
-            //     this.asteroidMove(i);
-            // }
+            this.asteroidMove();
+            console.log("ASteroid");
+            console.log(this.allAsteroids);
 
             this.checkCollision(this.battleField.rowGrid.length, turn);
             // this.checkAsteroidCollision(this.battleField.rowGrid.length);
@@ -857,11 +868,11 @@ export class GameService {
                 this.allBattleShips[i].shipStats.shieldActive = false;
             }
         }
-        for (let i = 0; i < this.allBattleShips.length; i++){
-            if (this.allBattleShips[i].fullReport.reportArray.length == 0){
-                this.inputReport(this.allBattleShips[i],0);
-            }
-        }
+        // for (let i = 0; i < this.allBattleShips.length; i++){
+        //     if (this.allBattleShips[i].fullReport.reportArray.length == 0){
+        //         this.inputReport(this.allBattleShips[i],0);
+        //     }
+        // }
 
         this.storeRP();
 
@@ -898,7 +909,7 @@ export class GameService {
         // reset all action and report
         this.allBattleShips.map(ship => {
             ship.shipAction = new ShipAction([]);
-            ship.fullReport.reportArray.length = 0;
+            // ship.fullReport.reportArray.length = 0;
         });
     }
 
@@ -919,39 +930,85 @@ export class GameService {
         }
     }
 
-    // createAstArray() {
-    //     let i;
-    //     let newAstArray:AsteroidModel[] = [];
-    //     //for(i=0; i <= this.allBattleShips.length; i++) {
-    //     for(i=0; i <= 2; i++) {
-    //         newAstArray.push(this.generateAsteroid(i))
-    //     }
-    //     return newAstArray;
-    // }
-    // generateAsteroid(i:number){
-    //     let newPosition = this.genAstPosition(i);
-    //     // newPosition = this.checkPosition( newPosition, i);
-    //     let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
-    //     let newDamage = this.genAstDamage();
-    //     let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
-    //     return newAsteroid;
-    // }
+    createAstArray() {
+        let i;
+        let newAstArray:AsteroidModel[] = [];
+        //for(i=0; i <= this.allBattleShips.length; i++) {
+        for(i=0; i <= 2; i++) {
+            newAstArray.push(this.generateAsteroid(i))
+        }
+        return newAstArray;
+    }
+    generateAsteroid(i:number){
+        let newPosition = this.genAstPosition(i);
+        // newPosition = this.checkPosition( newPosition, i);
+        let newMotion = new AsteroidMotion(this.genAstMotion(),this.genAstMotion());
+        let newDamage = this.genAstDamage();
+        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
+        return newAsteroid;
+    }
+    genAstPosition(i:number){
+        const maxX = 25 / (3*2);
+        // const maxX = 25 / (this.allBattleShips.length * 2);
+        let xTmp = this.astCoord(maxX, ((2*i)+1)*maxX);
+        let yTmp = Math.floor(Math.random()*25);
+        let tmpPosition = new AsteroidPosition(xTmp, yTmp);
+        return tmpPosition;
+    }
 
-    // checkPosition(oldPosition: AsteroidPosition, i: number): AsteroidPosition{
-    //     let valid = true;
-    //     let newPosition = oldPosition;
-    //     // for (let i = 0; i < 2; i++){
-    //     for (let i = 0; i < this.allBattleShips.length; i++){
-    //         if (oldPosition == this.allBattleShips[i].shipPosition){
-    //             valid = false;
-    //         }
-    //     }
-    //     if(valid == false){
-    //         newPosition = this.genAstPosition(i);
-    //         newPosition = this.checkPosition(newPosition, i);
-    //     }
-    //     return newPosition;
-    // }
+    astCoord(max: number, start: number) {
+        return Math.floor((Math.random() * max) + start);
+    }
+
+    genAstMotion() {
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return -1;
+        }
+        else if (chance == 1){
+            return 0;
+        }
+        else if (chance == 2){
+            return 1;
+        }
+    }
+
+    genAstDamage() {
+        let chance = Math.floor(Math.random()*3);
+        if (chance == 0){
+            return 200;
+        }
+        else if (chance == 1){
+            return 250;
+        }
+        else if (chance == 2){
+            return 300;
+        }
+    }
+
+    asteroidMove() {
+        let i;
+        for (i = 0; i < this.allAsteroids.length; i++){
+            this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
+            this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
+        }
+    }
+
+//     checkPosition(oldPosition: AsteroidPosition, i: number): AsteroidPosition{
+//         let valid = true;
+//         let newPosition = oldPosition;
+//         // for (let i = 0; i < 2; i++){
+//         for (let i = 0; i < this.allBattleShips.length; i++){
+//             if (oldPosition == this.allBattleShips[i].shipPosition){
+//                 valid = false;
+//             }
+//         }
+//         if(valid == false){
+//             newPosition = this.genAstPosition(i);
+//             newPosition = this.checkPosition(newPosition, i);
+//         }
+//         return newPosition;
+// }
 
     //     updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
 //         let damage: number;
@@ -1032,9 +1089,9 @@ export class GameService {
     //     return newHostility;
     // }
 
-    inputReport(ship:ShipModel, reportNumber: number ){
-        ship.fullReport.reportArray.push(reportNumber);
-    }
+    // inputReport(ship:ShipModel, reportNumber: number ){
+    //     ship.fullReport.reportArray.push(reportNumber);
+    // }
 }
 
 function mod(n, m) {

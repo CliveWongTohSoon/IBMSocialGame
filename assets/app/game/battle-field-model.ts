@@ -1,7 +1,10 @@
 import { ShipDepartment } from "./ship-model";
+import {AsteroidModel} from "./asteroid-model";
 
 export class BattleFieldModel {
     constructor(public rowGrid: Array<TableContent[]>) {} // row grid contain the column array
+
+
 
     static renderGrid(shipDepartment: ShipDepartment, battleField: BattleFieldModel, colourFront: string, colourBack: string) {
 
