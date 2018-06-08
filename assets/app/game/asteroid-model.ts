@@ -1,7 +1,8 @@
 export class AsteroidModel {
     constructor(public asteroidPosition: AsteroidPosition,
                 public asteroidMotion: AsteroidMotion,
-                public damage:number) {}
+                public damage:number,
+                public color = '#000000') {}
 }
 
 export class AsteroidPosition {

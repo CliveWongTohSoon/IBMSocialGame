@@ -204,7 +204,7 @@ export class GameService {
     }
 
     updateAstGrid(asteroid: AsteroidModel) : BattleFieldModel {
-        return BattleFieldModel.renderAsteroids(asteroid, this.battleField);
+        return BattleFieldModel.renderAsteroids(asteroid, this.battleField, asteroid.color);
     }
 
     updateGrid(currentShip: ShipModel): BattleFieldModel {
@@ -339,14 +339,16 @@ export class GameService {
 
                     if (shipX == asterX && shipY == asterY) {
                         console.log("ASTEROID COLLISION");
+                        console.log(this.allAsteroids[i].asteroidPosition);
+                        console.log(this.allAsteroids[i].asteroidMotion);
                         resultant.xIndex = asterX - shipPosX;
                         resultant.yIndex = asterY - shipPosY;
 
-                        resultant.xIndex = -1 * resetToOne(resultant.xIndex);
-                        resultant.yIndex = -1 * resetToOne(resultant.yIndex);
+                        resultant.xIndex = 2 * resultant.xIndex;
+                        resultant.yIndex = 2 * resultant.yIndex;
 
-                        this.allAsteroids[i].asteroidMotion.xMotion += resultant.xIndex;
-                        this.allAsteroids[j].asteroidMotion.yMotion += resultant.yIndex;
+                        this.allAsteroids[i].asteroidMotion.xMotion = resultant.xIndex;
+                        this.allAsteroids[i].asteroidMotion.yMotion = resultant.yIndex;
                         this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1 * resultant.xIndex;
                         this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1 * resultant.yIndex;
 
@@ -355,11 +357,15 @@ export class GameService {
                 }
             }
             if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
-                this.allAsteroids[i].asteroidPosition.xIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.xMotion);
+                this.allAsteroids[i].asteroidPosition.xIndex += resetToOne(this.allAsteroids[i].asteroidMotion.xMotion);
+                this.worldRound(this.allAsteroids[i].asteroidPosition, this.battleField.rowGrid.length)
             }
             if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
-                this.allAsteroids[i].asteroidPosition.yIndex += -1 * resetToOne(this.allAsteroids[i].asteroidMotion.yMotion);
+                this.allAsteroids[i].asteroidPosition.yIndex += resetToOne(this.allAsteroids[i].asteroidMotion.yMotion);
+                this.worldRound(this.allAsteroids[i].asteroidPosition, this.battleField.rowGrid.length)
             }
+            console.log(this.allAsteroids[i].asteroidPosition);
+            console.log(this.allAsteroids[i].asteroidMotion);
         }
         function resetToOne(overflow: number): number {
             return Math.abs(overflow) / overflow;
@@ -881,10 +887,8 @@ export class GameService {
                 }
             }
             this.asteroidMove();
-
-
             this.checkCollision(this.battleField.rowGrid.length, turn);
-            // this.checkAsteroidCollision(this.battleField.rowGrid.length);
+            this.checkAsteroidCollision(this.battleField.rowGrid.length);
             this.performCollision(this.battleField.rowGrid.length, turn);
             //fb: collision with enemy / successful move
             for (let i = 0; i < this.allBattleShips.length; i++) {
@@ -973,7 +977,7 @@ export class GameService {
         let i;
         let newAstArray: AsteroidModel[] = [];
         //for(i=0; i <= this.allBattleShips.length; i++) {
-        for (i = 0; i <= 9; i++) {
+        for (i = 0; i < 3; i++) {
             newAstArray.push(this.generateAsteroid(i))
         }
         return newAstArray;
@@ -989,7 +993,7 @@ export class GameService {
     }
 
     genAstPosition(i: number) {
-        const maxX = 25 / (10 * 2);
+        const maxX = 25 / (3 * 2);
         // const maxX = 25 / (this.allBattleShips.length * 2);
         let xTmp = this.astCoord(maxX, ((2 * i) + 1) * maxX);
         let yTmp = Math.floor(Math.random() * 25);
@@ -1036,19 +1040,18 @@ export class GameService {
             this.allAsteroids[i].asteroidPosition.xIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.xIndex, this.battleField.rowGrid.length);
             this.allAsteroids[i].asteroidPosition.yIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.yIndex, this.battleField.rowGrid.length);
             //console.log(this.allAsteroids[i].asteroidMotion);
-            console.log(this.allAsteroids[i].asteroidPosition);
         }
 
     }
 
     circleAround(x : number, fieldsize : number) : number {
-        if(x == fieldsize){
-            return x - fieldsize;
+        if(x >= fieldsize){
+            return (x - fieldsize);
         }
         else if(x < 0){
-            return x + fieldsize;
+            return (x + fieldsize);
         }
-        return x;
+        else {return x}
     }
 
 
