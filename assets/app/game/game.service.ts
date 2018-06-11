@@ -780,7 +780,7 @@ export class GameService {
                 leAlive: depart[1].alive,
                 lwAlive: depart[2].alive,
                 rwAlive: depart[3].alive,
-                report0: 0,
+                report0: 0, // TODO:- Send report to the ship
                 report1: 1,
                 report2: 2
             });
