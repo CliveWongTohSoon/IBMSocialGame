@@ -1,7 +1,7 @@
 export class AsteroidModel {
     constructor(public asteroidPosition: AsteroidPosition,
                 public asteroidMotion: AsteroidMotion,
-                public damage:number
+                public damage:number,
                 public collided: boolean) {}
 }
 

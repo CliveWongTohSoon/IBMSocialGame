@@ -21,7 +21,8 @@ const schema = new Schema({
     defence: {type: Number, required: true},
     opponentDistance: {type: Array, required: true},
     opponentAngle: {type: Array, required: true},
-    report: {type: Array, required: true}
+    report: {type: Array, required: true},
+    colour: {type: String, required: true}
 });
 
 module.exports = mongoose.model('Start', schema);
