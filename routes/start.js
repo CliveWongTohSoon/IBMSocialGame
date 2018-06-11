@@ -27,6 +27,7 @@ router.post('/init', (req, res, next) => {
         ship.x = battleShipdata.x;
         ship.y = battleShipdata.y;
         ship.dir = battleShipdata.dir;
+        ship.totalHp = battleShipdata.totalHp;
         ship.reHealth = battleShipdata.totalHp;
         ship.leHealth = battleShipdata.totalHp;
         ship.rwHealth = battleShipdata.totalHp;
