@@ -609,6 +609,10 @@ export class GameService {
             if (victimShip.shipStats.shieldActive == true) {
                 damage = shootShieldCheck(shooterShip, victimShip, damage);
             }
+            else {
+                shooterShip.report.push(1);
+                victimShip.report.push(4);
+            }
             if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
                 victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
             } else {
