@@ -329,7 +329,7 @@ export class GameService {
                     if (shipX == asterX && shipY == asterY) {
                         console.log("ASTEROID COLLISION");
                         console.log(this.allAsteroids[i].asteroidMotion);
-                        console.log("Department hit = ", k;
+                        console.log("Department hit = ", k);
                         resultant.xIndex = asterX - shipPosX;
                         resultant.yIndex = asterY - shipPosY;
 
@@ -1142,7 +1142,9 @@ export class GameService {
         // }
     }
 
-    function mod(n, m) {
-        return ((n % m) + m) % m;
-    }
+
+}
+
+function mod(n, m) {
+    return ((n % m) + m) % m;
 }
