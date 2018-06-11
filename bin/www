@@ -50,14 +50,16 @@ io.on('connection', (socket) => {
     });
 
     socket.on('test', data => {
+        console.log('Entered test:', data);
         Instruction.findOne({shipId: data.shipId}, (err, instruction) => {
            if (err) throw err;
            instruction.instruction0 = data.instruction0;
            instruction.instruction1 = data.instruction1;
            instruction.instruction2 = data.instruction2;
+           instruction.phase = 'action';
            instruction.save(err, _ => {
                // console.log(instruction);
-               if (!err) io.sockets.emit('instruction_server', {shipId: data.shipId});
+               if (!err) io.sockets.emit('instruction_client', instruction);
            });
         });
     });
@@ -119,13 +121,17 @@ io.on('connection', (socket) => {
             ship.y = battleShipData.y;
             ship.dir = battleShipData.dir;
             ship.reHealth = battleShipData.reHealth;
-            ship.leHealth =  battleShipData.leHealth;
+            ship.leHealth = battleShipData.leHealth;
             ship.lwHealth = battleShipData.lwHealth;
             ship.rwHealth = battleShipData.rwHealth;
             ship.reAlive = battleShipData.reAlive;
             ship.leAlive = battleShipData.leAlive;
             ship.lwAlive = battleShipData.lwAlive;
             ship.rwAlive = battleShipData.rwAlive;
+            ship.opponentDistance = battleShipData.opponentDistance;
+            ship.opponentAngle = battleShipData.opponentAngle;
+            ship.report = battleShipData.report;
+
 
             ship.phase = 'report';
             // console.log('After: ', ship);
@@ -142,9 +148,8 @@ io.on('connection', (socket) => {
                             // TODO:- Send this to specific client only
                             io.to(battleShipData.shipId).emit('instruction', {
                                 phase: 'report',
-                                report0: battleShipData.report0,
-                                report1: battleShipData.report1,
-                                report2: battleShipData.report2
+                                report: battleShipData.report,
+
                             });
                         });
                 }

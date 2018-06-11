@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {ShipModel, Action, ShipAction, ShipPhase} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
+import {AsteroidModel} from "./asteroid-model";
 
 @Component({
     selector: 'app-game',
@@ -17,12 +18,16 @@ export class GameComponent implements OnInit {
 
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
+    // allAsteroid: AsteroidModel[];
 
     // Mock raspberry pi
     intentArray = [];
 
     constructor(private gameService: GameService) {
-        gameService.init(25).subscribe(battleField => this.battleField = battleField);
+        gameService.init(25).subscribe(battleField => {
+            this.battleField = battleField;
+            // gameService.createAstArray();
+        });
     }
 
     renderBackgroundColor(col: TableContent) {
@@ -31,6 +36,7 @@ export class GameComponent implements OnInit {
 
     start(numberOfPlayers: string) {
         // randomDir();
+
        //  console.log(numberOfPlayers);
        //
        //  console.log("Working");
@@ -146,11 +152,11 @@ export class GameComponent implements OnInit {
         // this.gameService.createShipFromSocket().subscribe(console.log);
         this.gameService.listenToInstruction().subscribe(instructionData => {
             // Match instruction data to different action
-            console.log('Entered listenToInstruction', instructionData);
+            // console.log('Entered listenToInstruction', instructionData);
             const currentShip = this.allBattleShip.filter(ship => ship.shipId === instructionData['shipId'])[0];
 
             // Update the ship phase to phase given in instruction
-            console.log(this.allBattleShip, instructionData['shipId']);
+            // console.log(this.allBattleShip, instructionData['shipId']);
             currentShip.phase = this.gameService.getPhase(instructionData['phase']);
             const instruction0 = instructionData['instruction0'];
             const instruction1 = instructionData['instruction1'];
@@ -166,15 +172,16 @@ export class GameComponent implements OnInit {
                 return curr.phase === ShipPhase.Action && prev;
             }, this.allBattleShip);
 
+            console.log('Are all battleship ready?', allBattleShipReady);
 
             if (allBattleShipReady) {
-                console.log('Entering full turn...');
+                // console.log('Entering full turn...');
                 this.gameService.fullTurns();
             }
         });
 
         this.gameService.createShipFromSocket().subscribe(shipModel => {
-            console.log('Ship:', shipModel);
+            // console.log('Ship:', shipModel);
             const numberOfPlayers = shipModel.length;
             // if (numberOfPlayers <= 2) {
             //     this.gameService.init(25)
@@ -193,6 +200,7 @@ export class GameComponent implements OnInit {
             // }
 
             this.allBattleShip = shipModel;
+
         });
     }
 }
