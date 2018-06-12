@@ -68,6 +68,7 @@ export class GameService {
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
         this.allAsteroids = this.createAstArray();
+        //this.Testing();
         console.log("Working!1");
         return Observable.of(this.battleField);
     }
@@ -97,13 +98,13 @@ export class GameService {
                         range = data[key]['range'],
                         attackRange = data[key]['attackRange'],
                         defence = data[key]['defence'],
-
+                        colour = data[key]['colour'],
                         phase = this.getPhase(data[key]['phase']); // Should give Start initially
                     // console.log(data);
 
                     const start = phase !== ShipPhase.End; // Check what I can do with this
 
-                    const randomColorBack = this.genRandomColor();
+                    const randomColorBack = colour;
                     const randomColorFront = this.shadeColor(randomColorBack, 20);
                     const initShipPosition = new ShipPosition(randomX, randomY);
                     const initShipDirection = new ShipDirection(randomDir);
@@ -328,34 +329,22 @@ export class GameService {
                     if (shipX == asterX && shipY == asterY) {
                         console.log("ASTEROID COLLISION");
                         console.log(this.allAsteroids[i].asteroidMotion);
+                        console.log("Department hit = ", k);
                         resultant.xIndex = asterX - shipPosX;
                         resultant.yIndex = asterY - shipPosY;
 
                         resultant.xIndex = 2 * resultant.xIndex;
                         resultant.yIndex = 2 * resultant.yIndex;
-                        console.log("RESULTANT before reset")
-                        console.log(resultant);
-                        this.allAsteroids[i].asteroidMotion.xMotion = resetToOne(resultant.xIndex);
-                        this.allAsteroids[i].asteroidMotion.yMotion = resetToOne(resultant.yIndex);
-                        this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1 * resultant.xIndex;
-                        this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1 * resultant.yIndex;
-                        this.allBattleShips[j].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+                        this.allAsteroids[i].asteroidMotion.xMotion = resetToOne( resultant.xIndex);
+                        this.allAsteroids[i].asteroidMotion.yMotion = resetToOne( resultant.yIndex);
+                        this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1* resultant.xIndex;
+                        this.allBattleShips[j].collisionInfo.resultantMove.yIndex +=  -1* resultant.yIndex;
+                        this.allBattleShips[j].collisionInfo.moveCount = 3;
                         this.allAsteroids[i].collided = true;
                         this.updateAsteroidHealth(this.allAsteroids[i], this.allBattleShips[j], k);
                     }
                 }
             }
-
-            // if(AsteroidCollided) {
-            //     if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
-            //         this.allAsteroids[i].asteroidPosition.xIndex += this.circleAround(resetToOne(this.allAsteroids[i].asteroidMotion.xMotion),fieldSize);
-            //     }
-            //     if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
-            //         this.allAsteroids[i].asteroidPosition.yIndex += this.circleAround(resetToOne(this.allAsteroids[i].asteroidMotion.yMotion),fieldSize);
-            //     }
-            //     AsteroidCollided = false;
-            //}
-
         }
 
         function resetToOne(overflow: number): number {
@@ -617,6 +606,10 @@ export class GameService {
             if (victimShip.shipStats.shieldActive == true) {
                 damage = shootShieldCheck(shooterShip, victimShip, damage);
             }
+            else {
+                shooterShip.report.push(1);
+                victimShip.report.push(4);
+            }
             if (victimShip.shipDepartment.departmentArray[affectedDep].health < damage) {
                 victimShip.shipDepartment.departmentArray[affectedDep].health = 0;
             } else {
@@ -718,7 +711,9 @@ export class GameService {
     }
 
     genRandomColor(): string {
-        return '#' + (Math.random() * 0xFFFFFF << 0).toString(16) === '#FFFFFF' ? '#990000' : '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+        let Color;
+        Color = (Math.random() * 0xFFFFFF << 0).toString(16);
+        return '#' + Color === '#FFFFFF' ? '#990000' : '#' + Color;
     }
 
     shadeColor(color, percent): string {
@@ -965,44 +960,53 @@ export class GameService {
         }
     }
 
-    createAstArray() {
+    createAstArray() : AsteroidModel[] {
         let i;
         let newAstArray: AsteroidModel[] = [];
         //for(i=0; i <= this.allBattleShips.length; i++) {
-        for (i = 0; i < 1; i++) {
+        for (i = 0; i < 2; i++) {
             newAstArray.push(this.generateAsteroid(i))
         }
         return newAstArray;
     }
 
-    generateAsteroid(i: number) {
+    generateAsteroid(i: number) : AsteroidModel {
         let newPosition = this.genAstPosition(i);
         // newPosition = this.checkPosition( newPosition, i);
-        let newMotion = new AsteroidMotion(0, 0);//this.genAstMotion(), this.genAstMotion());
+        let newMotion = new AsteroidMotion(this.genAstMotion(), this.genAstMotion());
         let newDamage = this.genAstDamage();
-        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage, false);
+        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage,false);
         return newAsteroid;
     }
 
-    genAstPosition(i: number) {
-        const maxX = 25 / (1 * 2);
+
+
+    genAstPosition(i: number) : AsteroidPosition {
+        const maxX = 25 / (2 * 2);
         // const maxX = 25 / (this.allBattleShips.length * 2);
         let xTmp = this.astCoord(maxX, ((2 * i) + 1) * maxX);
         let yTmp = Math.floor(Math.random() * 25);
-        let tmpPosition = new AsteroidPosition(2, 16);//xTmp, yTmp);
+        let tmpPosition = new AsteroidPosition(xTmp, yTmp);
         return tmpPosition;
     }
 
-    astCoord(max: number, start: number) {
+    Testing(){
+        for (let i = 0; i < this.allAsteroids.length ; i++){
+            let tmpPosition = new AsteroidPosition(21-i, 24);
+            this.allAsteroids[i].asteroidPosition = tmpPosition;
+        }
+    }
+
+    astCoord(max: number, start: number) : number{
         return Math.floor((Math.random() * max) + start);
     }
 
-    genAstMotion() {
+    genAstMotion() : number{
         let chance = Math.floor(Math.random() * 3) - 1;
         return chance;
     }
 
-    genAstDamage() {
+    genAstDamage() : number{
         let chance = Math.floor(Math.random() * 3);
         if (chance == 0) {
             return 200;
@@ -1029,12 +1033,13 @@ export class GameService {
 
     }
 
-    circleAround(x: number, fieldsize: number): number {
-        if (x == fieldsize) {
-            return x - fieldsize;
+
+    circleAround(x: number, fieldSize: number): number {
+        if (x == fieldSize) {
+            return x - fieldSize;
         }
         else if (x < 0) {
-            return x + fieldsize;
+            return x + fieldSize;
         }
         else {
             return x
@@ -1140,6 +1145,6 @@ export class GameService {
 
 }
 
-    function mod(n, m) {
-        return ((n % m) + m) % m;
-    }
+function mod(n, m) {
+    return ((n % m) + m) % m;
+}

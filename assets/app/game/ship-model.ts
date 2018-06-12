@@ -250,7 +250,7 @@ export class ShipHostility {
 //     "Shields have been damaged by an enemy",             // code 5
 //     "We have collided with an enemy ship"                // code 6
 //     "We've collided with an asteroid"                    // code 7
-//     "Our right weapons have missed"                      //code 8
+//     "Our right weapons have missed"                      // code 8
 // ];
 
 

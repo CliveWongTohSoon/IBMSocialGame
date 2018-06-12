@@ -7,7 +7,7 @@ export class BattleFieldModel {
     static renderAsteroids(asteroid: AsteroidModel, battleField: BattleFieldModel){
         const rowIndex = asteroid.asteroidPosition.yIndex, colIndex = asteroid.asteroidPosition.xIndex;
 
-        battleField.rowGrid[rowIndex][colIndex].color = '#000000';
+        battleField.rowGrid[rowIndex][colIndex].color = '#7d7d7d';
 
         return battleField;
     }
