@@ -1,3 +1,21 @@
+#health-table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 20%;
+}
+
+#health-table td, th {
+    color: #ffffff;
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+/*#health-table tr{*/
+    /*background-color: #dddddd;*/
+/*}*/
+
+
 #drawing-table {
     table-layout: fixed;
     width: 100%;
