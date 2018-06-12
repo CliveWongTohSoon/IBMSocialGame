@@ -68,7 +68,7 @@ export class GameService {
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
         this.allAsteroids = this.createAstArray();
-        console.log(this.allAsteroids);
+        console.log("Working!1");
         return Observable.of(this.battleField);
     }
 
@@ -197,14 +197,14 @@ export class GameService {
             return prev;
         }, this.battleField);
 
-        this.battleField = this.allAsteroids.reduce((prev,curr) => {
+        this.battleField = this.allAsteroids.reduce((prev, curr) => {
             prev = this.updateAstGrid(curr);
             return prev;
         }, this.battleField);
     }
 
-    updateAstGrid(asteroid: AsteroidModel) : BattleFieldModel {
-        return BattleFieldModel.renderAsteroids(asteroid, this.battleField, asteroid.color);
+    updateAstGrid(asteroid: AsteroidModel): BattleFieldModel {
+        return BattleFieldModel.renderAsteroids(asteroid, this.battleField);
     }
 
     updateGrid(currentShip: ShipModel): BattleFieldModel {
@@ -253,10 +253,16 @@ export class GameService {
     }
 
     performCollision(fieldSize: number, turn: number) {
+        console.log(this.allAsteroids[0].asteroidPosition);
         var validCheck = false;
 
         for (let i = 0; i < this.allBattleShips.length; i++) {
             if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
+                validCheck = true;
+            }
+        }
+        for (let i = 0; i < this.allAsteroids.length; i++) {
+            if (this.allAsteroids[i].collided == true) {
                 validCheck = true;
             }
         }
@@ -268,45 +274,23 @@ export class GameService {
                     this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
                     this.allBattleShips[i].collisionInfo.moveCount--;
                     this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
+                    console.log(this.allBattleShips[i].collisionInfo.resultantMove);
                 }
             }
+            for (let i = 0; i < this.allAsteroids.length; i++) {
+                if (this.allAsteroids[i].collided == true) {
+                    this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
+                    this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
+                    this.allAsteroids[i].asteroidPosition.xIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.xIndex, fieldSize);
+                    this.allAsteroids[i].asteroidPosition.yIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.yIndex, fieldSize);
+                    this.allAsteroids[i].collided = false;
+                }
+            }
+            console.log("After");
+            console.log(this.allAsteroids[0].asteroidPosition);
+
 
             this.checkCollision(fieldSize, turn);
-            validCheck = false;
-
-            for (let i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
-
-                    validCheck = true;
-                }
-            }
-        }
-        for (let i = 0; i < this.allBattleShips.length; i++) {
-            this.allBattleShips[i].collisionInfo.resultantMove.xIndex = 0;
-            this.allBattleShips[i].collisionInfo.resultantMove.yIndex = 0;
-        }
-    }
-
-
-    performAsteroidCollision(fieldSize: number) {
-        var validCheck = false;
-
-        for (let i = 0; i < this.allBattleShips.length; i++) {
-            if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
-                validCheck = true;
-            }
-        }
-        while (validCheck) {
-            for (let i = 0; i < this.allBattleShips.length; i++) {
-                if (this.allBattleShips[i].collisionInfo.moveCount > 0) {
-                    this.allBattleShips[i].shipPosition.xIndex += this.allBattleShips[i].collisionInfo.resultantMove.xIndex;
-                    this.allBattleShips[i].shipPosition.yIndex += this.allBattleShips[i].collisionInfo.resultantMove.yIndex;
-                    this.allBattleShips[i].shipPosition = this.worldRound(this.allBattleShips[i].shipPosition, fieldSize);
-                    this.allBattleShips[i].collisionInfo.moveCount--;
-                    this.updateShip(this.allBattleShips[i], this.allBattleShips[i].shipPosition, this.allBattleShips[i].shipDirection);
-                }
-            }
-
             this.checkAsteroidCollision(fieldSize);
             validCheck = false;
 
@@ -324,9 +308,13 @@ export class GameService {
     }
 
     checkAsteroidCollision(fieldSize: number) {
+        console.log("Inside Collisio");
+        console.log(this.allBattleShips);
+        let AsteroidCollided: boolean = false;
         var resultant: ShipPosition = new ShipPosition(0, 0);
 
         for (let i = 0; i < this.allAsteroids.length; i++) {
+            console.log(this.allAsteroids[i].asteroidPosition);
             for (let j = 0; j < this.allBattleShips.length; j++) {
                 for (let k = 0; k < 4; k++) {
                     let shipX = this.allBattleShips[j].shipDepartment.departmentArray[k].xIndex;
@@ -339,34 +327,37 @@ export class GameService {
 
                     if (shipX == asterX && shipY == asterY) {
                         console.log("ASTEROID COLLISION");
-                        console.log(this.allAsteroids[i].asteroidPosition);
                         console.log(this.allAsteroids[i].asteroidMotion);
                         resultant.xIndex = asterX - shipPosX;
                         resultant.yIndex = asterY - shipPosY;
 
                         resultant.xIndex = 2 * resultant.xIndex;
                         resultant.yIndex = 2 * resultant.yIndex;
-
-                        this.allAsteroids[i].asteroidMotion.xMotion = resultant.xIndex;
-                        this.allAsteroids[i].asteroidMotion.yMotion = resultant.yIndex;
+                        console.log("RESULTANT before reset")
+                        console.log(resultant);
+                        this.allAsteroids[i].asteroidMotion.xMotion = resetToOne(resultant.xIndex);
+                        this.allAsteroids[i].asteroidMotion.yMotion = resetToOne(resultant.yIndex);
                         this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1 * resultant.xIndex;
                         this.allBattleShips[j].collisionInfo.resultantMove.yIndex += -1 * resultant.yIndex;
-
-                        this.allBattleShips[i].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+                        this.allBattleShips[j].collisionInfo.moveCount = Math.floor(Math.random() * 3 + 3);
+                        this.allAsteroids[i].collided = true;
+                        this.updateAsteroidHealth(this.allAsteroids[i], this.allBattleShips[j], k);
                     }
                 }
             }
-            if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
-                this.allAsteroids[i].asteroidPosition.xIndex += resetToOne(this.allAsteroids[i].asteroidMotion.xMotion);
-                this.worldRound(this.allAsteroids[i].asteroidPosition, this.battleField.rowGrid.length)
-            }
-            if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
-                this.allAsteroids[i].asteroidPosition.yIndex += resetToOne(this.allAsteroids[i].asteroidMotion.yMotion);
-                this.worldRound(this.allAsteroids[i].asteroidPosition, this.battleField.rowGrid.length)
-            }
-            console.log(this.allAsteroids[i].asteroidPosition);
-            console.log(this.allAsteroids[i].asteroidMotion);
+
+            // if(AsteroidCollided) {
+            //     if (Math.abs(this.allAsteroids[i].asteroidMotion.xMotion) >= 1) {
+            //         this.allAsteroids[i].asteroidPosition.xIndex += this.circleAround(resetToOne(this.allAsteroids[i].asteroidMotion.xMotion),fieldSize);
+            //     }
+            //     if (Math.abs(this.allAsteroids[i].asteroidMotion.yMotion) >= 1) {
+            //         this.allAsteroids[i].asteroidPosition.yIndex += this.circleAround(resetToOne(this.allAsteroids[i].asteroidMotion.yMotion),fieldSize);
+            //     }
+            //     AsteroidCollided = false;
+            //}
+
         }
+
         function resetToOne(overflow: number): number {
             return Math.abs(overflow) / overflow;
         }
@@ -645,7 +636,7 @@ export class GameService {
                     shooterShip.report.push(3);
                     victimShip.report.push(5);
                 }
-                else{
+                else {
                     shooterShip.report.push(1);
                     victimShip.report.push(4);
                 }
@@ -900,10 +891,11 @@ export class GameService {
                 // fb: *department* destroyed
                 this.allBattleShips[i].shipStats.shieldActive = false;
             }
+
         }
 
-        for (let i = 0; i < this.allBattleShips.length; i++){
-            if (this.allBattleShips[i].report.length == 0){
+        for (let i = 0; i < this.allBattleShips.length; i++) {
+            if (this.allBattleShips[i].report.length == 0) {
                 this.allBattleShips[i].report.push(0);
             }
         }
@@ -977,7 +969,7 @@ export class GameService {
         let i;
         let newAstArray: AsteroidModel[] = [];
         //for(i=0; i <= this.allBattleShips.length; i++) {
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < 1; i++) {
             newAstArray.push(this.generateAsteroid(i))
         }
         return newAstArray;
@@ -986,18 +978,18 @@ export class GameService {
     generateAsteroid(i: number) {
         let newPosition = this.genAstPosition(i);
         // newPosition = this.checkPosition( newPosition, i);
-        let newMotion = new AsteroidMotion(this.genAstMotion(), this.genAstMotion());
+        let newMotion = new AsteroidMotion(0, 0);//this.genAstMotion(), this.genAstMotion());
         let newDamage = this.genAstDamage();
-        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage);
+        let newAsteroid = new AsteroidModel(newPosition, newMotion, newDamage, false);
         return newAsteroid;
     }
 
     genAstPosition(i: number) {
-        const maxX = 25 / (3 * 2);
+        const maxX = 25 / (1 * 2);
         // const maxX = 25 / (this.allBattleShips.length * 2);
         let xTmp = this.astCoord(maxX, ((2 * i) + 1) * maxX);
         let yTmp = Math.floor(Math.random() * 25);
-        let tmpPosition = new AsteroidPosition(xTmp, yTmp);
+        let tmpPosition = new AsteroidPosition(2, 16);//xTmp, yTmp);
         return tmpPosition;
     }
 
@@ -1006,16 +998,8 @@ export class GameService {
     }
 
     genAstMotion() {
-        let chance = Math.floor(Math.random() * 3);
-        if (chance == 0) {
-            return -1;
-        }
-        else if (chance == 1) {
-            return 0;
-        }
-        else if (chance == 2) {
-            return 1;
-        }
+        let chance = Math.floor(Math.random() * 3) - 1;
+        return chance;
     }
 
     genAstDamage() {
@@ -1040,18 +1024,21 @@ export class GameService {
             this.allAsteroids[i].asteroidPosition.xIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.xIndex, this.battleField.rowGrid.length);
             this.allAsteroids[i].asteroidPosition.yIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.yIndex, this.battleField.rowGrid.length);
             //console.log(this.allAsteroids[i].asteroidMotion);
+            // console.log(this.allAsteroids[i].asteroidPosition);
         }
 
     }
 
-    circleAround(x : number, fieldsize : number) : number {
-        if(x >= fieldsize){
-            return (x - fieldsize);
+    circleAround(x: number, fieldsize: number): number {
+        if (x == fieldsize) {
+            return x - fieldsize;
         }
-        else if(x < 0){
-            return (x + fieldsize);
+        else if (x < 0) {
+            return x + fieldsize;
         }
-        else {return x}
+        else {
+            return x
+        }
     }
 
 
@@ -1071,86 +1058,88 @@ export class GameService {
 //         return newPosition;
 // }
 
-    //     updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
-//         let damage: number;
-//         damage = asteroid.damage;
-//         if (victimShip.shipStats.shieldActive == true) {
-//             damage = asteroidShieldCheck(victimShip, asteroid, damage);
-//         }
-//         console.log("DAMAGE" + damage);
-//         if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
-//             victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
-//         }
-//         else {
-//             victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
-//         }
-//
-//         function asteroidShieldCheck(updatingShip: ShipModel, asteroid: AsteroidModel, damage: number) {
-//             let shieldGridDirection: Direction;
-//             let reducedDamage = damage;
-//             // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
-//             // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
-//             shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
-//             if (shieldGridDirection > 3) {
-//                 shieldGridDirection = shieldGridDirection - 4;
-//             }
-//             if (asteroid.asteroidMotion.yMotion > 0 && shieldGridDirection == Direction.Up) {
-//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-//             }
-//             if (asteroid.asteroidMotion.yMotion < 0 && shieldGridDirection == Direction.Down) {
-//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-//             }
-//             if (asteroid.asteroidMotion.xMotion > 0 && shieldGridDirection == Direction.Left) {
-//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-//             }
-//             if (asteroid.asteroidMotion.xMotion < 0 && shieldGridDirection == Direction.Right) {
-//                 reducedDamage = damage * (1 - updatingShip.shipStats.defence)
-//             }
-//
-//             return reducedDamage;
-//         }
+    updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
+        let damage: number;
+        damage = asteroid.damage;
+        if (victimShip.shipStats.shieldActive == true) {
+            damage = asteroidShieldCheck(victimShip, asteroid, damage);
+        }
+        console.log("DAMAGE" + damage);
+        if (victimShip.shipDepartment.departmentArray[affectedVictimDep].health < damage) {
+            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = 0;
+        }
+        else {
+            victimShip.shipDepartment.departmentArray[affectedVictimDep].health = victimShip.shipDepartment.departmentArray[affectedVictimDep].health - damage;
+        }
 
-    // getHostility(json, ship: ShipModel) {
-    //     const emotion = json['emotion_tone']; // This is an array
-    //     const language = json['language_tone'];
-    //     const social = json['social_tone'];
-    //     let hostility = new ShipHostility(ship.ShipHostility.hosti);
-    //     //const sampleJson = {hallo: [{personality: 'trait'}, {personality: 'second_trait'}]};
-    //     Object.keys(emotion).map((key) => {
-    //          hostility= this.emotionSort(hostility, (emotion[key]["trait_id"]), emotion[key]["percentile"])
-    //     });
-    //     Object.keys(language).map((key) => {
-    //         hostility = this.languageSort(hostility, (language[key]["trait_id"]), language[key]["percentile"])
-    //     });
-    //     Object.keys(social).map((key) => {
-    //         hostility = this.socialSort(hostility, (social[key]["trait_id"]), social[key]["percentile"])
-    //     });
-    //
-    //     ship.ShipHostility = hostility;
-    // }
+        function asteroidShieldCheck(updatingShip: ShipModel, asteroid: AsteroidModel, damage: number) {
+            let shieldGridDirection: Direction;
+            let reducedDamage = damage;
+            // let xDiff = updatingShip.shipPosition.xIndex - referShip.shipPosition.xIndex;
+            // let yDiff = updatingShip.shipPosition.yIndex - referShip.shipPosition.yIndex;
+            shieldGridDirection = updatingShip.shipDirection.dir + updatingShip.shipStats.shieldDirection;
+            if (shieldGridDirection > 3) {
+                shieldGridDirection = shieldGridDirection - 4;
+            }
+            if (asteroid.asteroidMotion.yMotion > 0 && shieldGridDirection == Direction.Up) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.yMotion < 0 && shieldGridDirection == Direction.Down) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.xMotion > 0 && shieldGridDirection == Direction.Left) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
+            if (asteroid.asteroidMotion.xMotion < 0 && shieldGridDirection == Direction.Right) {
+                reducedDamage = damage * (1 - updatingShip.shipStats.defence)
+            }
 
-    // emotionSort(shipHostility: ShipHostility, traitID: string, percentile: number): ShipHostility {
-    //     let newHostility = shipHostility;
-    //     const hostile_increase = 0.2;
-    //     if (traitID == 'emotion_anger') {
-    //         newHostility.hosti += hostile_increase * percentile;
-    //     }
-    //     if (traitID == 'emotion_disgust') {
-    //         newHostility.hosti += hostile_increase * percentile;
-    //     }
-    //     if (traitID == 'emotion_fear') {
-    //         newHostility.hosti += hostile_increase * percentile;
-    //     }
-    //     if (traitID == 'emotion_joy') {
-    //         newHostility.hosti -= hostile_increase * percentile;
-    //     }
-    //     if (traitID == 'emotion_sadness') {
-    //         newHostility.hosti += hostile_increase * percentile;
-    //     }
-    //     return newHostility;
-    // }
+            return reducedDamage;
+        }
+    }
+
+        // getHostility(json, ship: ShipModel) {
+        //     const emotion = json['emotion_tone']; // This is an array
+        //     const language = json['language_tone'];
+        //     const social = json['social_tone'];
+        //     let hostility = new ShipHostility(ship.ShipHostility.hosti);
+        //     //const sampleJson = {hallo: [{personality: 'trait'}, {personality: 'second_trait'}]};
+        //     Object.keys(emotion).map((key) => {
+        //          hostility= this.emotionSort(hostility, (emotion[key]["trait_id"]), emotion[key]["percentile"])
+        //     });
+        //     Object.keys(language).map((key) => {
+        //         hostility = this.languageSort(hostility, (language[key]["trait_id"]), language[key]["percentile"])
+        //     });
+        //     Object.keys(social).map((key) => {
+        //         hostility = this.socialSort(hostility, (social[key]["trait_id"]), social[key]["percentile"])
+        //     });
+        //
+        //     ship.ShipHostility = hostility;
+        // }
+
+        // emotionSort(shipHostility: ShipHostility, traitID: string, percentile: number): ShipHostility {
+        //     let newHostility = shipHostility;
+        //     const hostile_increase = 0.2;
+        //     if (traitID == 'emotion_anger') {
+        //         newHostility.hosti += hostile_increase * percentile;
+        //     }
+        //     if (traitID == 'emotion_disgust') {
+        //         newHostility.hosti += hostile_increase * percentile;
+        //     }
+        //     if (traitID == 'emotion_fear') {
+        //         newHostility.hosti += hostile_increase * percentile;
+        //     }
+        //     if (traitID == 'emotion_joy') {
+        //         newHostility.hosti -= hostile_increase * percentile;
+        //     }
+        //     if (traitID == 'emotion_sadness') {
+        //         newHostility.hosti += hostile_increase * percentile;
+        //     }
+        //     return newHostility;
+        // }
+
 }
 
-function mod(n, m) {
-    return ((n % m) + m) % m;
-}
+    function mod(n, m) {
+        return ((n % m) + m) % m;
+    }

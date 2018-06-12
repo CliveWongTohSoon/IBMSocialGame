@@ -4,10 +4,10 @@ import {AsteroidModel} from "./asteroid-model";
 export class BattleFieldModel {
     constructor(public rowGrid: Array<TableContent[]>) {} // row grid contain the column array
 
-    static renderAsteroids(asteroid: AsteroidModel, battleField: BattleFieldModel, color: string){
+    static renderAsteroids(asteroid: AsteroidModel, battleField: BattleFieldModel){
         const rowIndex = asteroid.asteroidPosition.yIndex, colIndex = asteroid.asteroidPosition.xIndex;
 
-        battleField.rowGrid[rowIndex][colIndex].color = color;
+        battleField.rowGrid[rowIndex][colIndex].color = '#000000';
 
         return battleField;
     }
