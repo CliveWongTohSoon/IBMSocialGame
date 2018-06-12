@@ -242,15 +242,15 @@ export class ShipHostility {
 
 
 // const report = [
-//     "[] unknown entities detected within radar range",   // code 0
-//     "Attacked the enemy successfully",                   // code 1
-//     "Our left weapons have missed",                      // code 2
-//     "Our weapons have hit enemy shields"                 // code 3
-//     "We're under attack from an enemy",                  // code 4
-//     "Shields have been damaged by an enemy",             // code 5
-//     "We have collided with an enemy ship"                // code 6
-//     "We've collided with an asteroid"                    // code 7
-//     "Our right weapons have missed"                      // code 8
+//     "[opponentDistance.length] unknown entities detected within radar range",    // code 0
+//     "Attacked the enemy successfully",                                           // code 1
+//     "Our left weapons have missed",                                              // code 2
+//     "Our weapons have hit enemy shields"                                         // code 3
+//     "We're under attack from an enemy",                                          // code 4
+//     "Shields have been damaged by an enemy",                                     // code 5
+//     "We have collided with an enemy ship"                                        // code 6
+//     "We've collided with an asteroid"                                            // code 7
+//     "Our right weapons have missed"                                              // code 8
 // ];
 
 
