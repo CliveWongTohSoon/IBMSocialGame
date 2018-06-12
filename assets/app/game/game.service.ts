@@ -283,7 +283,7 @@ export class GameService {
                     this.allAsteroids[i].asteroidPosition.xIndex += this.allAsteroids[i].asteroidMotion.xMotion;
                     this.allAsteroids[i].asteroidPosition.yIndex += this.allAsteroids[i].asteroidMotion.yMotion;
                     this.allAsteroids[i].asteroidPosition.xIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.xIndex, fieldSize);
-                    this.allAsteroids[i].asteroidPosition.yIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.yIndex,fieldSize);
+                    this.allAsteroids[i].asteroidPosition.yIndex = this.circleAround(this.allAsteroids[i].asteroidPosition.yIndex, fieldSize);
                     this.allAsteroids[i].collided = false;
                 }
             }
@@ -335,13 +335,10 @@ export class GameService {
 
                         resultant.xIndex = 2 * resultant.xIndex;
                         resultant.yIndex = 2 * resultant.yIndex;
-
-
                         this.allAsteroids[i].asteroidMotion.xMotion = resetToOne( resultant.xIndex);
                         this.allAsteroids[i].asteroidMotion.yMotion = resetToOne( resultant.yIndex);
                         this.allBattleShips[j].collisionInfo.resultantMove.xIndex += -1* resultant.xIndex;
                         this.allBattleShips[j].collisionInfo.resultantMove.yIndex +=  -1* resultant.yIndex;
-
                         this.allBattleShips[j].collisionInfo.moveCount = 3;
                         this.allAsteroids[i].collided = true;
                         this.updateAsteroidHealth(this.allAsteroids[i], this.allBattleShips[j], k);
@@ -876,8 +873,6 @@ export class GameService {
                 }
             }
             this.asteroidMove();
-
-
             this.checkCollision(this.battleField.rowGrid.length, turn);
             this.checkAsteroidCollision(this.battleField.rowGrid.length);
             this.performCollision(this.battleField.rowGrid.length, turn);
@@ -1046,7 +1041,9 @@ export class GameService {
         else if (x < 0) {
             return x + fieldSize;
         }
-        return x;
+        else {
+            return x
+        }
     }
 
 
@@ -1104,6 +1101,7 @@ export class GameService {
 
             return reducedDamage;
         }
+    }
 
         // getHostility(json, ship: ShipModel) {
         //     const emotion = json['emotion_tone']; // This is an array
@@ -1144,8 +1142,6 @@ export class GameService {
         //     }
         //     return newHostility;
         // }
-    }
-
 
 }
 

@@ -17,8 +17,12 @@
 
 
 #drawing-table {
+    /*position:absolute;*/
+    /*left: 0px;*/
+    /*top: 20px;*/
     table-layout: fixed;
-    width: 100%;
+    width: 650px;
+    height: 650px;
     border-collapse: collapse;
 }
 
