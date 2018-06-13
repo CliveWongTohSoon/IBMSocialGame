@@ -16,6 +16,10 @@ export class GameComponent implements OnInit {
     text: string = 'Right';
     disabledBool = true;
 
+    showButton = '';
+    Move = 0;
+
+
     battleField: BattleFieldModel;
     allBattleShip: ShipModel[];
     // allAsteroid: AsteroidModel[];
@@ -203,6 +207,22 @@ export class GameComponent implements OnInit {
 
         });
     }
+    // showDiv1() {
+    //     this.showButton = 'TestShipB';
+    // }
+    // showDiv2() {
+    //     this.showButton = 'TestShipA';
+    // }
+    showDiv(i){
+        if(i==0){
+            this.showButton = 'TestShipB';
+        }
+        else{
+            this.showButton = 'TestShipA';
+        }
+
+    }
+
 }
 
 

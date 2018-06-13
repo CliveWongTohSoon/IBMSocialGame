@@ -1,0 +1,15 @@
+h1{
+    font: 5em "Pixel Twist", serif;
+    text-transform: lowercase;
+}
+h2{
+    font: 4em "Pixel Twist", serif;
+    text-transform: lowercase;
+}
+h3{
+    font: 3em "Pixel Twist", serif;
+    text-transform: lowercase;
+}
+p{
+    font: 2em "Pixelade", serif;
+}

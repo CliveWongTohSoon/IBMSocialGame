@@ -1,7 +1,30 @@
 <div class="col-md-8 col-md-offset-2">
     <h1> Introduction </h1>
-    Some Rules...
-    <hr>
+    <p>SpaceRaze is a Star Trek inspired game that uses a player's twitter personality to adjust for different experiences.
+    The game uses IBM Watson AI personality insight module to analyse the player's personality through their twitter account.
+    It returns a score for each personality attribute in the Five Factor Model and the Theory of Basic Human Values. Then the game
+    uses an algorithm to convert these scores into 5 different ship parameters.
+        Each ship within a game represents one player.</p>
+    <br>
+
+    <h2> How to play </h2>
+    <p>
+    •	Your aim is to find and destroy the other spaceship, before it happens to you! <br><br>
+    •	The radar system of your ship will detect nearby enemy ships and asteroids by emitting a “ping” noise in the direction which they are coming from, increasing pitch the closer it gets.<br><br>
+    •	Your ship has the ability to do the following things:<br><br>
+    SHOOT<br>
+    MOVE<br>
+    TURN - Left/Right<br>
+    SHIELD - Front/Back/Left/Right<br><br>
+    •	You have 60 seconds to give a maximum of 3 commands to your crew. Along with the original commands, the ship can also accept some variations of these commands:<br><br>
+    “FIRE” or “BLAST” for “SHOOT”<br>
+    “ROTATE” or “SPIN” for “TURN”<br>
+    “DEFEND”, “ACTIVATE FORCE FIELD”, “ARMOUR UP”, or “COVER” for “SHIELD”<br>
+    “FORWARD” or “STRAIGHT AHEAD” for "MOVE"<br>
+    There are several others- feel free to try them!<br><br>
+
+    •	At the end of the 60 seconds, the commands of both players will be executed.<br>
+    </p>
     <h2> Select a ship </h2>
     <h3> Available Ship </h3>
     <div *ngIf="shipModel == null" style="color: red">No ship available yet, please come back later!</div>
