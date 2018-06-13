@@ -12,6 +12,7 @@ import {
 } from "../game/ship-model";
 import {GameService} from "../game/game.service";
 import {Router} from "@angular/router";
+import {AsteroidModel} from "../game/asteroid-model";
 
 @Component({
     selector: 'app-introduction',
@@ -27,6 +28,9 @@ export class IntroductionComponent {
     // ship
     shipModel: ShipModel[];
 
+    // Asteroid
+    allAsteroid: AsteroidModel[];
+
     // Your ship stats
     myShipStats: ShipStats;
 
@@ -35,7 +39,8 @@ export class IntroductionComponent {
 
         this.createShipFromSocket();
 
-        http.get('https://ibmsg2018.eu-gb.mybluemix.net//getuser').subscribe(result => {
+        const url = window.location.origin + '/getuser';
+        http.get(url).subscribe(result => {
             const data = result['obj'];
             
             if (!data) this.router.navigate(['/']);
@@ -86,6 +91,12 @@ export class IntroductionComponent {
             })
                 .filter(ship => ship !== null);
         });
+
+        this.createAsteroid();
+    }
+
+    createAsteroid() {
+        this.allAsteroid = this.gameService.createAstArray();
     }
 
     getPersonality(json) {
@@ -208,13 +219,16 @@ export class IntroductionComponent {
         // Update to database
 
         const maxX = 25 / (this.shipModel.length * 2);
+
         const data = {
+            // asteroid: this.allAsteroid,
             shipId: ship.shipId,
             totalHp: this.myShipStats.totalHp,
             x: this.gameService.randomCoor(maxX, 2*i*maxX),
             y: ship.shipPosition.yIndex,
             dir: this.gameService.randomDir(4)
         };
+
         console.log(data);
 
         const body = JSON.stringify(data);
@@ -222,7 +236,8 @@ export class IntroductionComponent {
             'Content-Type': 'application/json'
         });
 
-        this.http.post('https://ibmsg2018.eu-gb.mybluemix.net/start/init', body, {headers: headers})
+        const url = window.location.origin + '/start/init';
+        this.http.post(url, body, {headers: headers})
             .take(1)
             .toPromise()
             .then(() => this.router.navigate(['/game']));
@@ -234,7 +249,8 @@ export class IntroductionComponent {
             'Content-Type': 'application/json'
         });
 
-        return this.http.post('https://ibmsg2018.eu-gb.mybluemix.net/api/profile/twitter', body, {headers: headers})
+        const url = window.location.origin + '/api/profile/twitter';
+        return this.http.post(url, body, {headers: headers})
             .take(1)
             .toPromise();
     }

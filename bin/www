@@ -36,17 +36,30 @@ io.on('connection', (socket) => {
         .exec((err, start) => {
             if (err) throw err;
             // console.log('All ships: ', start);
+
             socket.emit('start', start);
+
+            // Send to ship
+            // Object.keys(start).forEach(key => {
+            //     const eachShip = start[key];
+            //     socket.to(eachShip.shipId).emit('start_client', eachShip);
+            // });
         });
 
     Instruction.find()
-        .exec((err, instruction) => {
+        .exec((err) => {
            if (err) throw err;
            socket.emit('instruction', {phase: 'action'});
         });
 
     socket.on('join', roomData => {
-       socket.join(roomData.shipId);
+        socket.join(roomData.shipId);
+
+        // send to ship initially
+        Start.findOne({shipId: roomData.shipId}, (err, ship) => {
+            if (err) throw err;
+            io.to(roomData.shipId).emit('start_client', ship);
+        });
     });
 
     socket.on('test', data => {
@@ -65,7 +78,6 @@ io.on('connection', (socket) => {
     });
 
     // Listening to instruction given by pi
-    // Note: Cannot use -
     socket.on('instruction_server', data => {
         // Update the ship to action phase
         console.log('instruction_server reached!', data);
@@ -76,7 +88,7 @@ io.on('connection', (socket) => {
                     // update the instruction to action phase
                     Instruction.findOne({shipId: data.shipId}, (err, instruction) => {
                         instruction.phase = 'action';
-                        instruction.save(err, _ => {
+                        instruction.save((err) => {
                             if (!err) {
                                 io.sockets.emit('instruction_client', instruction);
                             }
@@ -108,46 +120,53 @@ io.on('connection', (socket) => {
        });
     });
 
-    socket.on('update', battleShipData => {
-        console.log('Entered update');
+    socket.on('update', allBattleShipData => {
         // console.log(newBattleShipArray);
-        Start.findOne({shipId: battleShipData.shipId}, (err, ship) => {
-            // console.log('Before: ', ship);
-            ship.x = battleShipData.x;
-            ship.y = battleShipData.y;
-            ship.dir = battleShipData.dir;
-            ship.reHealth = battleShipData.reHealth;
-            ship.leHealth = battleShipData.leHealth;
-            ship.lwHealth = battleShipData.lwHealth;
-            ship.rwHealth = battleShipData.rwHealth;
-            ship.reAlive = battleShipData.reAlive;
-            ship.leAlive = battleShipData.leAlive;
-            ship.lwAlive = battleShipData.lwAlive;
-            ship.rwAlive = battleShipData.rwAlive;
-            ship.opponentDistance = battleShipData.opponentDistance;
-            ship.opponentAngle = battleShipData.opponentAngle;
-            ship.report = battleShipData.report;
+        Object.keys(allBattleShipData).forEach(key => {
+            const battleShipData = allBattleShipData[key];
+            // console.log(battleShipData);
+            Start.findOne({shipId: battleShipData.shipId}, (err, ship) => {
+                // console.log('Before: ', ship);
+                ship.x = battleShipData.x;
+                ship.y = battleShipData.y;
+                ship.dir = battleShipData.dir;
+                ship.reHealth = battleShipData.reHealth;
+                ship.leHealth = battleShipData.leHealth;
+                ship.lwHealth = battleShipData.lwHealth;
+                ship.rwHealth = battleShipData.rwHealth;
+                ship.reAlive = battleShipData.reAlive;
+                ship.leAlive = battleShipData.leAlive;
+                ship.lwAlive = battleShipData.lwAlive;
+                ship.rwAlive = battleShipData.rwAlive;
+                ship.opponentDistance = battleShipData.opponentDistance;
+                ship.opponentAngle = battleShipData.opponentAngle;
+                ship.report = battleShipData.report;
+                ship.phase = 'report';
+                // console.log('After: ', ship);
+                // console.log(ship);
 
-            ship.phase = 'report';
-            // console.log('After: ', ship);
-            // console.log(ship);
-            ship.save(err, _ => {
-                if (!err) {
-                    Start.find()
-                        .exec((err, start) => {
-                            if (err) throw err;
-                            // Send to front end to update the ship to sync with database
-                            io.sockets.emit('start', start);
+                ship.save(err => {
+                    if (!err) {
+                        // Send to specific ship
+                        io.to(battleShipData.shipId).emit('start_client', ship);
 
-                            // Send to pi to report the status of the ship
-                            // TODO:- Send this to specific client only
-                            io.to(battleShipData.shipId).emit('instruction', {
-                                phase: 'report',
-                                report: battleShipData.report,
-                            });
+                        // Send instruction to pi
+                        io.to(battleShipData.shipId).emit('instruction', {
+                            phase: 'report',
+                            report: battleShipData.report,
                         });
-                }
+
+                        Start.find()
+                            .exec((err, start) => {
+                                if (err) throw err;
+                                // Send to front end to update the ship to sync with database
+                                io.sockets.emit('start', start);
+                            });
+                    }
+                });
             });
+
+
         });
     });
 

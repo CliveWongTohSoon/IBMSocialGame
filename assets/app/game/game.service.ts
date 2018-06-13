@@ -55,7 +55,9 @@ export class GameService {
         }
         this.battleField = new BattleFieldModel(rowContent);
         // Make battleField an Observable, so whenever the battleField model changes, it will update
+
         this.allAsteroids = this.createAstArray();
+
         //this.Testing();
         console.log("Working!1");
         return Observable.of(this.battleField);
@@ -882,10 +884,9 @@ export class GameService {
             }
         }
 
-
         this.storeRP();
 
-        this.allBattleShips.map(ship => {
+        const dataToSend = this.allBattleShips.map(ship => {
             // Update the phase
             let depart = ship.shipDepartment.departmentArray;
             let oppoDis = [], oppoAng = [];
@@ -893,7 +894,7 @@ export class GameService {
                 oppoDis.push(ship.rp[i].distance);
                 oppoAng.push(ship.rp[i].angle);
             }
-            this.socket.emit('update', {
+            return {
                 shipId: ship.shipId,
                 x: ship.shipPosition.xIndex,
                 y: ship.shipPosition.yIndex,
@@ -909,8 +910,10 @@ export class GameService {
                 opponentDistance: oppoDis,
                 opponentAngle: oppoAng,
                 report: ship.report // Pass in array
-            });
+            };
         });
+
+        this.socket.emit('update', dataToSend);
 
         // reset all action and report
         this.allBattleShips.map(ship => {
@@ -964,8 +967,6 @@ export class GameService {
         return newAsteroid;
     }
 
-
-
     genAstPosition(i: number) : AsteroidPosition {
         const maxX = 25 / (2 * 2);
         // const maxX = 25 / (this.allBattleShips.length * 2);
@@ -1015,7 +1016,6 @@ export class GameService {
             //console.log(this.allAsteroids[i].asteroidMotion);
             // console.log(this.allAsteroids[i].asteroidPosition);
         }
-
     }
 
 

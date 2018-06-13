@@ -1,7 +1,7 @@
 export class AsteroidModel {
     constructor(public asteroidPosition: AsteroidPosition,
                 public asteroidMotion: AsteroidMotion,
-                public damage:number,
+                public damage: number,
                 public collided: boolean) {}
 }
 
@@ -10,5 +10,5 @@ export class AsteroidPosition {
 }
 
 export class AsteroidMotion {
-    constructor(public xMotion:number, public yMotion:number) {}
+    constructor(public xMotion: number, public yMotion: number) {}
 }

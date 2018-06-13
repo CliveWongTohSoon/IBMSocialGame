@@ -12,6 +12,8 @@ import {Router} from "@angular/router";
 export class SigninComponent {
     myForm: FormGroup;
 
+    hrefEndPoint = window.location.origin + '/auth/twitter';
+
     constructor(private authService: AuthService,
                 private router: Router) {}
 
@@ -38,6 +40,7 @@ export class SigninComponent {
     }
 
     ngOnInit() {
+        console.log(window.location.origin);
         this.myForm = new FormGroup({
             email: new FormControl(null, [
                 Validators.required,
