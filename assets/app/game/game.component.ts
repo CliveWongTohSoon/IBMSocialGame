@@ -172,6 +172,7 @@ export class GameComponent implements OnInit {
                 return curr.phase === ShipPhase.Action && prev;
             }, this.allBattleShip);
 
+            console.log('Are all battleship ready?', allBattleShipReady);
 
             if (allBattleShipReady) {
                 // console.log('Entering full turn...');

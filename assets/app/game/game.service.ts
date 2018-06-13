@@ -1,19 +1,6 @@
 import {Injectable} from "@angular/core";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
-import {
-    ShipDepartment,
-    ShipDirection,
-    ShipModel,
-    ShipPosition,
-    ShipStats,
-    CollisionInfo,
-    ShipAction,
-    Action,
-    ShipPhase,
-    ShipHostility,
-    RelativePosition
-} from "./ship-model";
-
+import {ShipDepartment, ShipDirection, ShipModel, ShipPosition, ShipStats, CollisionInfo, ShipAction, Action, ShipPhase, ShipHostility, RelativePosition} from "./ship-model";
 import {Direction} from "./ship-model";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -41,11 +28,12 @@ export class GameService {
      * Test for Raspberry Pi
      * ********************************************/
     test(shipId, instructionArray) {
-        this.socket.emit('instruction_server', {
-            shipId: shipId
-            // instruction0: instructionArray[0],
-            // instruction1: instructionArray[1],
-            // instruction2: instructionArray[2]
+        console.log('Entered test', shipId, instructionArray);
+        this.socket.emit('test', {
+            shipId: shipId,
+            instruction0: instructionArray[0],
+            instruction1: instructionArray[1],
+            instruction2: instructionArray[2]
         });
     }
 
@@ -76,7 +64,6 @@ export class GameService {
     createShipFromSocket(): Observable<ShipModel[]> {
         // this.socket.on('start', data => console.log(data));
         let observable = new Observable<ShipModel[]>(observer => {
-
 
             this.socket.on('start', data => {
                 // console.log('Entered Start');
@@ -153,7 +140,7 @@ export class GameService {
     listenToInstruction(): Observable<InstructionModel> {
         let observable = new Observable<ShipModel[]>(observer => {
             this.socket.on('instruction_client', instructionData => {
-                // console.log('Entered Instruction_Client', instructionData);
+                console.log('Entered Instruction_Client', instructionData);
                 observer.next(instructionData);
             });
             return () => {
@@ -921,9 +908,7 @@ export class GameService {
                 rwAlive: depart[3].alive,
                 opponentDistance: oppoDis,
                 opponentAngle: oppoAng,
-
                 report: ship.report // Pass in array
-
             });
         });
 
@@ -1142,7 +1127,6 @@ export class GameService {
         //     }
         //     return newHostility;
         // }
-
 }
 
 function mod(n, m) {

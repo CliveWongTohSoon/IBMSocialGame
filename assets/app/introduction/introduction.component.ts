@@ -35,7 +35,7 @@ export class IntroductionComponent {
 
         this.createShipFromSocket();
 
-        http.get('http://localhost:3000/getuser').subscribe(result => {
+        http.get('https://ibmsg2018.eu-gb.mybluemix.net//getuser').subscribe(result => {
             const data = result['obj'];
             
             if (!data) this.router.navigate(['/']);
@@ -222,7 +222,7 @@ export class IntroductionComponent {
             'Content-Type': 'application/json'
         });
 
-        this.http.post('http://localhost:3000/start/init', body, {headers: headers})
+        this.http.post('https://ibmsg2018.eu-gb.mybluemix.net/start/init', body, {headers: headers})
             .take(1)
             .toPromise()
             .then(() => this.router.navigate(['/game']));
@@ -234,7 +234,7 @@ export class IntroductionComponent {
             'Content-Type': 'application/json'
         });
 
-        return this.http.post('http://localhost:3000/api/profile/twitter', body, {headers: headers})
+        return this.http.post('https://ibmsg2018.eu-gb.mybluemix.net/api/profile/twitter', body, {headers: headers})
             .take(1)
             .toPromise();
     }
