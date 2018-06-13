@@ -18,10 +18,10 @@
 <!--<p><img src="a.jpg"></p>-->
 <h1>AI Social Game</h1>
 <div class="row">
-    <label for="player" class="col-md-8 col-offset-2">Number of players</label>
-    <input type="number" class="col-md-4 form-control" id="player" #player>
-    <button  type="button" class="btn btn-default " (click)="start(player.value)"> START </button><br>
-    <br>
+    <!--<label for="player" class="col-md-8 col-offset-2">Number of players</label>-->
+    <!--<input type="number" class="col-md-4 form-control" id="player" #player>-->
+    <!--<button  type="button" class="btn btn-default " (click)="start(player.value)"> START </button><br>-->
+    <!--<br>-->
 
     <div align = "center" class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
         <h4> PLAYER {{i+1}}: {{ship.shipId}} </h4>

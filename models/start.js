@@ -7,6 +7,7 @@ const schema = new Schema({
     x: {type: Number, required: true},
     y: {type: Number, required: true},
     dir: {type: Number, required: true},
+    totalHp: {type: Number,required: true},
     reHealth: {type: Number, required: true},
     leHealth: {type: Number, required: true},
     lwHealth: {type: Number, required: true},
@@ -21,7 +22,8 @@ const schema = new Schema({
     defence: {type: Number, required: true},
     opponentDistance: {type: Array, required: true},
     opponentAngle: {type: Array, required: true},
-    report: {type: Array, required: true}
+    report: {type: Array, required: true},
+    colour: {type: String, required: true}
 });
 
 module.exports = mongoose.model('Start', schema);
