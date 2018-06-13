@@ -1,27 +1,17 @@
 
-@font-face {
-    font-family: "Pixel Twist";
-    src: url('PixelTwist.ttf')  format('truetype');
-}
-
-@font-face {
-    font-family: Pixelade;
-    src: url('PIXELADE.ttf')  format('truetype');
-}
 
 h1{
-    font: 5em "Pixel Twist", serif;
-    text-transform: lowercase;
+    font: 3em Helvetica-bold, serif;
 }
 h2{
-    font: 4em "Pixel Twist", serif;
-    text-transform: lowercase;
+    font: 2em Helvetica-bold, serif;
 }
 h3{
-    font: 3em "Pixel Twist", serif;
-    text-transform: lowercase;
+    font: 1.8em Helvetica-bold, serif;
 }
 p{
-    font: 2em "Pixelade", serif;
-
+    font: 1.2em Helvetica, serif;
+}
+#HTP{
+    font: 1.2em Helvetica, serif;
 }

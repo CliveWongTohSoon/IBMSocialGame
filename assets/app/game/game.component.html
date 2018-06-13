@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
 <body align="center">
-<div class="bg"></div>
 <!--<p><img src="a.jpg"></p>-->
-<h1>spaceraze</h1>
+<h1>SPACERAZE</h1>
 <div class="row">
      <br> <br>
 
@@ -38,10 +37,10 @@
     <div *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
         <div><button type="button" class="Player_Select" *ngIf="showButton === ''" (click)="showDiv(i)" [ngStyle]="{ 'background': ship.colorBack}">{{i+1}} </button></div>
     <div id="welcomeDiv" *ngIf="showButton === ship.shipId">
-
-        <div id="Player" [ngStyle]="{ 'background': ship.colorBack}"> PLAYER {{i+1}} <p><br></p>
+        <div id="Player" [ngStyle]="{ 'background': ship.colorBack}"> <p style="font-size:160%;"><br>PLAYER {{i+1}} <br><br></p>
              <div *ngFor="let intent of intentArray" >
             {{intent}}
+                 <p><br></p>
             </div>
         </div>
         <p><br></p>
@@ -56,9 +55,8 @@
         <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="ShieldLeft" (click)="inputShieldLeft(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Shield Left </button>
         <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="ShieldRight"(click)="inputShieldRight(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Shield Right</button><br>
         <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="ShieldBack" (click)="inputShieldDown(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Shield Back </button><br>
-        <button  type="button" class="Buttons " id="Done"(click)="fullTurns(ship)" [ngStyle]="{ 'background': ship.colorFront}"> Done</button>
+        <button  type="button" class="Buttons " id="Done"(click)="fullTurns(ship)" [ngStyle]="{ 'background': ship.colorFront}">DONE</button>
         </div>
     </div>
-
 </div>
 </body>

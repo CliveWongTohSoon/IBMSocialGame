@@ -1,5 +1,5 @@
 <div class="col-md-8 col-md-offset-2">
-    <h1> Introduction </h1>
+    <h1> INTRODUCTION </h1>
     <p>SpaceRaze is a Star Trek inspired game that uses a player's twitter personality to adjust for different experiences.
     The game uses IBM Watson AI personality insight module to analyse the player's personality through their twitter account.
     It returns a score for each personality attribute in the Five Factor Model and the Theory of Basic Human Values. Then the game
@@ -7,26 +7,35 @@
         Each ship within a game represents one player.</p>
     <br>
 
-    <h2> How to play </h2>
-    <p>
-    •	Your aim is to find and destroy the other spaceship, before it happens to you! <br><br>
-    •	The radar system of your ship will detect nearby enemy ships and asteroids by emitting a “ping” noise in the direction which they are coming from, increasing pitch the closer it gets.<br><br>
-    •	Your ship has the ability to do the following things:<br><br>
-    SHOOT<br>
-    MOVE<br>
-    TURN - Left/Right<br>
-    SHIELD - Front/Back/Left/Right<br><br>
-    •	You have 60 seconds to give a maximum of 3 commands to your crew. Along with the original commands, the ship can also accept some variations of these commands:<br><br>
-    “FIRE” or “BLAST” for “SHOOT”<br>
-    “ROTATE” or “SPIN” for “TURN”<br>
-    “DEFEND”, “ACTIVATE FORCE FIELD”, “ARMOUR UP”, or “COVER” for “SHIELD”<br>
-    “FORWARD” or “STRAIGHT AHEAD” for "MOVE"<br>
-    There are several others- feel free to try them!<br><br>
+    <h2> HOW TO PLAY </h2>
+<div id="HTP">
+    <ul>
+    <li>Your aim is to find and destroy the other spaceship, before it happens to you!</li><br>
+    <li>The radar system of your ship will detect nearby enemy ships and asteroids by emitting a “ping” noise in the direction which they are coming from, increasing pitch the closer it gets.</li><br>
+    <li>Your ship has the ability to do the following things:</li><br>
 
-    •	At the end of the 60 seconds, the commands of both players will be executed.<br>
-    </p>
-    <h2> Select a ship </h2>
-    <h3> Available Ship </h3>
+        <ul>
+        <li>SHOOT</li>
+        <li>MOVE</li>
+        <li>TURN - Left/Right</li>
+        <li>SHIELD - Front/Back/Left/Right</li><br>
+        </ul>
+
+    <li>You have 60 seconds to give a maximum of 3 commands to your crew. Along with the original commands, the ship can also accept some variations of these commands:</li><br>
+
+        <ul>
+            <li>“FIRE” or “BLAST” for “SHOOT”</li>
+            <li>“ROTATE” or “SPIN” for “TURN”</li>
+            <li>“DEFEND”, “ACTIVATE FORCE FIELD”, “ARMOUR UP”, or “COVER” for “SHIELD”</li>
+            <li> “FORWARD” or “STRAIGHT AHEAD” for "MOVE"</li><br>
+    There are several others- feel free to try them!<br><br>
+        </ul>
+
+        <li>At the end of the 60 seconds, the commands of both players will be executed.</li><br>
+    </ul>
+</div>
+    <h2> SELECT A SHIP </h2>
+    <h3> AVALIABLE SHIP </h3>
     <div *ngIf="shipModel == null" style="color: red">No ship available yet, please come back later!</div>
     <div *ngFor="let ship of shipModel; let i = index" [attr.data-index]="i">
         <!-- Can put an image -->
