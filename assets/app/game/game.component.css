@@ -41,7 +41,7 @@
 
 @font-face {
     font-family: "Pixel Twist";
-
+    src: url('PixelTwist.ttf')  format('truetype');
 }
 
 h1{
@@ -132,7 +132,7 @@ h3{
     font:          normal 700 30px/1 "Pixel Twist", sans-serif;
     text-align:    center;
     text-shadow:   1px 1px #000000;
-    text-transform: ;*/
+    text-transform: lowercase;
 }
 .Player_Select{
 
