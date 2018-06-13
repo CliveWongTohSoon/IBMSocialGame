@@ -20,23 +20,43 @@
     /*position:absolute;*/
     /*left: 0px;*/
     /*top: 20px;*/
+    margin-top:30px ;
     table-layout: fixed;
     width: 650px;
     height: 650px;
     border-collapse: collapse;
+
 }
 
 #drawing-table td {
     border: 1.5px solid #b3b3b3;
 }
+@font-face {
+    font-family: "Pixel Twist";
 
+}
+
+html{
+    background-color: whitesmoke;
+
+}
+h1{
+    font-size: 120px;
+    /*color: ;*/
+
+}
 body {
-    font: 1em Arial, serif;
+
+    font: 1em "Pixel Twist", serif;
     text-align: center;
+    /*background: url("https://wallpaper4rest.com/nature/wallpaper/space-stars-galaxy-hd-background-images_1-1-800x600.jpg");*/
+
 }
 
 h4{
-    font: 1.5em Arial, serif;
+    font-size: 90px;
+    font: 1.5em "Pixel Twist", serif;
+    text-transform: lowercase;
 }
 .demonstrateHealth{
     font: 1.2em Arial, serif;
@@ -50,9 +70,9 @@ h4{
     height: 100%;
 
     /* Center and scale the image nicely */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+    /*background-position: center;*/
+    /*background-repeat: no-repeat;*/
+    /*background-size: cover;*/
 }
 
 
