@@ -1,41 +1,73 @@
 <div class="col-md-8 col-md-offset-2">
     <h1> Introduction </h1>
-    Some Rules...
+    <p>SpaceRaze is a Star Trek inspired game that uses a player's twitter personality to adjust for different experiences.
+    The game uses IBM Watson AI personality insight module to analyse the player's personality through their twitter account.
+    It returns a score for each personality attribute in the Five Factor Model and the Theory of Basic Human Values. Then the game
+    uses an algorithm to convert these scores into 5 different ship parameters.
+        Each ship within a game represents one player.</p>
     <hr>
-    <h2> Select a ship </h2>
-    <h3> Available Ship </h3>
-    <div *ngIf="shipModel == null" style="color: red">No ship available yet, please come back later!</div>
-    <div *ngFor="let ship of shipModel; let i = index" [attr.data-index]="i">
-        <!-- Can put an image -->
-        <h4> ShipId: {{ship.shipId}}</h4>
-        <div *ngIf="myShipStats == null" style="color: darkred"> Analysing your personality...</div>
-        <div *ngIf="myShipStats != null">
-            <label>Your Personality gives the ship: </label>
-            <table>
-                <tr>
-                    <td>Department's total health </td>
-                    <td>: {{myShipStats.totalHp}}</td>
-                </tr>
-                <tr>
-                    <td>Attack </td>
-                    <td>: {{myShipStats.attack}}</td>
-                </tr>
-                <tr>
-                    <td>Attack Range </td>
-                    <td>: {{myShipStats.attackRange}}</td>
-                </tr>
-                <tr>
-                    <td>Defence </td>
-                    <td>: {{myShipStats.defence}}</td>
-                </tr>
-                <tr>
-                    <td>Sonar Range </td>
-                    <td>: {{myShipStats.range}}</td>
-                </tr>
-            </table>
 
-            <button class="btn btn-primary" (click)="startGame(ship, i)">Start Game</button>
-        </div>
-    </div>
+    <h1> How to play </h1>
+    <ul>
+        <li>Your aim is to find and destroy the other spaceship, before it happens to you! </li>
+        <li>The radar system of your ship will detect nearby enemy ships and asteroids by emitting a “ping” noise in the direction which they are coming from, increasing pitch the closer it gets.</li>
+        <li>Your ship has the ability to do the following things:
+            <ol>
+                <li>SHOOT</li>
+                <li>MOVE</li>
+                <li>TURN - Left/Right </li>
+                <li>SHIELD - Front/Back/Left/Right</li>
+            </ol>
+        </li>
+        <li> You have 60 seconds to give a maximum of 3 commands to your crew. Along with the original commands, the ship can also accept some variations of these commands:
+            <ol>
+                <li>“FIRE” or “BLAST” for “SHOOT”</li>
+                <li>“ROTATE” or “SPIN” for “TURN”</li>
+                <li>“DEFEND”, “ACTIVATE FORCE FIELD”, “ARMOUR UP”, or “COVER” for “SHIELD”</li>
+                <li>“FORWARD” or “STRAIGHT AHEAD” for "MOVE"</li>
+            </ol>
+            There are several others- feel free to try them!
+        </li>
+        <li>At the end of the 60 seconds, the commands of both players will be executed.</li>
+    </ul>
 
+    <hr>
+    <h1> Select a ship </h1>
+    <h3> Available Ship: </h3>
+    <div class="container" *ngIf="shipModel == null" style="color: red">No ship available yet, please come back later!</div>
+    <ol>
+        <li *ngFor="let ship of shipModel; let i = index" [attr.data-index]="i">
+            <!-- Can put an image -->
+            <h4> ShipId: {{ship.shipId}}</h4>
+            <div *ngIf="myShipStats == null" style="color: darkred"> Analysing your personality...</div>
+            <div *ngIf="myShipStats != null">
+                <label>Your Personality gives the ship: </label>
+                <table>
+                    <tr>
+                        <td>Department's total health </td>
+                        <td>: {{myShipStats.totalHp}}</td>
+                    </tr>
+                    <tr>
+                        <td>Attack </td>
+                        <td>: {{myShipStats.attack}}</td>
+                    </tr>
+                    <tr>
+                        <td>Attack Range </td>
+                        <td>: {{myShipStats.attackRange}}</td>
+                    </tr>
+                    <tr>
+                        <td>Defence </td>
+                        <td>: {{myShipStats.defence}}</td>
+                    </tr>
+                    <tr>
+                        <td>Sonar Range </td>
+                        <td>: {{myShipStats.range}}</td>
+                    </tr>
+                </table>
+
+                <br>
+                <button class="btn btn-primary" (click)="startGame(ship, i)">Start Game</button>
+            </div>
+        </li>
+    </ol>
 </div>

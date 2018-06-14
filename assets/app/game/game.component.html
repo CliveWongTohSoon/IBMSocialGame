@@ -1,29 +1,11 @@
 <!DOCTYPE html>
-<!--<head>-->
-    <!--<h1 align="center">AI SOCIAL GAME</h1>-->
-    <!--<title>AI SOCIAL GAME</title>-->
-    <!--<link rel="stylesheet" type = "text/css" href= "grid.css" />-->
-    <!--&lt;!&ndash; Latest compiled and minified CSS &ndash;&gt;-->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
 
-    <!--&lt;!&ndash; Optional theme &ndash;&gt;-->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">-->
-
-
-    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>-->
-    <!--<script src='Test.js'>  </script>-->
-<!--</head>-->
 <body align="center">
 <div class="bg"></div>
 <!--<p><img src="a.jpg"></p>-->
-<h1>AI Social Game</h1>
+<h1>spaceraze</h1>
 <div class="row">
-
-    <!--<label for="player" class="col-md-8 col-offset-2">Number of players</label>-->
-    <!--<input type="number" class="col-md-4 form-control" id="player" #player>-->
-    <!--<button  type="button" class="btn btn-default " (click)="start(player.value)"> START </button><br>-->
-    <br> <br> <br>
-
+     <br> <br>
 
     <div align="center" class="col-sm-8">
         <table id="drawing-table">
@@ -35,25 +17,10 @@
     </div>
     <br>
 
-    <div align = "center" class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
-        <h4> PLAYER {{i+1}}: {{ship.shipId}} </h4>
-        <p class="demonstrateHealth"><small>Attack: {{ship.shipStats.attack}} <br> Attack Range: {{ship.shipStats.attackRange}} <br> Sonar Range: {{ship.shipStats.range}} <br> Defence: {{ship.shipStats.defence}}</small></p>
-        <!--<p class="demonstrateHealth"><small>Left Weapon: {{ship.shipDepartment.departmentArray[2].health}} {{ship.shipDepartment.departmentArray[2].alive}}<br>Right Weapon: {{ship.shipDepartment.departmentArray[3].health}} {{ship.shipDepartment.departmentArray[3].alive}}</small></p>-->
-        <!--<p class="demonstrateHealth"><small>Left Engine: {{ship.shipDepartment.departmentArray[1].health}} {{ship.shipDepartment.departmentArray[1].alive}}<br>&nbsp;Right Engine: {{ship.shipDepartment.departmentArray[0].health}} {{ship.shipDepartment.departmentArray[0].alive}}</small></p>-->
+    <div align = "center" id="Health" class="btn-group-vertical col-sm-3" role="group" aria-label="..." *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
+        <h3> PLAYER {{i+1}} </h3>
 
-        <div class="btn-group-vertical">
-            <button  type="button" class="btn btn-default  "  id="move1" (click)="inputMove(ship)"> Move </button>
-            <button  type="button" class="btn btn-default " id="left1" (click)="inputRotateLeft(ship)"> Turn Left </button>
-            <button  type="button" class="btn btn-default " id="right1" (click)="inputRotateRight(ship)"> Turn Right </button>
-            <button  type="button" class="btn btn-default "  id="shoot" (click)="inputShoot(ship)"> Shoot </button>
-            <button  type="button" class="btn btn-default "  id="rp" (click)="relativePosition(ship)"> RP </button>
-            <button  type="button" class="btn btn-default " id="ShieldFront" (click)="inputShieldUp(ship)" >Shield Front </button>
-            <button  type="button" class="btn btn-default " id="ShieldBack" (click)="inputShieldDown(ship)"> Shield Back </button>
-            <button  type="button" class="btn btn-default " id="ShieldLeft" (click)="inputShieldLeft(ship)"> Shield Left </button>
-            <button  type="button" class="btn btn-default " id="ShieldRight"(click)="inputShieldRight(ship)"> Shield Right</button>
-            <button  type="button" class="btn btn-success " id="Done"(click)="fullTurns(ship)"> Done</button>
-        </div>
-
+        <p class="demonstrateHealth">Attack: {{ship.shipStats.attack}} <br> Attack Range: {{ship.shipStats.attackRange}} <br> Sonar Range: {{ship.shipStats.range}} <br> Defence: {{ship.shipStats.defence}}</p>
         <table id="health-table">
             <tr [ngStyle]="{backgroundColor: ship.colorFront}">
                 <td>{{ship.shipDepartment.departmentArray[2].health}} </td>
@@ -66,7 +33,32 @@
         </table>
         <br>
     </div>
+    <br><br><br>
 
+    <div *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
+        <div><button type="button" class="Player_Select" *ngIf="showButton === ''" (click)="showDiv(i)" [ngStyle]="{ 'background': ship.colorBack}">{{i+1}} </button></div>
+    <div id="welcomeDiv" *ngIf="showButton === ship.shipId">
+
+        <div id="Player" [ngStyle]="{ 'background': ship.colorBack}"> PLAYER {{i+1}} <p><br></p>
+             <div *ngFor="let intent of intentArray" >
+            {{intent}}
+            </div>
+        </div>
+        <p><br></p>
+
+        <button  type="button" class="Buttons "  [disabled]="intentArray.length>=3" id="shoot" (click)="inputShoot(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Shoot </button><br>
+        <button  type="button" class="Buttons "  [disabled]="intentArray.length>=3" id="move1" (click)="inputMove(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Move </button><br>
+        <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="left1" (click)="inputRotateLeft(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Turn Left </button>
+        <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="right1" (click)="inputRotateRight(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Turn Right </button>
+        <!--<button  type="button" class="Buttons "  id="rp" (click)="relativePosition(ship)" [ngStyle]="{ 'background': ship.colorBack }"> RP </button>-->
+        <br>
+        <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="ShieldFront" (click)="inputShieldUp(ship)" [ngStyle]="{ 'background': ship.colorBack }">Shield Front </button><br>
+        <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="ShieldLeft" (click)="inputShieldLeft(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Shield Left </button>
+        <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="ShieldRight"(click)="inputShieldRight(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Shield Right</button><br>
+        <button  type="button" class="Buttons " [disabled]="intentArray.length>=3" id="ShieldBack" (click)="inputShieldDown(ship)" [ngStyle]="{ 'background': ship.colorBack }"> Shield Back </button><br>
+        <button  type="button" class="Buttons " id="Done"(click)="fullTurns(ship)" [ngStyle]="{ 'background': ship.colorFront}"> Done</button>
+        </div>
+    </div>
 
 </div>
 </body>

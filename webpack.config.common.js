@@ -1,4 +1,4 @@
-var webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
     entry: {
@@ -10,6 +10,17 @@ module.exports = {
     },
 
     module: {
+        loaders: [
+            {
+                test: /\.(png|jpg|ttf|eot)$/,
+                exclude: /node_modules/,
+                include: path.join(__dirname, 'src'),
+                loader: 'file-loader',
+                options: {
+                    name: '[name].[ext]'
+                }
+            }
+        ],
         rules: [
             {
                 test: /\.html$/,
@@ -21,6 +32,5 @@ module.exports = {
             }
         ],
         exprContextCritical: false
-
     }
 };

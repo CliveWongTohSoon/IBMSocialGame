@@ -29,6 +29,7 @@
     "dotenv": "^5.0.1",
     "express": "~4.14.0",
     "express-session": "^1.15.6",
+    "file-loader": "^1.1.11",
     "hbs": "~3.1.0",
     "jsonwebtoken": "^8.2.1",
     "mic": "^2.1.2",
@@ -48,6 +49,7 @@
     "serve-favicon": "~2.3.0",
     "socket.io": "^2.1.1",
     "twitter": "^1.7.1",
+    "url-loader": "^1.0.1",
     "watson-developer-cloud": "^3.4.2",
     "zone.js": "^0.8.5"
   },
