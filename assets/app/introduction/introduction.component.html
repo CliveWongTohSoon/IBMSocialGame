@@ -1,5 +1,5 @@
 <div class="col-md-8 col-md-offset-2">
-    <h1> Introduction </h1>
+    <h1> INTRODUCTION </h1>
     <p>SpaceRaze is a Star Trek inspired game that uses a player's twitter personality to adjust for different experiences.
     The game uses IBM Watson AI personality insight module to analyse the player's personality through their twitter account.
     It returns a score for each personality attribute in the Five Factor Model and the Theory of Basic Human Values. Then the game
@@ -7,34 +7,40 @@
         Each ship within a game represents one player.</p>
     <hr>
 
-    <h1> How to play </h1>
-    <ul>
-        <li>Your aim is to find and destroy the other spaceship, before it happens to you! </li>
-        <li>The radar system of your ship will detect nearby enemy ships and asteroids by emitting a “ping” noise in the direction which they are coming from, increasing pitch the closer it gets.</li>
-        <li>Your ship has the ability to do the following things:
-            <ol>
-                <li>SHOOT</li>
-                <li>MOVE</li>
-                <li>TURN - Left/Right </li>
-                <li>SHIELD - Front/Back/Left/Right</li>
-            </ol>
-        </li>
-        <li> You have 60 seconds to give a maximum of 3 commands to your crew. Along with the original commands, the ship can also accept some variations of these commands:
-            <ol>
+    <h2> HOW TO PLAY </h2>
+    <div id="HTP">
+        <ul>
+        <li>Your aim is to find and destroy the other spaceship, before it happens to you!</li><br>
+        <li>The radar system of your ship will detect nearby enemy ships and asteroids by emitting a “ping” noise in the direction which they are coming from, increasing pitch the closer it gets.</li><br>
+        <li>Your ship has the ability to do the following things:</li><br>
+
+            <ul>
+            <li>SHOOT</li>
+            <li>MOVE</li>
+            <li>TURN - Left/Right</li>
+            <li>SHIELD - Front/Back/Left/Right</li><br>
+            </ul>
+
+        <li>You have 60 seconds to give a maximum of 3 commands to your crew. Along with the original commands, the ship can also accept some variations of these commands:</li><br>
+
+            <ul>
                 <li>“FIRE” or “BLAST” for “SHOOT”</li>
                 <li>“ROTATE” or “SPIN” for “TURN”</li>
                 <li>“DEFEND”, “ACTIVATE FORCE FIELD”, “ARMOUR UP”, or “COVER” for “SHIELD”</li>
-                <li>“FORWARD” or “STRAIGHT AHEAD” for "MOVE"</li>
-            </ol>
-            There are several others- feel free to try them!
-        </li>
-        <li>At the end of the 60 seconds, the commands of both players will be executed.</li>
-    </ul>
+                <li> “FORWARD” or “STRAIGHT AHEAD” for "MOVE"</li><br>
+        There are several others- feel free to try them!<br><br>
+            </ul>
+
+            <li>At the end of the 60 seconds, the commands of both players will be executed.</li><br>
+        </ul>
+    </div>
 
     <hr>
-    <h1> Select a ship </h1>
-    <h3> Available Ship: </h3>
-    <div class="container" *ngIf="shipModel == null" style="color: red">No ship available yet, please come back later!</div>
+
+    <h2> SELECT A SHIP </h2>
+    <h3> AVALIABLE SHIP: </h3>
+
+    <div *ngIf="shipModel == null" style="color: red">No ship available yet, please come back later!</div>
     <ol>
         <li *ngFor="let ship of shipModel; let i = index" [attr.data-index]="i">
             <!-- Can put an image -->
@@ -64,10 +70,9 @@
                         <td>: {{myShipStats.range}}</td>
                     </tr>
                 </table>
-
-                <br>
-                <button class="btn btn-primary" (click)="startGame(ship, i)">Start Game</button>
             </div>
         </li>
     </ol>
+    <br>
+    <button class="btn btn-primary" (click)="startGame(ship, i)">Start Game</button>
 </div>
