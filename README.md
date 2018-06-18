@@ -9,3 +9,4 @@ on your local device.
 To run this on localhost, on your terminal/command prompt, execute
 * npm start to start the app.js server
 * npm run build to build the angular front end
+
