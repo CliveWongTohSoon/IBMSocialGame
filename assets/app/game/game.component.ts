@@ -38,43 +38,6 @@ export class GameComponent implements OnInit {
         return col.color ? col.color : 'white';
     }
 
-    start(numberOfPlayers: string) {
-        // randomDir();
-
-       //  console.log(numberOfPlayers);
-       //
-       //  console.log("Working");
-       //
-       //  if (Number(numberOfPlayers) <= 2) {
-       //      this.gameService.init(25)
-       //          .subscribe(battleField => {
-       //              this.battleField = battleField;
-       //              this.gameService.createShip(Number(numberOfPlayers))
-       //                  .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
-       //          });
-       //  }
-       //
-       //  else if (Number(numberOfPlayers) == 3) {
-       //      this.gameService.init(30)
-       //          .subscribe(battleField => {
-       //              this.battleField = battleField;
-       //              this.gameService.createShip(Number(numberOfPlayers))
-       //                  .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
-       //          });
-       //  }
-       //
-       // else if (Number(numberOfPlayers) >= 4) {
-       //      this.gameService.init(36)
-       //          .subscribe(battleField => {
-       //              this.battleField = battleField;
-       //              this.gameService.createShip(Number(numberOfPlayers))
-       //                  .subscribe(allBattleShip => this.allBattleShip = allBattleShip);
-       //          });
-       //  }
-       //
-       //  this.fullTurns();
-    }
-
     relativePosition(ship:ShipModel){
         this.gameService.relativePosition(ship,this.battleField.rowGrid.length);
     }
@@ -120,7 +83,7 @@ export class GameComponent implements OnInit {
     }
 
     /*************************************************
-     * Mock raspberry pi
+     * Mimic raspberry pi voice command
      * ***********************************************/
     getInstruction(intent, entity) {
         if (intent === 'goforward') return 'MoveFront';
@@ -135,7 +98,7 @@ export class GameComponent implements OnInit {
     }
 
 
-    fullTurns(ship: ShipModel){
+    fullTurns(ship: ShipModel) {
         // Test
         this.gameService.test(ship.shipId, this.intentArray);
         this.intentArray = [];
@@ -185,34 +148,11 @@ export class GameComponent implements OnInit {
         });
 
         this.gameService.createShipFromSocket().subscribe(shipModel => {
-            // console.log('Ship:', shipModel);
-            const numberOfPlayers = shipModel.length;
-            // if (numberOfPlayers <= 2) {
-            //     this.gameService.init(25)
-            //         .subscribe(battleField => {
-            //             this.battleField = battleField;
-            // } else if (numberOfPlayers === 3) {
-            //     this.gameService.init(30)
-            //         .subscribe(battleField => {
-            //             this.battleField = battleField;
-            //         });
-            // } else if (numberOfPlayers >= 4) {
-            //     this.gameService.init(36)
-            //         .subscribe(battleField => {
-            //             this.battleField = battleField;
-            //         });
-            // }
-
             this.allBattleShip = shipModel;
 
         });
     }
-    // showDiv1() {
-    //     this.showButton = 'TestShipB';
-    // }
-    // showDiv2() {
-    //     this.showButton = 'TestShipA';
-    // }
+
     showDiv(i){
         if(i==0){
             this.showButton = 'TestShipB';
@@ -220,9 +160,7 @@ export class GameComponent implements OnInit {
         else{
             this.showButton = 'TestShipA';
         }
-
     }
-
 }
 
 

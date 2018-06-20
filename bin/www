@@ -15,19 +15,19 @@ const Instruction = require('../models/instruction');
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-/**
+/***********************************************************************************************************************
  * Create HTTP server.
- */
+ ***********************************************************************************************************************/
 const server = http.createServer(app);
 const io = socketIO(server);
 
-/**
+/***********************************************************************************************************************
  * Listen on provided port, on all network interfaces.
- */
+ **********************************************************************************************************************/
 
-/**
+/***********************************************************************************************************************
  * Socket events
- */
+ ***********************************************************************************************************************/
 io.on('connection', (socket) => {
     console.log('Socket connected', socket.id);
     socket.emit('hello', {message: 'Can you hear me?'});
@@ -35,15 +35,8 @@ io.on('connection', (socket) => {
     Start.find() // Find all ships initially
         .exec((err, start) => {
             if (err) throw err;
-            // console.log('All ships: ', start);
-
+            // this socket will be listened by MEAN front end
             socket.emit('start', start);
-
-            // Send to ship
-            // Object.keys(start).forEach(key => {
-            //     const eachShip = start[key];
-            //     socket.to(eachShip.shipId).emit('start_client', eachShip);
-            // });
         });
 
     Instruction.find()
@@ -114,19 +107,14 @@ io.on('connection', (socket) => {
             ship.lwAlive = true;
             ship.rwAlive = true;
             ship.phase = 'start';
-            ship.save(err, _ => {
-
-            });
+            ship.save();
        });
     });
 
     socket.on('update', allBattleShipData => {
-        // console.log(newBattleShipArray);
         Object.keys(allBattleShipData).forEach(key => {
             const battleShipData = allBattleShipData[key];
-            // console.log(battleShipData);
             Start.findOne({shipId: battleShipData.shipId}, (err, ship) => {
-                // console.log('Before: ', ship);
                 ship.x = battleShipData.x;
                 ship.y = battleShipData.y;
                 ship.dir = battleShipData.dir;
@@ -142,8 +130,6 @@ io.on('connection', (socket) => {
                 ship.opponentAngle = battleShipData.opponentAngle;
                 ship.report = battleShipData.report;
                 ship.phase = 'report';
-                // console.log('After: ', ship);
-                // console.log(ship);
 
                 ship.save(err => {
                     if (!err) {
@@ -165,8 +151,6 @@ io.on('connection', (socket) => {
                     }
                 });
             });
-
-
         });
     });
 
@@ -181,9 +165,9 @@ server.on('listening', onListening);
 
 
 
-/**
+/****************************************************************************************************************
  * Normalize a port into a number, string, or false.
- */
+ ***************************************************************************************************************/
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
@@ -201,9 +185,9 @@ function normalizePort(val) {
   return false;
 }
 
-/**
+/****************************************************************************************************************
  * Event listener for HTTP server "error" event.
- */
+ ***************************************************************************************************************/
 
 function onError(error) {
   if (error.syscall !== 'listen') {
@@ -229,9 +213,9 @@ function onError(error) {
   }
 }
 
-/**
+/****************************************************************************************************************
  * Event listener for HTTP server "listening" event.
- */
+ ***************************************************************************************************************/
 
 function onListening() {
   var addr = server.address();

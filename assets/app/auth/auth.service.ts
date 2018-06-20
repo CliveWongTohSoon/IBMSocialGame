@@ -1,8 +1,7 @@
-import {UserModel} from "./user.model";
 import {Injectable} from "@angular/core";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import "rxjs/add/operator/map";
-import {Observable} from "rxjs/Observable";
+
 
 @Injectable()
 export class AuthService {
@@ -12,29 +11,5 @@ export class AuthService {
 
     loginToTwitter() {
         return this.http.get('http://localhost:3000/auth/twitter');
-    }
-
-    signup(user: UserModel) {
-        const body = JSON.stringify(user);
-        const headers = new HttpHeaders({'Content-Type': 'application/json'});
-        return this.http.post('http://localhost:3000/user', body, {headers: headers})
-            .map((response: Response) => response)
-            .catch((error: Response) => Observable.throw(error));
-    }
-
-    signin(user: UserModel) {
-        const body = JSON.stringify(user);
-        const headers = new HttpHeaders({'Content-Type': 'application/json'});
-        return this.http.post('http://localhost:3000/user/signin', body, {headers: headers})
-            .map((response: Response) => response)
-            .catch((error: Response) => Observable.throw(error));
-    }
-
-    logout() {
-        localStorage.clear();
-    }
-
-    isLoggedIn() {
-        return localStorage.getItem('token') !== null;
     }
 }

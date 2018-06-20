@@ -35,11 +35,13 @@
     <br><br><br>
 
     <div *ngFor="let ship of allBattleShip; let i = index" [attr.data-index]="i">
-        <div><button type="button" class="Player_Select" *ngIf="showButton === ''" (click)="showDiv(i)" [ngStyle]="{ 'background': ship.colorBack}">{{i+1}} </button></div>
-    <div id="welcomeDiv" *ngIf="showButton === ship.shipId">
-        <div id="Player" [ngStyle]="{ 'background': ship.colorBack}"> <p style="font-size:160%;"><br>PLAYER {{i+1}} <br><br></p>
-             <div *ngFor="let intent of intentArray" >
-            {{intent}}
+        <div>
+            <button type="button" class="Player_Select" *ngIf="showButton === ''" (click)="showDiv(i)" [ngStyle]="{ 'background': ship.colorBack}">{{i+1}} </button>
+        </div>
+        <div id="welcomeDiv" *ngIf="showButton === ship.shipId">
+            <div id="Player" [ngStyle]="{ 'background': ship.colorBack}"> <p style="font-size:160%;"><br>PLAYER {{i+1}} <br><br></p>
+                <div *ngFor="let intent of intentArray" >
+                    {{intent}}
                  <p><br></p>
             </div>
         </div>

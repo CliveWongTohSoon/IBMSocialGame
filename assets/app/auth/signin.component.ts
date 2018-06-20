@@ -1,6 +1,4 @@
 import {Component} from "@angular/core";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {UserModel} from "./user.model";
 import {AuthService} from "./auth.service";
 import {Router} from "@angular/router";
 
@@ -10,43 +8,14 @@ import {Router} from "@angular/router";
 })
 
 export class SigninComponent {
-    myForm: FormGroup;
 
     hrefEndPoint = window.location.origin + '/auth/twitter';
 
-    constructor(private authService: AuthService,
-                private router: Router) {}
-
-    onSubmit() {
-        const user = new UserModel(
-            null,
-            this.myForm.value.email,
-            this.myForm.value.password
-        );
-        this.authService.signin(user)
-            .subscribe(
-                data => {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userId', data.userId);
-                    this.router.navigateByUrl('/');
-                },
-                error => console.log(error)
-                );
-        this.myForm.reset();
-    }
+    constructor(private authService: AuthService) {}
 
     loginToTwitter() {
         this.authService.loginToTwitter().subscribe();
     }
 
-    ngOnInit() {
-        console.log(window.location.origin);
-        this.myForm = new FormGroup({
-            email: new FormControl(null, [
-                Validators.required,
-                Validators.email
-            ]),
-            password: new FormControl(null, Validators.required)
-        });
-    }
+    ngOnInit() {}
 }

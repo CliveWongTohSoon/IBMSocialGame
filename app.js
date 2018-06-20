@@ -10,10 +10,6 @@ const expressSession = require('express-session');
 require('dotenv').config({ silent: true });
 
 const appRoutes = require('./routes/app');
-const messageRoutes = require('./routes/messages');
-const userRoutes = require('./routes/user');
-const instructionRoutes = require('./routes/instruction');
-const startGameRoutes = require('./routes/start');
 const twitterRoutes = require('./routes/twitRouter');
 
 const app = express();
@@ -25,7 +21,8 @@ app.set('view engine', 'hbs');
 /***********************************************************************************************************************
  * Set up mongoose
  * ********************************************************************************************************************/
-const uri = "mongodb://new-user:IBMSG2018@ibmsocialgame-shard-00-00-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-01-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-02-zpkv9.mongodb.net:27017/test?ssl=true&replicaSet=IBMSocialGame-shard-0&authSource=admin&retryWrites=true";
+const uri = ""; // Insert your MongoDB uri here
+
 mongoose.connect(uri);
 
 /***********************************************************************************************************************
@@ -54,12 +51,6 @@ app.use(expressSession({
 
 // Set up passport for twitter
 require('./config/passport')(app);
-
-app.use('/start', startGameRoutes);
-app.use('/message', messageRoutes);
-app.use('/user', userRoutes);
-app.use('/instruction', instructionRoutes);
-
 app.use('/', appRoutes, twitterRoutes);
 
 // catch 404 and forward to error handler

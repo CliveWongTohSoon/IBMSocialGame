@@ -6,27 +6,20 @@ import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import * as io from 'socket.io-client';
 import {Instruction, InstructionModel} from "./instruction-model";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
 import "rxjs/add/operator/take";
 import {AsteroidModel, AsteroidMotion, AsteroidPosition} from "./asteroid-model";
-import {Ast} from "@angular/animations/browser/src/dsl/animation_ast";
 
 @Injectable()
 export class GameService {
     private socket: SocketIOClient.Socket;
 
-    constructor(private http: HttpClient) {
+    constructor() {
         this.socket = io();
     }
 
-    /***********************************************
-     * Test For IBM Personality Analysis
-     * *********************************************/
-
-
-    /**********************************************
-     * Test for Raspberry Pi
-     * ********************************************/
+    /*******************************************************************************************************************
+     * Test button for Raspberry Pi
+     * ****************************************************************************************************************/
     test(shipId, instructionArray) {
         console.log('Entered test', shipId, instructionArray);
         this.socket.emit('test', {
@@ -388,15 +381,6 @@ export class GameService {
             }
         }
 
-        // function collisionReport(ship:ShipModel){
-        //     let lastElement = ship.report.pop();
-        //     if (lastElement == 6 || lastElement == 7){
-        //         ship.report.push(lastElement,7);
-        //     }
-        //     else {
-        //         ship.report.push(lastElement, 6);
-        //     }
-        // }
         function checkCollisionHit(rammerShip: ShipModel, victimShip: ShipModel, turn: number) {
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
@@ -1031,23 +1015,6 @@ export class GameService {
         }
     }
 
-
-//     checkPosition(oldPosition: AsteroidPosition, i: number): AsteroidPosition{
-//         let valid = true;
-//         let newPosition = oldPosition;
-//         // for (let i = 0; i < 2; i++){
-//         for (let i = 0; i < this.allBattleShips.length; i++){
-//             if (oldPosition == this.allBattleShips[i].shipPosition){
-//                 valid = false;
-//             }
-//         }
-//         if(valid == false){
-//             newPosition = this.genAstPosition(i);
-//             newPosition = this.checkPosition(newPosition, i);
-//         }
-//         return newPosition;
-// }
-
     updateAsteroidHealth(asteroid: AsteroidModel, victimShip: ShipModel, affectedVictimDep: number) {
         let damage: number;
         damage = asteroid.damage;
@@ -1087,46 +1054,6 @@ export class GameService {
             return reducedDamage;
         }
     }
-
-        // getHostility(json, ship: ShipModel) {
-        //     const emotion = json['emotion_tone']; // This is an array
-        //     const language = json['language_tone'];
-        //     const social = json['social_tone'];
-        //     let hostility = new ShipHostility(ship.ShipHostility.hosti);
-        //     //const sampleJson = {hallo: [{personality: 'trait'}, {personality: 'second_trait'}]};
-        //     Object.keys(emotion).map((key) => {
-        //          hostility= this.emotionSort(hostility, (emotion[key]["trait_id"]), emotion[key]["percentile"])
-        //     });
-        //     Object.keys(language).map((key) => {
-        //         hostility = this.languageSort(hostility, (language[key]["trait_id"]), language[key]["percentile"])
-        //     });
-        //     Object.keys(social).map((key) => {
-        //         hostility = this.socialSort(hostility, (social[key]["trait_id"]), social[key]["percentile"])
-        //     });
-        //
-        //     ship.ShipHostility = hostility;
-        // }
-
-        // emotionSort(shipHostility: ShipHostility, traitID: string, percentile: number): ShipHostility {
-        //     let newHostility = shipHostility;
-        //     const hostile_increase = 0.2;
-        //     if (traitID == 'emotion_anger') {
-        //         newHostility.hosti += hostile_increase * percentile;
-        //     }
-        //     if (traitID == 'emotion_disgust') {
-        //         newHostility.hosti += hostile_increase * percentile;
-        //     }
-        //     if (traitID == 'emotion_fear') {
-        //         newHostility.hosti += hostile_increase * percentile;
-        //     }
-        //     if (traitID == 'emotion_joy') {
-        //         newHostility.hosti -= hostile_increase * percentile;
-        //     }
-        //     if (traitID == 'emotion_sadness') {
-        //         newHostility.hosti += hostile_increase * percentile;
-        //     }
-        //     return newHostility;
-        // }
 }
 
 function mod(n, m) {
