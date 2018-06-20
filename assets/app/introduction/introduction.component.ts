@@ -1,10 +1,9 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import * as io from 'socket.io-client';
 import {
     Action,
     CollisionInfo, ShipAction,
-    ShipDepartment,
     ShipDirection,
     ShipModel,
     ShipPhase, ShipPosition,

@@ -1,8 +1,7 @@
 import {Component, OnInit} from "@angular/core";
-import {ShipModel, Action, ShipAction, ShipPhase} from "./ship-model";
+import {ShipModel, ShipPhase} from "./ship-model";
 import {BattleFieldModel, TableContent} from "./battle-field-model";
 import {GameService} from "./game.service";
-import {AsteroidModel} from "./asteroid-model";
 
 @Component({
     selector: 'app-game',
